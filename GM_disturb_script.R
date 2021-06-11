@@ -92,25 +92,25 @@ data.RE = list(y=obs, n=NT, ns=length(geoID),
             a_add=0.1,t_add=0.1,
             rmean=0,rprec=0.00001)
 
-j.pests.RE<-list()
-j.pests.out.RE<-list()
+#j.pests.RE<-list()
+#j.pests.out.RE<-list()
 
 #initial state of model parameters
+init<-list()
 nchain <- 3
-for (i in geoID){
-  samp<- sample(!is.na(obs[i,]),length(obs[i,]),replace=TRUE)
-  for(j in 1:nchain){
-    init<-list(tau_add=1/var(diff(samp)),tau_obs=1/var(samp))
-    }
+for(j in 1:nchain){
+  samp<- sample(!is.na(obs),length(obs),replace=TRUE)
+  init[[j]]<-list(tau_add=1/var(diff(samp)),tau_obs=1/var(samp))
+}
 
-  j.pests.RE[[i]] <- jags.model (file = textConnection(pests.RE),
+j.pests.RE <- jags.model (file = textConnection(pests.RE),
                       data = data.RE,
                       inits = init,
                       n.chains = 3)
-  j.pests.out.RE[[i]] <- coda.samples (model = j.pests.RE[[i]],
+j.pests.out.RE <- coda.samples (model = j.pests.RE,
                             variable.names = c("x","tau_add","tau_obs", "R", "p", "D", "mu0", "pa0"),
                             n.iter = 5000)
-}
+
 #plot(j.pests.out)
 
 out<-list()
