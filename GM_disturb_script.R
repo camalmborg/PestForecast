@@ -48,6 +48,12 @@ model{
   pa0 ~ dgamma(1,1) #precision of disturbed state
 }
 "
+data = list(y=obs, n=NT,
+               x_ic=0, tau_ic=0.1,
+               a_obs=0.1,t_obs=0.1,
+               a_add=0.1,t_add=0.1,
+               rmean=0,rprec=0.00001)
+
 
 #----model with site random effect------
 pests.RE = "
@@ -111,59 +117,71 @@ j.pests.out.RE <- coda.samples (model = j.pests.RE,
                             variable.names = c("x","tau_add","tau_obs", "R", "p", "D", "mu0", "pa0"),
                             n.iter = 5000)
 
-#plot(j.pests.out)
 
-out<-list()
-x.cols<-list()
-d.cols<-list()
-ci.x<-list()
-ci.d<-list()
-for (i in geoID){
-  out[[i]] <- as.matrix(j.pests.out[[i]])
-  x.cols[[i]] <- grep("^x",colnames(out[[i]]))
-  ci.x[[i]] <- apply(out[[i]][,x.cols[[i]]],2,quantile,c(0.025,0.5,0.975))
 
-  d.cols[[i]] <- grep("^D",colnames(out[[i]]))
-  ci.d[[i]] <- apply(out[[i]][,d.cols[[i]]],2,quantile,c(0.025,0.5,0.975))
-}
+###this is the next section to fix
+out <- as.matrix(j.pests.out.RE)
+x.cols <- grep("^x",colnames(out))
+d.cols <- grep("^D",colnames(out))
+ci.x <- apply(out[,x.cols],2,quantile,c(0.025,0.5,0.975))
+ci.d <- apply(out[,d.cols],2,quantile,c(0.25,0.5,0.975))
 
-#i=10
-plot(time,ci.x[[i]][2,],type='n',ylim=range(obs[[i]],na.rm=TRUE),ylab="Forest Condition",main=i)
-ecoforecastR::ciEnvelope(time,ci.x[[i]][1,],ci.x[[i]][3,],col=ecoforecastR::col.alpha("lightBlue",0.75))
-points(time,obs[[i]],pch="+",cex=0.5)
-ecoforecastR::ciEnvelope(time[-1],ci.d[[i]][1,],ci.d[[i]][3,],col=ecoforecastR::col.alpha("hot pink",0.75))
+plot(ci.x[2,],type='n',ylim=range(obs,na.rm=TRUE),ylab="Forest Condition")
+# ecoforecastR::ciEnvelope(time,ci.x[[i]][1,],ci.x[[i]][3,],col=ecoforecastR::col.alpha("lightBlue",0.75))
+# points(time,obs[[i]],pch="+",cex=0.5)
+# ecoforecastR::ciEnvelope(time[-1],ci.d[[i]][1,],ci.d[[i]][3,],col=ecoforecastR::col.alpha("hot pink",0.75))
 
+# out<-list()
+# x.cols<-list()
+# d.cols<-list()
+# ci.x<-list()
+# ci.d<-list()
+# for (i in geoID){
+#   out[[i]] <- as.matrix(j.pests.out[[i]])
+#   x.cols[[i]] <- grep("^x",colnames(out[[i]]))
+#   ci.x[[i]] <- apply(out[[i]][,x.cols[[i]]],2,quantile,c(0.025,0.5,0.975))
+# 
+#   d.cols[[i]] <- grep("^D",colnames(out[[i]]))
+#   ci.d[[i]] <- apply(out[[i]][,d.cols[[i]]],2,quantile,c(0.025,0.5,0.975))
+# }
+# 
+# #i=10
+# plot(time,ci.x[[i]][2,],type='n',ylim=range(obs[[i]],na.rm=TRUE),ylab="Forest Condition",main=i)
+# ecoforecastR::ciEnvelope(time,ci.x[[i]][1,],ci.x[[i]][3,],col=ecoforecastR::col.alpha("lightBlue",0.75))
+# points(time,obs[[i]],pch="+",cex=0.5)
+# ecoforecastR::ciEnvelope(time[-1],ci.d[[i]][1,],ci.d[[i]][3,],col=ecoforecastR::col.alpha("hot pink",0.75))
+# 
 
 #distributions of parameters:
 rs<-matrix(NA,nrow=15000,ncol=50)
 for (i in geoID){
-  rs[,i]<-out[[i]][,"R"]
+  rs[,i]<-out[,"R"]
 }
 hist(rs)
 
 ps<-matrix(NA,nrow=15000,ncol=50)
 for (i in geoID){
-  ps[,i]<-out[[i]][,"p"]
+  ps[,i]<-out[,"p"]
 }
 hist(ps)
 
 mu0s<-matrix(NA,nrow=15000,ncol=50)
 for (i in geoID){
-  mu0s[,i]<-out[[i]][,"mu0"]
+  mu0s[,i]<-out[,"mu0"]
 }
 hist(mu0s)
 
 pa0s<-matrix(NA,nrow=15000,ncol=50)
 for (i in geoID){
-  pa0s[,i]<-out[[i]][,"pa0"]
+  pa0s[,i]<-out[,"pa0"]
 }
 hist(pa0s)
 
 
 #looking at tau values @ example site 48:
-hist(1/sqrt(out[[48]][,'tau_add']))
-hist(1/sqrt(out[[48]][,'tau_obs']))
-plot(out[[48]][,'tau_add'],out[[48]][,'tau_obs'])
+hist(1/sqrt(out[,'tau_add']))
+hist(1/sqrt(out[,'tau_obs']))
+plot(out[,'tau_add'],out[,'tau_obs'])
 
 
 
