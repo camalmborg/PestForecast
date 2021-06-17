@@ -26,15 +26,40 @@ recov.rate<-slope$coefficients["ind"]
 
 
 #calculating slope for each recovery rate (loop):
-recov.rate=matrix(NA,nrow=50,ncol=1)
+recov.rate<-matrix(NA,nrow=50,ncol=1)
+slope<-list()
+mins<-matrix(NA,nrow=50,ncol=1)
 colnum<-matrix(NA,nrow=50,ncol=1)
 for (i in geoID){
-  min<-min(obs[i,],na.rm=T)
-  colnum[i,]<-which(obs[i,]==min)
-  recov<-obs[i,colnum[i,]:130]
-  ind<-1:length(colnum[i,]:130)
-  slope<-lm(recov~ind)
-  recov.rate[i,]<-slope$coefficients["ind"]
+  mins[i,]<-min(obs[i,],na.rm=T)            #grabs min forest condition score for each site
+  colnum[i,]<-which(obs[i,]==mins[i,])      #grabs time step at which min score appears
+  recov<-obs[i,colnum[i,]:(colnum[i,]+10)]  #+10=2 year recovery period
+  ind<-1:length(recov)                      #grabs length of recov rate (now 11)
+  slope[[i]]<-lm(recov~ind)                      #runs the lm to find slope of recov rate, saves output
+  recov.rate[i,]<-slope[[i]]$coefficients["ind"] #stores recovery rate
 }
 
-obs.recov<-cbind(obs,colnum,recov.rate)
+obs.recov<-cbind(obs,colnum,mins,recov.rate)
+
+
+#the 2016-onward version:
+recov.rate<-matrix(NA,nrow=50,ncol=1)
+slope<-list()
+mins<-matrix(NA,nrow=50,ncol=1)
+colnum<-matrix(NA,nrow=50,ncol=1)
+for (i in geoID){
+  mins[i,]<-min(obs[i,105:130],na.rm=T)          #grabs min forest condition score for each site
+  colnum[i,]<-which(obs[i,]==mins[i,])           #grabs time step at which min score appears
+  if((colnum[i,])>120){ 
+    recov<-obs[i,colnum[i,]:130]
+    } else {
+    recov<-obs[i,colnum[i,]:(colnum[i,]+10)]     #+10=2 year recovery period
+    }
+  ind<-1:length(recov)                           #grabs length of recov rate
+  slope[[i]]<-lm(recov~ind)                      #runs the lm to find slope of recov rate, saves output
+  recov.rate[i,]<-slope[[i]]$coefficients["ind"] #stores recovery rate
+}
+
+obs.recov<-cbind(obs,colnum,mins,recov.rate)
+
+
