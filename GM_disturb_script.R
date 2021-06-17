@@ -21,7 +21,7 @@ for (i in geoID){
 }
 
 #----model with disturbance probability added:------
-pests = "
+pests.R = "
 model{
   
   #### Data Model
@@ -48,15 +48,35 @@ model{
   pa0 ~ dgamma(1,1) #precision of disturbed state
 }
 "
-data = list(y=obs, n=NT,
-               x_ic=0, tau_ic=0.1,
-               a_obs=0.1,t_obs=0.1,
-               a_add=0.1,t_add=0.1,
-               rmean=0,rprec=0.00001)
 
+# #data for pests model:
+# data = list(y=obs, n=NT,
+#                x_ic=0, tau_ic=0.1,
+#                a_obs=0.1,t_obs=0.1,
+#                a_add=0.1,t_add=0.1,
+#                rmean=0,rprec=0.00001)
+# 
+# init<-list()
+# #j.pests<-list()
+# #j.pests.out<-list()
+# nchain <- 3
+# for (i in geoID){
+#   for(j in 1:nchain){
+#     samp<- sample(!is.na(obs[[i]]),length(obs[[i]]),replace=TRUE)
+#     init[[j]]<-list(tau_add=1/var(diff(samp)),tau_obs=1/var(samp))
+#   }
+# 
+# j.pests[[i]] <- jags.model (file = textConnection(pests),
+#                           data = data,
+#                           inits = init,
+#                           n.chains = 3)
+# j.pests.out[[i]] <- coda.samples (model = j.pests[[i]],
+#                                 variable.names = c("x","tau_add","tau_obs", "R", "p", "D", "mu0", "pa0"),
+#                                 n.iter = 5000)
+# }
 
-#----model with site random effect------
-pests.RE = "
+#----disturbance prob model with site random effect------
+pests = "
 model{
 
 ###Loop over individual sites
@@ -90,9 +110,8 @@ for (s in 1:ns){
 }
 "
 
-#data and parameters for each site:
-
-data.RE = list(y=obs, n=NT, ns=length(geoID),
+#data and parameters for random effects model:
+data.s = list(y=obs, n=NT, ns=length(geoID),
             x_ic=0, tau_ic=0.1,
             a_obs=0.1,t_obs=0.1,
             a_add=0.1,t_add=0.1,
@@ -109,26 +128,57 @@ for(j in 1:nchain){
   init[[j]]<-list(tau_add=1/var(diff(samp)),tau_obs=1/var(samp))
 }
 
-j.pests.RE <- jags.model (file = textConnection(pests.RE),
-                      data = data.RE,
+j.pests <- jags.model (file = textConnection(pests),
+                      data = data.s,
                       inits = init,
                       n.chains = 3)
-j.pests.out.RE <- coda.samples (model = j.pests.RE,
+j.pests.out <- coda.samples (model = j.pests,
                             variable.names = c("x","tau_add","tau_obs", "R", "p", "D", "mu0", "pa0"),
                             n.iter = 5000)
 
+#getting proper names for each site from looped-over-sites mcmc output:
+##' @param w mcmc object containing matrix outputs
+##' @param pre prefix (variable name) for the matrix variable to be extracted
+##' @param numeric boolean, whether to coerce class to numeric
+parse.MatrixNames <- function(w, pre = "x", numeric = FALSE) {
+  w <- sub(pre, "", w)
+  w <- sub("[", "", w, fixed = TRUE)
+  w <- sub("]", "", w, fixed = TRUE)
+  w <- matrix(unlist(strsplit(w, ",")), nrow = length(w), byrow = TRUE)
+  if (numeric) {
+    class(w) <- "numeric"
+  }
+  colnames(w) <- c("row", "col")
+  return(as.data.frame(w))
+}
+
+###splitting output
+#out = list(params=NULL,predict=NULL)
+#mfit = as.matrix(mc3.out,chains=TRUE)
+pred.cols = union(grep("x[",colnames(mfit),fixed=TRUE),grep("mu[",colnames(mfit),fixed=TRUE))
+chain.col = which(colnames(mfit)=="CHAIN")
+out$predict = mat2mcmc.list(mfit[,c(chain.col,pred.cols)])
+out$params   = mat2mcmc.list(mfit[,-pred.cols])
+#if(dic) out$DIC <- dic.samples(mc3, 2000)
+#return(out)
 
 
 ###this is the next section to fix
-out <- as.matrix(j.pests.out.RE)
+out <- as.matrix(j.pests.out)
+
 x.cols <- grep("^x",colnames(out))
-d.cols <- grep("^D",colnames(out))
 ci.x <- apply(out[,x.cols],2,quantile,c(0.025,0.5,0.975))
+ci.x.names = parse.MatrixNames(colnames(ci.x),numeric=TRUE)
+
+
+d.cols <- grep("^D",colnames(out))
 ci.d <- apply(out[,d.cols],2,quantile,c(0.25,0.5,0.975))
 
-plot(ci.x[2,],type='n',ylim=range(obs,na.rm=TRUE),ylab="Forest Condition")
-# ecoforecastR::ciEnvelope(time,ci.x[[i]][1,],ci.x[[i]][3,],col=ecoforecastR::col.alpha("lightBlue",0.75))
-# points(time,obs[[i]],pch="+",cex=0.5)
+i=48
+sitei = which(ci.x.names$row == i)
+plot(ci.x[2,sitei],type='l',ylim=range(obs,na.rm=TRUE),ylab="Forest Condition", col="red")
+ecoforecastR::ciEnvelope(time,ci.x[1,sitei],ci.x[3,sitei],col=ecoforecastR::col.alpha("lightBlue",0.75))
+points(time,obs[i,],pch="+",cex=0.5)
 # ecoforecastR::ciEnvelope(time[-1],ci.d[[i]][1,],ci.d[[i]][3,],col=ecoforecastR::col.alpha("hot pink",0.75))
 
 # out<-list()
