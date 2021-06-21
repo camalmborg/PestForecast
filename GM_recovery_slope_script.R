@@ -39,8 +39,6 @@ for (i in geoID){
   recov.rate[i,]<-slope[[i]]$coefficients["ind"] #stores recovery rate
 }
 
-obs.recov<-cbind(obs,colnum,mins,recov.rate)
-
 
 #the 2016-onward version:
 recov.rate<-matrix(NA,nrow=50,ncol=1)

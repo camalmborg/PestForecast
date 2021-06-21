@@ -136,7 +136,7 @@ j.pests.out <- coda.samples (model = j.pests,
                             variable.names = c("x","tau_add","tau_obs", "R", "p", "D", "mu0", "pa0"),
                             n.iter = 5000)
 ###-----model output-----
-out.pest <- as.matrix(j.pests.out)
+out.pests <- as.matrix(j.pests.out)
 
 #getting proper names for each site from looped-over-sites mcmc output:
 ##' @param w mcmc object containing matrix outputs
@@ -156,22 +156,30 @@ parse.MatrixNames <- function(w, pre = "x", numeric = FALSE) {
 
 ###splitting output-----still doesn't work
 out = list(params=NULL,predict=NULL)
-mfit = as.matrix(out.pest,chains=TRUE)
+mfit = as.matrix(j.pests.out,chains=TRUE)
 pred.cols = union(grep("x",colnames(mfit),fixed=TRUE),
                   grep("D",colnames(mfit),fixed=TRUE))
 chain.col = which(colnames(mfit)=="CHAIN")
-out$predict = mat2mcmc.list(mfit[,pred.cols])
+out$predict = mat2mcmc.list(mfit[,c(chain.col,pred.cols)])
 out$params   = mat2mcmc.list(mfit[,-pred.cols])
 #if(dic) out$DIC <- dic.samples(mc3, 2000)
 #return(out)
 
-x.cols <- grep("^x",colnames(out.pest))
-ci.x <- apply(out.pest[,x.cols],2,quantile,c(0.025,0.5,0.975))
+#checking convergence
+paramconv <- coda.samples (model = j.pests,
+                            variable.names = c("mu0","p","pa0","tau_add"),
+                            n.iter = 10000)
+plot(paramconv)
+
+#-----visualizations:------
+
+x.cols <- grep("^x",colnames(out.pests))
+ci.x <- apply(out.pests[,x.cols],2,quantile,c(0.025,0.5,0.975))
 ci.x.names = parse.MatrixNames(colnames(ci.x),numeric=TRUE)
 
 
-d.cols <- grep("^D",colnames(out.pest))
-ci.d <- apply(out.pest[,d.cols],2,quantile,c(0.25,0.5,0.975))
+d.cols <- grep("^D",colnames(out.pests))
+ci.d <- apply(out.pests[,d.cols],2,quantile,c(0.25,0.5,0.975))
 
 i=48
 sitei = which(ci.x.names$row == i)
@@ -204,33 +212,33 @@ points(time,obs[i,],pch="+",cex=0.5)
 #distributions of parameters:
 rs<-matrix(NA,nrow=15000,ncol=50)
 for (i in geoID){
-  rs[,i]<-out.pest[,"R"]
+  rs[,i]<-out.pests[,"R"]
 }
 hist(rs)
 
 ps<-matrix(NA,nrow=15000,ncol=50)
 for (i in geoID){
-  ps[,i]<-out.pest[,"p"]
+  ps[,i]<-out.pests[,"p"]
 }
 hist(ps)
 
 mu0s<-matrix(NA,nrow=15000,ncol=50)
 for (i in geoID){
-  mu0s[,i]<-out.pest[,"mu0"]
+  mu0s[,i]<-out.pests[,"mu0"]
 }
 hist(mu0s)
 
 pa0s<-matrix(NA,nrow=15000,ncol=50)
 for (i in geoID){
-  pa0s[,i]<-out.pest[,"pa0"]
+  pa0s[,i]<-out.pests[,"pa0"]
 }
 hist(pa0s)
 
 
 #looking at tau values @ example site 48:
-hist(1/sqrt(out.pest[,'tau_add']))
-hist(1/sqrt(out.pest[,'tau_obs']))
-plot(out.pest[,'tau_add'],out.pest[,'tau_obs'])
+hist(1/sqrt(out.pests[,'tau_add']))
+hist(1/sqrt(out.pests[,'tau_obs']))
+plot(out.pests[,'tau_add'],out.pests[,'tau_obs'])
 
 
 
