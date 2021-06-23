@@ -14,16 +14,14 @@ for (i in geoID){
   obs[i,]<-gm.data[[i]]$score_mean
 }
 
-
 #calculating slope for each recovery rate (one site):
-min<-min(obs[1,],na.rm=T)
-colnum<-which(obs[1,]==min)
-recov<-obs[1,colnum:130]
-ind<-1:length(colnum:130)
-slope<-lm(recov~ind)
-#abline(slope)
-recov.rate<-slope$coefficients["ind"]
-
+# min<-min(obs[1,],na.rm=T)
+# colnum<-which(obs[1,]==min)
+# recov<-obs[1,colnum:130]
+# ind<-1:length(colnum:130)
+# slope<-lm(recov~ind)
+# #abline(slope)
+# recov.rate<-slope$coefficients["ind"]
 
 #calculating slope for each recovery rate (loop):
 recov.rate<-matrix(NA,nrow=50,ncol=1)
@@ -39,6 +37,12 @@ for (i in geoID){
   recov.rate[i,]<-slope[[i]]$coefficients["ind"] #stores recovery rate
 }
 
+# ##saving the if-else chunk:
+# if((colnum[i,])>120){ 
+#   recov<-obs[i,colnum[i,]:130]
+# } else {
+#   recov<-obs[i,colnum[i,]:(colnum[i,]+10)]     #+10=2 year recovery period
+# }
 
 #the 2016-onward version:
 recov.rate<-matrix(NA,nrow=50,ncol=1)
@@ -56,9 +60,25 @@ for (i in geoID){
 
 obs.recov<-cbind(obs,colnum,mins,recov.rate)
 
-# ##saving the if-else chunk:
-# if((colnum[i,])>120){ 
-#   recov<-obs[i,colnum[i,]:130]
-# } else {
-#   recov<-obs[i,colnum[i,]:(colnum[i,]+10)]     #+10=2 year recovery period
-# }
+
+#-----TASSLED CAP GREENNES VERSION--------------------------
+#load TCG mean data:
+tcgmeans<-"2021_06_23_sample_tcg_mean_GM_50_calib_points.csv"
+tcgtable<-read.csv(tcgmeans)
+tcg<-as.matrix(tcgtable[1:50,2:131])
+
+#the TCG 2016-onward version:
+recov.rate<-matrix(NA,nrow=50,ncol=1)
+slope<-list()
+mins<-matrix(NA,nrow=50,ncol=1)
+colnum<-matrix(NA,nrow=50,ncol=1)
+for (i in geoID){
+  mins[i,]<-min(tcg[i,105:130],na.rm=T)          #grabs min forest condition score for each site
+  colnum[i,]<-which(tcg[i,]==mins[i,])           #grabs time step at which min score appears
+  recov <- tcg[i,colnum[i,]:min(colnum[i,]+10,130)]  
+  ind<-1:length(recov)                           #grabs length of recov rate
+  slope[[i]]<-lm(recov~ind)                      #runs the lm to find slope of recov rate, saves output
+  recov.rate[i,]<-slope[[i]]$coefficients["ind"] #stores recovery rate
+}
+
+tcg.recov<-cbind(tcg,colnum,mins,recov.rate)
