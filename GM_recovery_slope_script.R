@@ -71,11 +71,9 @@ tcg<-as.matrix(tcgtable[1:50,2:131])
 recov.rate<-matrix(NA,nrow=50,ncol=1)
 slope<-list()
 mins<-matrix(NA,nrow=50,ncol=1)
-maxs<-matrix(NA,nrow=50,ncol=1)
 colnum<-matrix(NA,nrow=50,ncol=1)
 for (i in geoID){
   mins[i,]<-min(tcg[i,105:130],na.rm=T)          #grabs min forest condition score for each site
-  maxs[i,]<-max(tcg[i,105:130],na.rm=T)          #grabs max forest condition score for each site "magnitude"
   colnum[i,]<-which(tcg[i,]==mins[i,])           #grabs time step at which min score appears
   recov <- tcg[i,colnum[i,]:min(colnum[i,]+10,130)]  
   ind<-1:length(recov)                           #grabs length of recov rate
@@ -83,11 +81,14 @@ for (i in geoID){
   recov.rate[i,]<-slope[[i]]$coefficients["ind"] #stores recovery rate
 }
 
+#find the non-GM disturb condition "steady state"
+steady<-apply(tcg[,1:104],1,mean,na.rm=T)
+
 #magnitudes:
-mags<-maxs-mins
+mags<-steady-mins
 recov.time<-mags/recov.rate
 
-tcg.recov<-cbind(tcg,colnum,mins,maxs,mags,recov.rate,recov.time)
+tcg.recov<-cbind(tcg,colnum,mins,steady,mags,recov.rate,recov.time)
 
 
 
@@ -105,3 +106,5 @@ for (i in geoID){
 #sites with negative recovery rates
 which(recov.rate<0)
 
+hist(steady)
+hist(mags)
