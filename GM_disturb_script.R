@@ -138,6 +138,19 @@ j.pests.out <- coda.samples (model = j.pests,
 ###-----model output-----
 out.pests <- as.matrix(j.pests.out)
 
+
+###------diagnostic----------------
+#Brooks Gelman Rubin test:
+BGR<-gelman.diag(j.pests.out)
+
+#autocorrelation:
+acfplot(j.pests.out)
+
+#effective size:
+EffS<-effectiveSize(j.pests.out)
+cumuplot(j.pests.out,probs=c(0.025,0.25,0.5,0.75,0.975))
+
+
 #getting proper names for each site from looped-over-sites mcmc output:
 ##' @param w mcmc object containing matrix outputs
 ##' @param pre prefix (variable name) for the matrix variable to be extracted
