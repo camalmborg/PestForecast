@@ -8,11 +8,15 @@ for(i in geoID){
   gm.data[[i]]<-read.csv(file)
 }
 
+
 #load condition score means for each site into matrix:
 obs<-matrix(NA,nrow=length(geoID),ncol=130)
 for (i in geoID){
   obs[i,]<-gm.data[[i]]$score_mean
 }
+
+
+#------Forest Condition Score version:---------------
 
 #calculating slope for each recovery rate (one site):
 # min<-min(obs[1,],na.rm=T)
@@ -60,8 +64,26 @@ for (i in geoID){
 
 obs.recov<-cbind(obs,colnum,mins,recov.rate)
 
+#find the non-GM disturb condition "steady state"
+steady<-apply(obs[,90:105],1,mean,na.rm=T)
 
-#-----TASSLED CAP GREENNES VERSION--------------------------
+#magnitudes:
+mags<-steady-mins
+recov.time<-mags/recov.rate
+
+#previous year's greenness:
+endprevyr<-colnum-1
+startprevyr<-endprevyr-5
+prevyr<-matrix(NA,nrow=50,ncol=1)
+for (i in geoID){
+  prevyr[i,]<-(mean(na.omit(tcg[i,startprevyr[i,]:endprevyr[i,]])))
+}
+
+plot(prevyr,mags)
+
+
+
+#-----TASSLED CAP GREENNESS VERSION--------------------------
 #load TCG mean data:
 tcgmeans<-"2021_06_23_sample_tcg_mean_GM_50_calib_points.csv"
 tcgtable<-read.csv(tcgmeans)
@@ -75,24 +97,43 @@ colnum<-matrix(NA,nrow=50,ncol=1)
 for (i in geoID){
   mins[i,]<-min(tcg[i,105:130],na.rm=T)          #grabs min forest condition score for each site
   colnum[i,]<-which(tcg[i,]==mins[i,])           #grabs time step at which min score appears
-  recov <- tcg[i,colnum[i,]:min(colnum[i,]+10,130)]  
+  recov <- tcg[i,colnum[i,]:min(colnum[i,]+15,130)]  
   ind<-1:length(recov)                           #grabs length of recov rate
   slope[[i]]<-lm(recov~ind)                      #runs the lm to find slope of recov rate, saves output
   recov.rate[i,]<-slope[[i]]$coefficients["ind"] #stores recovery rate
 }
 
 #find the non-GM disturb condition "steady state"
-steady<-apply(tcg[,1:104],1,mean,na.rm=T)
+steady<-apply(tcg[,90:105],1,mean,na.rm=T)
 
 #magnitudes:
 mags<-steady-mins
 recov.time<-mags/recov.rate
 
-tcg.recov<-cbind(tcg,colnum,mins,steady,mags,recov.rate,recov.time)
+tcg.recov<-cbind(tcgtable,colnum,mins,steady,mags,recov.rate,recov.time)
+
+#previous year's greenness analysis:
+endprevyr<-colnum-1
+startprevyr<-endprevyr-5
+prevyr<-matrix(NA,nrow=50,ncol=1)
+for (i in geoID){
+  prevyr[i,]<-(mean(na.omit(tcg[i,startprevyr[i,]:endprevyr[i,]])))
+}
+
+plot(prevyr,mags)
+plot(prevyr,mins)
+plot(prevyr,recov.rate)
+plot(prevyr,recov.time)
+
+hist(prevyr)
+hist(steady)
+hist(mags)
+hist(mins)
+hist(recov.rate)
+hist(recov.time)
 
 
-
-#-----visualizations---------
+#-----some visualizations----------------------------------
 plot(time,tcg[1,],type="l",ylim=(c(-0.05,0.4)))
 for (i in geoID){
   lines(time,tcg[i,],col=i)
@@ -102,6 +143,13 @@ plot(time[105:130],tcg[1,105:130],type="l",ylim=c(-0.01,0.4))
 for (i in geoID){
   lines(time[105:130],tcg[i,105:130],col=i)
 }  
+
+#for recov.rate<0
+plot(time,tcg[12,],type="l",ylim=c(-0.01,0.4),col=12)
+lines(time,tcg[46,],col=46)
+
+plot(time[105:130],tcg[12,105:130],type="l",ylim=c(-0.01,0.4),col=12)
+lines(time[105:130],tcg[46,105:130],col=46)
 
 #sites with negative recovery rates
 which(recov.rate<0)
