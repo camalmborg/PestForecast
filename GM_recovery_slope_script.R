@@ -120,6 +120,14 @@ for (i in geoID){
   prevyr[i,]<-(mean(na.omit(tcg[i,startprevyr[i,]:endprevyr[i,]])))
 }
 
+#reduction in greenness from previous year using magnitude:
+defol<-prevyr-mags
+
+#make a nice table of it all:
+recov.view<-cbind(steady,prevyr,mags,defol,mins,recov.rate,recov.time)
+colnames(recov.view)<-c("steady","prevyr","mags","defol","mins","recov.rate","recov.time")
+
+#oh, you know we got the plots:
 plot(prevyr,mags)
 plot(prevyr,mins)
 plot(prevyr,recov.rate)
@@ -129,6 +137,7 @@ hist(prevyr)
 hist(steady)
 hist(mags)
 hist(mins)
+hist(defol)
 hist(recov.rate)
 hist(recov.time)
 
