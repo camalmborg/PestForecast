@@ -95,7 +95,7 @@ slope<-list()
 mins<-matrix(NA,nrow=50,ncol=1)
 colnum<-matrix(NA,nrow=50,ncol=1)
 for (i in geoID){
-  mins[i,]<-min(tcg[i,105:130],na.rm=T)          #grabs min forest condition score for each site
+  mins[i,]<-min(tcg[i,105:120],na.rm=T)          #grabs min forest condition score for each site
   colnum[i,]<-which(tcg[i,]==mins[i,])           #grabs time step at which min score appears
   recov <- tcg[i,colnum[i,]:min(colnum[i,]+15,130)]  
   ind<-1:length(recov)                           #grabs length of recov rate
@@ -124,14 +124,29 @@ for (i in geoID){
 defol<-prevyr-mags
 
 #make a nice table of it all:
-recov.view<-cbind(steady,prevyr,mags,defol,mins,recov.rate,recov.time)
+recov.view.mx<-cbind(steady,prevyr,mags,defol,mins,recov.rate,recov.time)
+recov.view<-as.data.frame(recov.view.mx)
 colnames(recov.view)<-c("steady","prevyr","mags","defol","mins","recov.rate","recov.time")
 
 #oh, you know we got the plots:
 plot(prevyr,mags)
 plot(prevyr,mins)
+plot(prevyr,defol)
 plot(prevyr,recov.rate)
 plot(prevyr,recov.time)
+
+plot(mags,recov.rate)
+plot(mags,recov.time)
+plot(mags,steady)
+
+plot(defol,recov.rate)
+plot(defol,recov.time)
+
+plot(mins,recov.time)
+plot(mins,recov.rate)
+plot(mins,mags)
+plot(mins,steady)
+
 
 hist(prevyr)
 hist(steady)
@@ -142,15 +157,19 @@ hist(recov.rate)
 hist(recov.time)
 
 
+defol.lm<-lm(defol~prevyr,recov.view)
+mags.lm<-lm(mags~prevyr,recov.view)
+
+
 #-----some visualizations----------------------------------
 plot(time,tcg[1,],type="l",ylim=(c(-0.05,0.4)))
 for (i in geoID){
   lines(time,tcg[i,],col=i)
 }
 
-plot(time[105:130],tcg[1,105:130],type="l",ylim=c(-0.01,0.4))
+plot(time[105:120],tcg[1,105:120],type="l",ylim=c(-0.01,0.4))
 for (i in geoID){
-  lines(time[105:130],tcg[i,105:130],col=i)
+  lines(time[105:120],tcg[i,105:120],col=i)
 }  
 
 #for recov.rate<0
@@ -162,6 +181,4 @@ lines(time[105:130],tcg[46,105:130],col=46)
 
 #sites with negative recovery rates
 which(recov.rate<0)
-
-hist(steady)
-hist(mags)
+which(recov.time<0)
