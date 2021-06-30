@@ -105,6 +105,7 @@ for (i in geoID){
 
 #find the non-GM disturb condition "steady state"
 steady<-apply(tcg[,90:105],1,mean,na.rm=T)
+steadyall<-apply(tcg[,1:105],1,mean,na.rm=T)
 
 #magnitudes:
 mags<-steady-mins
