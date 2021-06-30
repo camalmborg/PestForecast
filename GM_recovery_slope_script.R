@@ -18,6 +18,7 @@ for (i in geoID){
 
 #------Forest Condition Score version:---------------
 
+if(FALSE){
 #calculating slope for each recovery rate (one site):
 # min<-min(obs[1,],na.rm=T)
 # colnum<-which(obs[1,]==min)
@@ -80,7 +81,7 @@ for (i in geoID){
 }
 
 plot(prevyr,mags)
-
+}
 
 
 #-----TASSLED CAP GREENNESS VERSION--------------------------
@@ -95,7 +96,7 @@ slope<-list()
 mins<-matrix(NA,nrow=50,ncol=1)
 colnum<-matrix(NA,nrow=50,ncol=1)
 for (i in geoID){
-  mins[i,]<-min(tcg[i,105:120],na.rm=T)          #grabs min forest condition score for each site
+  mins[i,]<-min(tcg[i,110:118],na.rm=T)          #grabs min forest condition score for each site
   colnum[i,]<-which(tcg[i,]==mins[i,])           #grabs time step at which min score appears
   recov <- tcg[i,colnum[i,]:min(colnum[i,]+15,130)]  
   ind<-1:length(recov)                           #grabs length of recov rate
@@ -104,15 +105,18 @@ for (i in geoID){
 }
 
 #find the non-GM disturb condition "steady state"
-steady<-apply(tcg[,90:105],1,mean,na.rm=T)
-steadyall<-apply(tcg[,1:105],1,mean,na.rm=T)
+steady<-apply(tcg[,90:110],1,mean,na.rm=T) 
+steadyall<-apply(tcg[,1:110],1,mean,na.rm=T)
 
 #magnitudes:
 mags<-steady-mins
 recov.time<-mags/recov.rate
 
-tcg.recov<-cbind(tcgtable,colnum,mins,steady,mags,recov.rate,recov.time)
+tcg.recov.mx<-cbind(steadyall,steady,colnum,mins,mags,recov.rate,recov.time)
+tcg.recov<-as.data.frame(tcg.recov.mx)
+colnames(tcg.recov)<-c("steadyall","steady","colnum","mins","mags","recov.rate","recov.time")
 
+if (FALSE){
 #previous year's greenness analysis:
 endprevyr<-colnum-1
 startprevyr<-endprevyr-5
@@ -125,23 +129,22 @@ for (i in geoID){
 defol<-prevyr-mags
 
 #make a nice table of it all:
-recov.view.mx<-cbind(steady,prevyr,mags,defol,mins,recov.rate,recov.time)
+recov.view.mx<-cbind(steadyall,steady,prevyr,mags,defol,mins,recov.rate,recov.time)
 recov.view<-as.data.frame(recov.view.mx)
-colnames(recov.view)<-c("steady","prevyr","mags","defol","mins","recov.rate","recov.time")
+colnames(recov.view)<-c("steadyall","steady","prevyr","mags","defol","mins","recov.rate","recov.time")
+}
+
+
 
 #oh, you know we got the plots:
-plot(prevyr,mags)
-plot(prevyr,mins)
-plot(prevyr,defol)
-plot(prevyr,recov.rate)
-plot(prevyr,recov.time)
+plot(steady,mags)
+plot(steady,mins)
+plot(steady,recov.rate)
+plot(steady,recov.time)
 
 plot(mags,recov.rate)
 plot(mags,recov.time)
 plot(mags,steady)
-
-plot(defol,recov.rate)
-plot(defol,recov.time)
 
 plot(mins,recov.time)
 plot(mins,recov.rate)
@@ -149,18 +152,25 @@ plot(mins,mags)
 plot(mins,steady)
 
 
-hist(prevyr)
 hist(steady)
 hist(mags)
 hist(mins)
-hist(defol)
 hist(recov.rate)
 hist(recov.time)
 
 
-defol.lm<-lm(defol~prevyr,recov.view)
-mags.lm<-lm(mags~prevyr,recov.view)
+defol.lm<-lm(mags~steady,tcg.recov)
+recov.rate.lm<-lm(recov.rate~steady,tcg.recov)
+recov.time.lm<-lm(recov.time~steady,tcg.recov)
 
+plot(steady,mags)
+abline(defol.lm)
+
+plot(steady,recov.rate)
+abline(recov.rate.lm)
+
+plot(steady,recov.time)
+abline(recov.time.lm)
 
 #-----some visualizations----------------------------------
 plot(time,tcg[1,],type="l",ylim=(c(-0.05,0.4)))
@@ -168,9 +178,9 @@ for (i in geoID){
   lines(time,tcg[i,],col=i)
 }
 
-plot(time[105:120],tcg[1,105:120],type="l",ylim=c(-0.01,0.4))
+plot(time[100:125],tcg[1,100:125],type="l",ylim=c(-0.01,0.4))
 for (i in geoID){
-  lines(time[105:120],tcg[i,105:120],col=i)
+  lines(time[100:125],tcg[i,100:125],col=i)
 }  
 
 #for recov.rate<0
