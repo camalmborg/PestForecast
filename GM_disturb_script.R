@@ -134,7 +134,7 @@ j.pests <- jags.model (file = textConnection(pests),
                       n.chains = 3)
 j.pests.out <- coda.samples (model = j.pests,
                             variable.names = c("x","tau_add","tau_obs", "R", "p", "D", "mu0", "pa0"),
-                            n.iter = 5000)
+                            n.iter = 10000)
 ###-----model output-----
 out.pests <- as.matrix(j.pests.out)
 

@@ -114,7 +114,7 @@ recov.time<-mags/recov.rate
 
 tcg.recov.mx<-cbind(steadyall,steady,colnum,mins,mags,recov.rate,recov.time)
 tcg.recov<-as.data.frame(tcg.recov.mx)
-colnames(tcg.recov)<-c("steadyall","steady","colnum","mins","mags","recov.rate","recov.time")
+colnames(tcg.recov)<-c("Steady State (All Years)","Steady State 2012-2015","Column Number","Minimum TCG Value","Disturbance Magnitude","Recovery Rate","Recovery Time")
 
 if (FALSE){
 #previous year's greenness analysis:
@@ -193,3 +193,4 @@ lines(time[105:130],tcg[46,105:130],col=46)
 #sites with negative recovery rates
 which(recov.rate<0)
 which(recov.time<0)
+
