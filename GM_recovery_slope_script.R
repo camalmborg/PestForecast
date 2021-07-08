@@ -28,18 +28,24 @@ if(FALSE){
 # #abline(slope)
 # recov.rate<-slope$coefficients["ind"]
 
+  
+#find the non-GM disturb condition "steady state"
+steady<-apply(obs[,90:105],1,mean,na.rm=T)
+  
+
 #calculating slope for each recovery rate (loop):
 recov.rate<-matrix(NA,nrow=50,ncol=1)
+ind<-list()
 slope<-list()
-mins<-matrix(NA,nrow=50,ncol=1)
-colnum<-matrix(NA,nrow=50,ncol=1)
+mins<-vector()
+colnum<-vector()
 for (i in geoID){
-  mins[i,]<-min(obs[i,],na.rm=T)            #grabs min forest condition score for each site
-  colnum[i,]<-which(obs[i,]==mins[i,])      #grabs time step at which min score appears
-  recov<-obs[i,colnum[i,]:(colnum[i,]+10)]  #+10=2 year recovery period
-  ind<-1:length(recov)                      #grabs length of recov rate (now 11)
-  slope[[i]]<-lm(recov~ind)                      #runs the lm to find slope of recov rate, saves output
-  recov.rate[i,]<-slope[[i]]$coefficients["ind"] #stores recovery rate
+  mins[i]<-min(obs[i],na.rm=T)            #grabs min forest condition score for each site
+  colnum[i]<-which(obs[i]==mins[i])      #grabs time step at which min score appears
+  #recov<-obs[i,colnum[i,]:min(obs[i,colnum[i,]+15],130)  #+10=2 year recovery period
+  #ind<-1:length(recov)                      #grabs length of recov rate (now 11)
+  #slope[[i]]<-lm(recov~ind)                      #runs the lm to find slope of recov rate, saves output
+  #recov.rate[i,]<-slope[[i]]$coefficients["ind"] #stores recovery rate
 }
 
 # ##saving the if-else chunk:
@@ -65,9 +71,6 @@ for (i in geoID){
 
 obs.recov<-cbind(obs,colnum,mins,recov.rate)
 
-#find the non-GM disturb condition "steady state"
-steady<-apply(obs[,90:105],1,mean,na.rm=T)
-
 #magnitudes:
 mags<-steady-mins
 recov.time<-mags/recov.rate
@@ -81,6 +84,7 @@ for (i in geoID){
 }
 
 plot(prevyr,mags)
+
 }
 
 
@@ -90,23 +94,41 @@ tcgmeans<-"2021_06_23_sample_tcg_mean_GM_50_calib_points.csv"
 tcgtable<-read.csv(tcgmeans)
 tcg<-as.matrix(tcgtable[1:50,2:131])
 
+
+#find the non-GM disturb condition "steady state"
+steady<-apply(tcg[,90:110],1,mean,na.rm=T)
+steadyall<-apply(tcg[,1:110],1,mean,na.rm=T)
+
+#monthly steady states
+#maymeans<-apply(tcg[,seq(1,ncol(tcg),by=5)],1,mean,na.rm=T)
+steadymonths<-matrix(NA,nrow=50,ncol=5)
+months<-5
+for (i in 1:months){
+  steadymonths[,i]<-apply(tcg[,seq(i,ncol(tcg),by=5)],1,mean,na.rm=T)
+}
+
+
 #the TCG 2016-onward version:
 recov.rate<-matrix(NA,nrow=50,ncol=1)
 slope<-list()
-mins<-matrix(NA,nrow=50,ncol=1)
-colnum<-matrix(NA,nrow=50,ncol=1)
+ind<-list()
+mins<-vector()
+colnum<-vector()
+recovcol<-vector()
+recov<-vector()
 for (i in geoID){
-  mins[i,]<-min(tcg[i,110:118],na.rm=T)          #grabs min forest condition score for each site
-  colnum[i,]<-which(tcg[i,]==mins[i,])           #grabs time step at which min score appears
-  recov <- tcg[i,colnum[i,]:min(colnum[i,]+15,130)]  
-  ind<-1:length(recov)                           #grabs length of recov rate
-  slope[[i]]<-lm(recov~ind)                      #runs the lm to find slope of recov rate, saves output
-  recov.rate[i,]<-slope[[i]]$coefficients["ind"] #stores recovery rate
+  mins[i]<-min(tcg[i,110:118],na.rm=T)          #grabs min forest condition score for each site
+  colnum[i]<-which(tcg[i,]==mins[i])           #grabs time step at which min score appears in disturbance window
+  recovcol[i]<-colnum[i] + which(tcg[i,colnum[i]:130]>steady[i])[1]
+  #recovcol[i,]<-which(tcg[i,colnum[i,]:130]>steady[i])[1]
+  #recovcol[i,]<-colnum[i,]+which(tcg[i,colnum[i,]:130]>steady[i])[1]
+  recov <- tcg[i,colnum[i]:min(colnum[i]+10,recovcol[i],130)]       
+  ind[[i]]<-1:length(recov)                      #grabs length of recov rate   
+  #slope[[i]]<-lm(recov~ind)                      #runs the lm to find slope of recov rate, saves output
+  #recov.rate[i,]<-slope[[i]]$coefficients["ind"] #stores recovery rate
 }
 
-#find the non-GM disturb condition "steady state"
-steady<-apply(tcg[,90:110],1,mean,na.rm=T) 
-steadyall<-apply(tcg[,1:110],1,mean,na.rm=T)
+
 
 #magnitudes:
 mags<-steady-mins
@@ -115,6 +137,7 @@ recov.time<-mags/recov.rate
 tcg.recov.mx<-cbind(steadyall,steady,colnum,mins,mags,recov.rate,recov.time)
 tcg.recov<-as.data.frame(tcg.recov.mx)
 colnames(tcg.recov)<-c("Steady State (All Years)","Steady State 2012-2015","Column Number","Minimum TCG Value","Disturbance Magnitude","Recovery Rate","Recovery Time")
+
 
 if (FALSE){
 #previous year's greenness analysis:
@@ -133,7 +156,6 @@ recov.view.mx<-cbind(steadyall,steady,prevyr,mags,defol,mins,recov.rate,recov.ti
 recov.view<-as.data.frame(recov.view.mx)
 colnames(recov.view)<-c("steadyall","steady","prevyr","mags","defol","mins","recov.rate","recov.time")
 }
-
 
 
 #oh, you know we got the plots:
@@ -178,7 +200,7 @@ for (i in geoID){
   lines(time,tcg[i,],col=i)
 }
 
-plot(time[100:125],tcg[1,100:125],type="l",ylim=c(-0.01,0.4))
+plot(time[110:122],tcg[1,110:122],type="l",ylim=c(-0.01,0.4))
 for (i in geoID){
   lines(time[100:125],tcg[i,100:125],col=i)
 }  
@@ -194,3 +216,8 @@ lines(time[105:130],tcg[46,105:130],col=46)
 which(recov.rate<0)
 which(recov.time<0)
 
+#plotting steady states for each site
+plot(steadymonths[1,],type="l",ylim=c(0.125,0.32))
+for (i in 1:50){
+  lines(steadymonths[i,],col=i)
+}
