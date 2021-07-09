@@ -109,9 +109,9 @@ magrecovlattice<-xyplot(recov.rate ~ mags, data = tcg.recov,
                        f <- mrsumm$fstatistic
                        p <- pf(f[1],f[2],f[3],lower.tail=F)
                        panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
-                                  x=0.177,y=0.001,cex=0.75)
+                                  x=0.177,y=0.015,cex=0.75)
                        panel.text(labels = bquote(italic(p)==.(format(p,digits=3))),
-                                  x=0.18,y=0,cex=0.75)
+                                  x=0.176,y=0.008,cex=0.75)
                      },
                      ylab="Recovery Rate",
                      xlab="Disturbance Magnitude")
@@ -159,4 +159,44 @@ recovsumm<-summary(recov.rate.lm)
 
 recovplot<-ggplot(data = tcg.recov, aes(x=`Steady State 2012-2015`, y=`Recovery Rate`))+geom_point()
 recovplot+geom_abline(intercept = recovsumm$coefficients[1],slope=recovsumm$coefficients[2])
+
+ggplot(tcg.recov, aes(x=`Steady State 2012-2015`, 
+                      y=`Disturbance Magnitude`,
+                      color=as.factor(`NLCD Type`))) + geom_point(shape=1) +
+  scale_colour_hue(l=50)+  # Use a slightly darker palette than normal
+  geom_smooth(method=lm,   # Add linear regression lines
+              se=FALSE,    # Don't add shaded confidence region
+              fullrange=TRUE) # Extend regression lines
 }
+
+#------Categorical------------------------------------------------
+
+
+
+
+
+
+
+
+magrecovlattice<-xyplot(recov.rate ~ mags | NLCD, data = tcg.recov,
+                        panel = function(x, y) {
+                          panel.xyplot(x, y, pch=16,col="black")
+                          mr.lm<-lm(y~x)
+                          mrsumm<-summary(mr.lm)
+                          r2 <- mrsumm$adj.r.squared
+                          f <- mrsumm$fstatistic
+                          p <- pf(f[1],f[2],f[3],lower.tail=F)
+                          panel.abline(a = mr.lm$coefficients[1], 
+                                       b = mr.lm$coefficients[2])
+                          panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
+                                     x=0.177,y=0.015,cex=0.75)
+                          panel.text(labels = bquote(italic(p)==.(format(p,digits=3))),
+                                     x=0.176,y=0.008,cex=0.75)
+                        },
+                        ylab="Recovery Rate",
+                        xlab="Disturbance Magnitude")
+
+print(magrecovlattice)
+
+
+

@@ -8,13 +8,20 @@ for(i in geoID){
   gm.data[[i]]<-read.csv(file)
 }
 
-
 #load condition score means for each site into matrix:
-obs<-matrix(NA,nrow=length(geoID),ncol=130)
+obsm<-matrix(NA,nrow=length(geoID),ncol=130)
 for (i in geoID){
   obs[i,]<-gm.data[[i]]$score_mean
 }
 
+
+#load annual condition scores:
+data.an<-read.csv("2021_07_09_sample_score_mean_ANNUAL_50sites.csv")
+gm.data.an<-data.an[,2:27]
+
+#load NLCD data:
+nlcd.dat<-read.csv("2021_07_09_sample_nlcd_50sites.csv")
+NLCD<-nlcd.dat[4:5]
 
 #------Forest Condition Score version:---------------
 
@@ -86,7 +93,6 @@ for (i in geoID){
 plot(prevyr,mags)
 
 }
-
 
 #-----TASSLED CAP GREENNESS VERSION--------------------------
 
@@ -170,7 +176,10 @@ recov.time<-mags/recov.rate
 
 tcg.recov.mx<-cbind(steadyall,steady,colnum,mins,mags,recov.rate,recov.time)
 tcg.recov<-as.data.frame(tcg.recov.mx)
-colnames(tcg.recov)<-c("Steady State (All Years)","Steady State 2012-2015","Column Number","Minimum TCG Value","Disturbance Magnitude","Recovery Rate","Recovery Time")
+tcg.recov$NLCD <- factor(NLCD$landcover, levels=c(41,43,42,90,71),
+                              labels=c("Hardwood", "Conifer","Mixed","Woody Wetland","Herbaceous"))
+tcg.recov$percentcover<-NLCD$percent_tree_cover
+#colnames(tcg.recov)<-c("Steady State (All Years)","Steady State 2012-2015","Column Number","Minimum TCG Value","Disturbance Magnitude","Recovery Rate","Recovery Time","NLCD Type","Percent Tree Cover")
 
 
 if (FALSE){
@@ -218,6 +227,8 @@ hist(recov.time)
 defol.lm<-lm(mags~steady,tcg.recov)
 recov.rate.lm<-lm(recov.rate~steady,tcg.recov)
 recov.time.lm<-lm(recov.time~steady,tcg.recov)
+magrecov.lm<-lm(recov.rate ~ mags, data = tcg.recov)
+mins.lm<-lm(mins ~ steady, data = tcg.recov)
 
 plot(steady,mags)
 abline(defol.lm)
