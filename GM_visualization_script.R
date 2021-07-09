@@ -23,16 +23,17 @@ recovlattice<-xyplot(recov.rate ~ steady, data = tcg.recov,
                       f <- rsumm$fstatistic
                       p <- pf(f[1],f[2],f[3],lower.tail=F)
                     panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
-                                  x=0.131,y=0.0055,cex=0.75)
-                    panel.text(labels = bquote(italic(p)==.(format(p,digits=3))),
-                                  x=0.13,y=0.0045,cex=0.75)
+                                  x=0.13,y=0.06,cex=0.75)
+                    panel.text(labels = bquote(italic(p)==.(format(p,digits = 3))),
+                                  x=0.13,y=0.05,cex=0.75)
                              },
                     ylab="Recovery Rate",
-                    xlab="TCG Steady State (2012-2015)")
+                    xlab="TCG Steady State (2012-2015)",
+                    ylim=c(-0.02,0.07))
 
 print(recovlattice)
 #save plot as tiff file:
-tiff("recovlattice_50sites.tiff", units="in", width=7, height=5, res=300)
+tiff("recovlattice_50sites_monthlyNEW.tiff", units="in", width=7, height=5, res=300)
 print(recovlattice)
 dev.off()
 

@@ -89,11 +89,12 @@ plot(prevyr,mags)
 
 
 #-----TASSLED CAP GREENNESS VERSION--------------------------
+
+###THE MONTHLY DATA VERSION:
 #load TCG mean data:
 tcgmeans<-"2021_06_23_sample_tcg_mean_GM_50_calib_points.csv"
 tcgtable<-read.csv(tcgmeans)
 tcg<-as.matrix(tcgtable[1:50,2:131])
-
 
 #find the non-GM disturb condition "steady state"
 steady<-apply(tcg[,90:110],1,mean,na.rm=T)
@@ -107,26 +108,59 @@ for (i in 1:months){
   steadymonths[,i]<-apply(tcg[,seq(i,ncol(tcg),by=5)],1,mean,na.rm=T)
 }
 
-
-#the TCG 2016-onward version:
-recov.rate<-matrix(NA,nrow=50,ncol=1)
+#the TCG 2016-onward MONTHLY version:
+#ind<-list()
+recov.rate<-vector()
 slope<-list()
-ind<-list()
 mins<-vector()
 colnum<-vector()
 recovcol<-vector()
-recov<-vector()
 for (i in geoID){
   mins[i]<-min(tcg[i,110:118],na.rm=T)          #grabs min forest condition score for each site
   colnum[i]<-which(tcg[i,]==mins[i])           #grabs time step at which min score appears in disturbance window
-  recovcol[i]<-colnum[i] + which(tcg[i,colnum[i]:130]>steady[i])[1]
-  #recovcol[i,]<-which(tcg[i,colnum[i,]:130]>steady[i])[1]
-  #recovcol[i,]<-colnum[i,]+which(tcg[i,colnum[i,]:130]>steady[i])[1]
-  recov <- tcg[i,colnum[i]:min(colnum[i]+10,recovcol[i],130)]       
-  ind[[i]]<-1:length(recov)                      #grabs length of recov rate   
-  #slope[[i]]<-lm(recov~ind)                      #runs the lm to find slope of recov rate, saves output
-  #recov.rate[i,]<-slope[[i]]$coefficients["ind"] #stores recovery rate
+  if(is.na(colnum[i] + which(tcg[i,colnum[i]:130]>=steady[i])[1])){
+    recovcol[i]<-colnum[i] + 2
+  } else {
+    recovcol[i]<-colnum[i] + which(tcg[i,colnum[i]:130]>=steady[i])[1]
+  }
+  recov <- tcg[i,colnum[i]:recovcol[i]]      
+  ind<-1:length(recov)                      #grabs length of recov rate   
+  slope[[i]]<-lm(recov~ind)                      #runs the lm to find slope of recov rate, saves output
+  recov.rate[i]<-slope[[i]]$coefficients["ind"] #stores recovery rate
 }
+
+
+
+###ANNUAL DATA VERSION:
+#tcgmeans<-"2021_07_08_tcg_mean_annual_50sites.csv"
+#tcgtable<-read.csv(tcgmeans)
+#tcg<-as.matrix(tcgtable[1:50,2:27])
+
+#steady<-apply(tcg[,19:21],1,mean,na.rm=T)
+#steadyall<-apply(tcg[,1:26],1,mean,na.rm=T)
+
+#the TCG 2016-onward version:
+# recov.rate<-vector()
+# slope<-list()
+# #ind<-list()
+# mins<-vector()
+# colnum<-vector()
+# recovcol<-vector()
+# for (i in geoID){
+#   mins[i]<-min(tcg[i,22:23],na.rm=T)          #grabs min forest condition score for each site
+#   colnum[i]<-which(tcg[i,]==mins[i])           #grabs time step at which min score appears in disturbance window
+#   if(is.na(colnum[i] + which(tcg[i,colnum[i]:26]>=steady[i])[1])){
+#     recovcol[i]<-colnum[i] + 2
+#   } else {
+#     recovcol[i]<-colnum[i] + which(tcg[i,colnum[i]:26]>=steady[i])[1]
+#   }
+#   #recovcol[i,]<-which(tcg[i,colnum[i,]:130]>steady[i])[1]
+#   #recovcol[i,]<-colnum[i,]+which(tcg[i,colnum[i,]:130]>steady[i])[1]
+#   recov <- tcg[i,colnum[i]:recovcol[i]]      
+#   ind<-1:length(recov)                      #grabs length of recov rate   
+#   slope[[i]]<-lm(recov~ind)                      #runs the lm to find slope of recov rate, saves output
+#   recov.rate[i]<-slope[[i]]$coefficients["ind"] #stores recovery rate
+# }
 
 
 
