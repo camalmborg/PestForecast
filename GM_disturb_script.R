@@ -205,7 +205,7 @@ sitei = which(ci.x.names$row == i)
 plot(ci.x[2,sitei],type='l',ylim=range(obs,na.rm=TRUE),ylab="Forest Condition", col="red")
 ecoforecastR::ciEnvelope(time,ci.x[1,sitei],ci.x[3,sitei],col=ecoforecastR::col.alpha("lightBlue",0.75))
 points(time,obs[i,],pch="+",cex=0.5)
-# ecoforecastR::ciEnvelope(time[-1],ci.d[[i]][1,],ci.d[[i]][3,],col=ecoforecastR::col.alpha("hot pink",0.75))
+#ecoforecastR::ciEnvelope(time,ci.d[i,sitei][1,],ci.d[i,sitei][3,],col=ecoforecastR::col.alpha("hot pink",0.75))
 
 # out<-list()
 # x.cols<-list()

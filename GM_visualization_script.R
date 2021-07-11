@@ -68,12 +68,12 @@ dev.off()
 
 
 #recovery time vs steady state plot:
-rtimelattice<-xyplot(recov.time ~ steady, data = tcg.recov,
+rtimelattice<-xyplot(recov.time ~ mags, data = tcg.recov,
                      panel = function(x, y) {
-                       ci<-predict(recov.time.lm, interval="confidence")
-                       upper<-ci[,3]
-                       lower<-ci[,2]
-                       panel.ci(x, y, upper, lower, fill="gray48",alpha = 0.4)
+                       # ci<-predict(recov.time.lm, interval="confidence")
+                       # upper<-ci[,3]
+                       # lower<-ci[,2]
+                       # panel.ci(x, y, upper, lower, fill="gray48",alpha = 0.4)
                        panel.xyplot(x, y, pch=16,col="black")
                        panel.abline(lm(y ~ x))
                        rtsumm<-summary(recov.time.lm)
@@ -81,16 +81,16 @@ rtimelattice<-xyplot(recov.time ~ steady, data = tcg.recov,
                        f <- rtsumm$fstatistic
                        p <- pf(f[1],f[2],f[3],lower.tail=F)
                        panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
-                                  x=0.132,y=-50,cex=0.75)
+                                  x=0,y=200,cex=0.75)
                        panel.text(labels = bquote(italic(p)==.(format(p,digits=3))),
-                                  x=0.13,y=-85,cex=0.75)
+                                  x=0,y=170,cex=0.75)
                      },
-                     ylab="Recovery Time",
-                     xlab="TCG Steady State (2012-2015)")
+                     ylab="Recovery Time (growing season months)",
+                     xlab="Disturbance Magnitude")
 
 print(rtimelattice)
 #save plot as tiff file:
-tiff("rtimelattice_50sites.tiff", units="in", width=7, height=5, res=300)
+tiff("rtimelattice.tiff", units="in", width=7, height=5, res=300)
 print(rtimelattice)
 dev.off()
 
@@ -279,5 +279,31 @@ print(magrecovlattice_NLCD)
 
 tiff("magslattice_NLCD.tiff", units="in", width=7, height=5, res=300)
 print(magrecovlattice_NLCD)
+dev.off()
+
+
+recovtimelattice_NLCD<-xyplot(recov.time ~ mags | NLCD, data = tcg.recov,
+                             panel = function(x, y) {
+                               panel.xyplot(x, y, pch=16,col="black")
+                               mr.lm<-lm(y~x)
+                               mrsumm<-summary(mr.lm)
+                               r2 <- mrsumm$adj.r.squared
+                               f <- mrsumm$fstatistic
+                               p <- pf(f[1],f[2],f[3],lower.tail=F)
+                               #panel.abline(a = mr.lm$coefficients[1], 
+                               #b = mr.lm$coefficients[2])
+                               #panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
+                               #x=0.177,y=0.015,cex=0.75)
+                               #panel.text(labels = bquote(italic(p)==.(format(p,digits=3))),
+                               #x=0.176,y=0.008,cex=0.75)
+                             },
+                             ylab="Recovery Time",
+                             xlab="Disturbance Magnitude",
+                             layout=c(3,2))
+
+print(recovtimelattice_NLCD)
+
+tiff("recovtimelattice_NLCD.tiff", units="in", width=7, height=5, res=300)
+print(recovtimelattice_NLCD)
 dev.off()
 
