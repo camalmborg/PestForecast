@@ -175,7 +175,7 @@ parse.MatrixNames <- function(w, pre = "x", numeric = FALSE) {
 
 ###splitting output-----still doesn't work
 out = list(params=NULL,predict=NULL)
-mfit = as.matrix(j.pests.out,chains=TRUE)
+mfit = as.matrix(j.pests.out.thin,chains=TRUE)
 pred.cols = union(grep("x",colnames(mfit),fixed=TRUE),
                   grep("D",colnames(mfit),fixed=TRUE))
 chain.col = which(colnames(mfit)=="CHAIN")
@@ -185,20 +185,20 @@ out$params   = mat2mcmc.list(mfit[,-pred.cols])
 #return(out)
 
 #checking convergence
-paramconv <- coda.samples (model = j.pests,
-                            variable.names = c("mu0","p","pa0","tau_add"),
-                            n.iter = 10000)
-plot(paramconv)
+#paramconv <- coda.samples (model = j.pests,
+                            #variable.names = c("mu0","p","pa0","tau_add"),
+                            #n.iter = 10000)
+#plot(paramconv)
 
 #-----visualizations:------
 
-x.cols <- grep("^x",colnames(j.pests.out.thin))
-ci.x <- apply(j.pests.out.thin[,x.cols],2,quantile,c(0.025,0.5,0.975))
+x.cols <- grep("^x",colnames(out.pests.thin))
+ci.x <- apply(out.pests.thin[,x.cols],2,quantile,c(0.025,0.5,0.975))
 ci.x.names = parse.MatrixNames(colnames(ci.x),numeric=TRUE)
 
 
-d.cols <- grep("^D",colnames(out.pests))
-ci.d <- apply(out.pests[,d.cols],2,quantile,c(0.25,0.5,0.975))
+d.cols <- grep("^D",colnames(out.pests.thin))
+ci.d <- apply(out.pests.thin[,d.cols],2,quantile,c(0.25,0.5,0.975))
 
 i=48
 sitei = which(ci.x.names$row == i)
