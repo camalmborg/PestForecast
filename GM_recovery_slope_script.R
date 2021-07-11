@@ -241,6 +241,7 @@ recov.rate.lm<-lm(recov.rate~steady,tcg.recov)
 recov.time.lm<-lm(recov.time~steady,tcg.recov)
 mins.lm<-lm(mins ~ steady, data = tcg.recov)
 magrecov.lm<-lm(recov.rate ~ mags, data = tcg.recov)
+magtree.lm<-lm(mags~percentcover,data=tcg.recov)
 #defolrecov.lm<-lm(recov.rate~defol,recov.view)
 #prevyr.lm<-lm(recov.rate~prevyr,recov.view)
 

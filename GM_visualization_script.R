@@ -103,15 +103,15 @@ magrecovlattice<-xyplot(recov.rate ~ mags, data = tcg.recov,
                        #lower<-ci[,2]
                        #panel.ci(x, y, upper, lower, fill="gray48",alpha = 0.4)
                        panel.xyplot(x, y, pch=16,col="black")
-                       # panel.abline(lm(y ~ x))
-                       # mrsumm<-summary(magrecov.lm)
-                       # r2 <- mrsumm$adj.r.squared
-                       # f <- mrsumm$fstatistic
-                       # p <- pf(f[1],f[2],f[3],lower.tail=F)
-                       # panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
-                       #            x=0.177,y=0.015,cex=0.75)
-                       # panel.text(labels = bquote(italic(p)==.(format(p,digits=3))),
-                       #            x=0.176,y=0.008,cex=0.75)
+                       panel.abline(lm(y ~ x))
+                       mrsumm<-summary(magrecov.lm)
+                       r2 <- mrsumm$adj.r.squared
+                       f <- mrsumm$fstatistic
+                       p <- pf(f[1],f[2],f[3],lower.tail=F)
+                       panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
+                                  x=0,y=0.20,cex=0.75)
+                       panel.text(labels = bquote(italic(p)==.(format(p,digits=3))),
+                                  x=0,y=0.18,cex=0.75)
                      },
                      ylab="Recovery Rate",
                      xlab="Disturbance Magnitude")
@@ -150,6 +150,20 @@ tiff("prevyrlattice_NEW.tiff", units="in", width=7, height=5, res=300)
 print(prevyrlattice)
 dev.off()
 
+#magnitude vs percent tree cover
+magtreelattice<-xyplot(mags ~ percentcover | NLCD, data = tcg.recov,
+                      panel = function(x, y) {
+                        panel.xyplot(x, y, pch=16,col="black")
+                      },
+                      ylab="Recovery Rate",
+                      xlab="Percent Tree Cover")
+
+print(magtreelattice)
+
+tiff("magtreelattice_NEW.tiff", units="in", width=7, height=5, res=300)
+print(magtreelattice)
+dev.off()
+
 
 #minimum TCG value vs steady state plot:
 minslattice<-xyplot(mins ~ steady, data = tcg.recov,
@@ -182,24 +196,47 @@ dev.off()
 
 mags_hist_lattice <- histogram(~ mags, data = tcg.recov,
                                xlab="Disturbance Magnitude",
-                               breaks=100,
+                               breaks=250,
                                col="gray48")
 print(mags_hist_lattice)
 
-tiff("mags_hist_lattice.tiff", units="in", width=7, height=5, res=300)
+tiff("mags_hist_lattice.tiff", units="in", width=7, height=4, res=300)
 print(mags_hist_lattice)
 dev.off()
 
 
 recov.rate_hist_lattice <- histogram(~ recov.rate, data = tcg.recov,
                                xlab="Recovery Rate",
-                               breaks=100,
+                               breaks=250,
                                col="gray48")
 print(recov.rate_hist_lattice)
 
-tiff("recov.rate_hist_lattice.tiff", units="in", width=7, height=5, res=300)
+tiff("recov.rate_hist_lattice.tiff", units="in", width=7, height=4, res=300)
 print(recov.rate_hist_lattice)
 dev.off()
+
+
+steady_hist_lattice <- histogram(~ steady, data = tcg.recov,
+                                     xlab="Steady State TCG Values",
+                                     breaks=250,
+                                     col="gray48")
+print(steady_hist_lattice)
+
+tiff("steady_hist_lattice.tiff", units="in", width=7, height=4, res=300)
+print(steady_hist_lattice)
+dev.off()
+
+
+mins_hist_lattice <- histogram(~ mins, data = tcg.recov,
+                                 xlab="Disturbance Window Minimum TCG Values",
+                                 breaks=250,
+                                 col="gray48")
+print(mins_hist_lattice)
+
+tiff("mins_hist_lattice.tiff", units="in", width=7, height=4, res=300)
+print(mins_hist_lattice)
+dev.off()
+
 
 
 #------GGPLOT VERSION-------------------------------------------
@@ -243,5 +280,4 @@ print(magrecovlattice_NLCD)
 tiff("magslattice_NLCD.tiff", units="in", width=7, height=5, res=300)
 print(magrecovlattice_NLCD)
 dev.off()
-
 
