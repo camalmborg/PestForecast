@@ -103,7 +103,7 @@ for (s in 1:ns){
   #### Priors
   tau_obs ~ dgamma(t_obs,a_obs)
   tau_add ~ dgamma(a_add,t_add)
-  R ~ dnorm(rmean,rprec)  #rho growth term
+  R ~ dnorm(rmean,rprec)  #rho term
   p ~ dunif(0,1)  #disturbance probability
   mu0 ~ dnorm(-5,1) #mean of disturbed state
   pa0 ~ dgamma(1,1) #precision of disturbed state
@@ -135,20 +135,26 @@ j.pests <- jags.model (file = textConnection(pests),
 j.pests.out <- coda.samples (model = j.pests,
                             variable.names = c("x","tau_add","tau_obs", "R", "p", "D", "mu0", "pa0"),
                             n.iter = 10000)
+j.pests.out.thin<-window(j.pests.out,thin=10)
+
+# j.pests.out.2500<-coda.samples(model = j.pests,
+#                                variable.names = c("x","tau_add","tau_obs", "R", "p", "D", "mu0", "pa0"),
+#                                n.iter=10000)
+
 ###-----model output-----
 out.pests <- as.matrix(j.pests.out)
-
+out.pests.thin <-as.matrix(j.pests.out.thin)
 
 ###------diagnostic----------------
 #Brooks Gelman Rubin test:
-BGR<-gelman.diag(j.pests.out)
+BGR<-gelman.diag(j.pests.out.thin)
 
 #autocorrelation:
 acfplot(j.pests.out)
 
 #effective size:
-EffS<-effectiveSize(j.pests.out)
-cumuplot(j.pests.out,probs=c(0.025,0.25,0.5,0.75,0.975))
+#EffS<-effectiveSize(j.pests.out)
+#cumuplot(j.pests.out,probs=c(0.025,0.25,0.5,0.75,0.975))
 
 
 #getting proper names for each site from looped-over-sites mcmc output:
@@ -186,8 +192,8 @@ plot(paramconv)
 
 #-----visualizations:------
 
-x.cols <- grep("^x",colnames(out.pests))
-ci.x <- apply(out.pests[,x.cols],2,quantile,c(0.025,0.5,0.975))
+x.cols <- grep("^x",colnames(j.pests.out.thin))
+ci.x <- apply(j.pests.out.thin[,x.cols],2,quantile,c(0.025,0.5,0.975))
 ci.x.names = parse.MatrixNames(colnames(ci.x),numeric=TRUE)
 
 
