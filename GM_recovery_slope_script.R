@@ -1,7 +1,7 @@
 #load data for all test sites:
 time=1:130
 NT=length(time)
-geoID=1:50
+geoID=1:2500
 gm.data<-list()
 for(i in geoID){
   file<-paste0("TEST_monthly_data/GM_",geoID[i],"_mcs.csv")
@@ -19,9 +19,10 @@ for (i in geoID){
 data.an<-read.csv("2021_07_09_sample_score_mean_ANNUAL_50sites.csv")
 gm.data.an<-data.an[,2:27]
 
-#load NLCD data:
-nlcd.dat<-read.csv("2021_07_09_sample_nlcd_50sites.csv")
-NLCD<-nlcd.dat[4:5]
+#load NLCD data
+nlcd.dat<-read.csv("2020_07_11_sample_nlcd_500.csv")
+landcover<-nlcd.dat[,5]
+treecover<-nlcd.dat[,8]
 
 #------Forest Condition Score version:---------------
 
@@ -98,9 +99,9 @@ plot(prevyr,mags)
 
 ###THE MONTHLY DATA VERSION:
 #load TCG mean data:
-tcgmeans<-"2021_06_23_sample_tcg_mean_GM_50_calib_points.csv"
+tcgmeans<-"2020_07_10_500_sample_tcg_mean_MONTHLY.csv"
 tcgtable<-read.csv(tcgmeans)
-tcg<-as.matrix(tcgtable[1:50,2:131])
+tcg<-as.matrix(tcgtable[,2:131])
 
 #find the non-GM disturb condition "steady state"
 steady<-apply(tcg[,90:110],1,mean,na.rm=T)
@@ -108,7 +109,7 @@ steadyall<-apply(tcg[,1:110],1,mean,na.rm=T)
 
 #monthly steady states
 #maymeans<-apply(tcg[,seq(1,ncol(tcg),by=5)],1,mean,na.rm=T)
-steadymonths<-matrix(NA,nrow=50,ncol=5)
+steadymonths<-matrix(NA,nrow=4999,ncol=5)
 months<-5
 for (i in 1:months){
   steadymonths[,i]<-apply(tcg[,seq(i,ncol(tcg),by=5)],1,mean,na.rm=T)
@@ -129,7 +130,12 @@ for (i in geoID){
   } else {
     recovcol[i]<-colnum[i] + which(tcg[i,colnum[i]:130]>=steady[i])[1]
   }
-  recov <- tcg[i,colnum[i]:recovcol[i]]      
+  if(recovcol[i]>130){
+    recov<-tcg[i,colnum[i]:130]
+  } else {
+    recov<- tcg[i,colnum[i]:recovcol[i]]
+  }
+  #recov <- tcg[i,colnum[i]:recovcol[i]]      
   ind<-1:length(recov)                      #grabs length of recov rate   
   slope[[i]]<-lm(recov~ind)                      #runs the lm to find slope of recov rate, saves output
   recov.rate[i]<-slope[[i]]$coefficients["ind"] #stores recovery rate
@@ -176,9 +182,9 @@ recov.time<-mags/recov.rate
 
 tcg.recov.mx<-cbind(steadyall,steady,colnum,mins,mags,recov.rate,recov.time)
 tcg.recov<-as.data.frame(tcg.recov.mx)
-tcg.recov$NLCD <- factor(NLCD$landcover, levels=c(41,43,42,90,71),
-                              labels=c("Hardwood", "Conifer","Mixed","Woody Wetland","Herbaceous"))
-tcg.recov$percentcover<-NLCD$percent_tree_cover
+tcg.recov$NLCD <- factor(landcover, levels=c(41,42,43,90,21),
+                              labels=c("Deciduous", "Evergreen","Mixed","Woody Wetland","Developed:open space"))
+tcg.recov$percentcover<-treecover
 #colnames(tcg.recov)<-c("Steady State (All Years)","Steady State 2012-2015","Column Number","Minimum TCG Value","Disturbance Magnitude","Recovery Rate","Recovery Time","NLCD Type","Percent Tree Cover")
 
 
@@ -186,18 +192,24 @@ if (FALSE){
 #previous year's greenness analysis:
 endprevyr<-colnum-1
 startprevyr<-endprevyr-5
-prevyr<-matrix(NA,nrow=50,ncol=1)
+prevyr<-vector()
 for (i in geoID){
-  prevyr[i,]<-(mean(na.omit(tcg[i,startprevyr[i,]:endprevyr[i,]])))
+  prevyr[i]<-(mean(na.omit(tcg[i,startprevyr[i]:endprevyr[i]])))
 }
 
 #reduction in greenness from previous year using magnitude:
 defol<-prevyr-mags
 
 #make a nice table of it all:
-recov.view.mx<-cbind(steadyall,steady,prevyr,mags,defol,mins,recov.rate,recov.time)
-recov.view<-as.data.frame(recov.view.mx)
-colnames(recov.view)<-c("steadyall","steady","prevyr","mags","defol","mins","recov.rate","recov.time")
+#recov.view.mx<-cbind(steadyall,steady,prevyr,mags,defol,mins,recov.rate,recov.time)
+#recov.view<-as.data.frame(recov.view.mx)
+#colnames(recov.view)<-c("steadyall","steady","prevyr","mags","defol","mins","recov.rate","recov.time")
+
+recov.view.mx<-cbind(steadyall,steady,prevyr,mags,defol,recov.rate,recov.time)
+recov.view<-as.data.frame(tcg.recov.mx)
+recov.view$NLCD <- factor(landcover, levels=c(41,42,43,90,21),
+                         labels=c("Deciduous", "Evergreen","Mixed","Woody Wetland","Developed:open space"))
+recov.view$percentcover<-treecover
 }
 
 
@@ -227,8 +239,11 @@ hist(recov.time)
 defol.lm<-lm(mags~steady,tcg.recov)
 recov.rate.lm<-lm(recov.rate~steady,tcg.recov)
 recov.time.lm<-lm(recov.time~steady,tcg.recov)
-magrecov.lm<-lm(recov.rate ~ mags, data = tcg.recov)
 mins.lm<-lm(mins ~ steady, data = tcg.recov)
+magrecov.lm<-lm(recov.rate ~ mags, data = tcg.recov)
+#defolrecov.lm<-lm(recov.rate~defol,recov.view)
+#prevyr.lm<-lm(recov.rate~prevyr,recov.view)
+
 
 plot(steady,mags)
 abline(defol.lm)

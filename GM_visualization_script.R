@@ -12,10 +12,10 @@ library(tactile)
 #recovery rate vs steady state plot:
 recovlattice<-xyplot(recov.rate ~ steady, data = tcg.recov,
                     panel = function(x, y) {
-                    ci<-predict(recov.rate.lm, interval="confidence")
-                      upper<-ci[,3]
-                      lower<-ci[,2]
-                    panel.ci(x, y, upper, lower, fill="gray48",alpha = 0.4)
+                    #ci<-predict(recov.rate.lm, interval="confidence")
+                      #upper<-ci[,3]
+                      #lower<-ci[,2]
+                    #panel.ci(x, y, upper, lower, fill="gray48",alpha = 0.4)
                     panel.xyplot(x, y, pch=16,col="black")
                     panel.abline(lm(y ~ x))
                       rsumm<-summary(recov.rate.lm)
@@ -29,11 +29,11 @@ recovlattice<-xyplot(recov.rate ~ steady, data = tcg.recov,
                              },
                     ylab="Recovery Rate",
                     xlab="TCG Steady State (2012-2015)",
-                    ylim=c(-0.02,0.07))
+                    )
 
 print(recovlattice)
 #save plot as tiff file:
-tiff("recovlattice_50sites_monthlyNEW.tiff", units="in", width=7, height=5, res=300)
+tiff("recovlattice_monthlyNEW.tiff", units="in", width=7, height=5, res=300)
 print(recovlattice)
 dev.off()
 
@@ -58,7 +58,7 @@ defollattice<-xyplot(mags ~ steady, data = tcg.recov,
                      },
                      ylab="Disturbance Magnitude",
                      xlab="TCG Steady State (2012-2015)",
-                     ylim=c(-0.015,0.21))
+                     )
 
 print(defollattice)
 #save plot as tiff file:
@@ -98,28 +98,56 @@ dev.off()
 #recovery rate vs disturbance magnitude plot:
 magrecovlattice<-xyplot(recov.rate ~ mags, data = tcg.recov,
                      panel = function(x, y) {
-                       ci<-predict(magrecov.lm, interval="confidence")
-                       upper<-ci[,3]
-                       lower<-ci[,2]
-                       panel.ci(x, y, upper, lower, fill="gray48",alpha = 0.4)
+                       #ci<-predict(magrecov.lm, interval="confidence")
+                       #upper<-ci[,3]
+                       #lower<-ci[,2]
+                       #panel.ci(x, y, upper, lower, fill="gray48",alpha = 0.4)
                        panel.xyplot(x, y, pch=16,col="black")
-                       panel.abline(lm(y ~ x))
-                       mrsumm<-summary(magrecov.lm)
-                       r2 <- mrsumm$adj.r.squared
-                       f <- mrsumm$fstatistic
-                       p <- pf(f[1],f[2],f[3],lower.tail=F)
-                       panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
-                                  x=0.177,y=0.015,cex=0.75)
-                       panel.text(labels = bquote(italic(p)==.(format(p,digits=3))),
-                                  x=0.176,y=0.008,cex=0.75)
+                       # panel.abline(lm(y ~ x))
+                       # mrsumm<-summary(magrecov.lm)
+                       # r2 <- mrsumm$adj.r.squared
+                       # f <- mrsumm$fstatistic
+                       # p <- pf(f[1],f[2],f[3],lower.tail=F)
+                       # panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
+                       #            x=0.177,y=0.015,cex=0.75)
+                       # panel.text(labels = bquote(italic(p)==.(format(p,digits=3))),
+                       #            x=0.176,y=0.008,cex=0.75)
                      },
                      ylab="Recovery Rate",
                      xlab="Disturbance Magnitude")
 
 print(magrecovlattice)
 
-tiff("magrecovlattice_50sites.tiff", units="in", width=7, height=5, res=300)
+tiff("magrecovlattice_NEW.tiff", units="in", width=7, height=5, res=300)
 print(magrecovlattice)
+dev.off()
+
+#recovery rate vs defoliation from previous year plot:
+prevdefollattice<-xyplot(recov.rate ~ defol, data = recov.view,
+                        panel = function(x, y) {
+                          panel.xyplot(x, y, pch=16,col="black")
+                        },
+                        ylab="Recovery Rate",
+                        xlab="Defoliation")
+
+print(prevdefollattice)
+
+tiff("prevdefollattice_NEW.tiff", units="in", width=7, height=5, res=300)
+print(prevdefollattice)
+dev.off()
+
+#recovery rate vs previous years greenness plot:
+prevyrlattice<-xyplot(recov.rate ~ prevyr, data = recov.view,
+                      panel = function(x, y) {
+                        panel.xyplot(x, y, pch=16,col="black")
+                      },
+                      ylab="Recovery Rate",
+                      xlab="Previous Year Greenness")
+
+print(prevyrlattice)
+
+tiff("prevyrlattice_NEW.tiff", units="in", width=7, height=5, res=300)
+print(prevyrlattice)
 dev.off()
 
 
@@ -152,6 +180,27 @@ dev.off()
 
 
 
+mags_hist_lattice <- histogram(~ mags, data = tcg.recov,
+                               xlab="Disturbance Magnitude",
+                               breaks=100,
+                               col="gray48")
+print(mags_hist_lattice)
+
+tiff("mags_hist_lattice.tiff", units="in", width=7, height=5, res=300)
+print(mags_hist_lattice)
+dev.off()
+
+
+recov.rate_hist_lattice <- histogram(~ recov.rate, data = tcg.recov,
+                               xlab="Recovery Rate",
+                               breaks=100,
+                               col="gray48")
+print(recov.rate_hist_lattice)
+
+tiff("recov.rate_hist_lattice.tiff", units="in", width=7, height=5, res=300)
+print(recov.rate_hist_lattice)
+dev.off()
+
 
 #------GGPLOT VERSION-------------------------------------------
 if (FALSE){
@@ -171,14 +220,7 @@ ggplot(tcg.recov, aes(x=`Steady State 2012-2015`,
 
 #------Categorical------------------------------------------------
 
-
-
-
-
-
-
-
-magrecovlattice<-xyplot(recov.rate ~ mags | NLCD, data = tcg.recov,
+magrecovlattice_NLCD<-xyplot(recov.rate ~ mags | NLCD, data = tcg.recov,
                         panel = function(x, y) {
                           panel.xyplot(x, y, pch=16,col="black")
                           mr.lm<-lm(y~x)
@@ -186,17 +228,20 @@ magrecovlattice<-xyplot(recov.rate ~ mags | NLCD, data = tcg.recov,
                           r2 <- mrsumm$adj.r.squared
                           f <- mrsumm$fstatistic
                           p <- pf(f[1],f[2],f[3],lower.tail=F)
-                          panel.abline(a = mr.lm$coefficients[1], 
-                                       b = mr.lm$coefficients[2])
-                          panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
-                                     x=0.177,y=0.015,cex=0.75)
-                          panel.text(labels = bquote(italic(p)==.(format(p,digits=3))),
-                                     x=0.176,y=0.008,cex=0.75)
+                          #panel.abline(a = mr.lm$coefficients[1], 
+                                       #b = mr.lm$coefficients[2])
+                          #panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
+                                     #x=0.177,y=0.015,cex=0.75)
+                          #panel.text(labels = bquote(italic(p)==.(format(p,digits=3))),
+                                     #x=0.176,y=0.008,cex=0.75)
                         },
                         ylab="Recovery Rate",
                         xlab="Disturbance Magnitude")
 
-print(magrecovlattice)
+print(magrecovlattice_NLCD)
 
+tiff("magslattice_NLCD.tiff", units="in", width=7, height=5, res=300)
+print(magrecovlattice_NLCD)
+dev.off()
 
 
