@@ -216,7 +216,7 @@ recov.view$percentcover<-treecover
 }
 
 
-#oh, you know we got the plots:
+#oh, you know we got the plots:------
 plot(steady,mags)
 plot(steady,mins)
 plot(steady,recov.rate)
@@ -239,13 +239,13 @@ hist(recov.rate,breaks=250)
 #hist(recov.time,breaks=250)
 
 
-defol.lm<-lm(mags~steady,tcg.recov)
-recov.rate.lm<-lm(recov.rate~steady,tcg.recov)
-recov.steady.lm<-lm(recov.time~steady,tcg.recov)
-recov.time.lm<-lm(recov.time~mags,tcg.recov)
-mins.lm<-lm(mins ~ steady, data = tcg.recov)
-magrecov.lm<-lm(recov.rate ~ mags, data = tcg.recov)
-magtree.lm<-lm(mags~percentcover,data=tcg.recov)
+defol.lm<-lm(mags~steady,tcg.negremove)
+recov.rate.lm<-lm(recov.rate~steady,tcg.negremove)
+recov.steady.lm<-lm(recov.time~steady,tcg.negremove)
+recov.time.lm<-lm(recov.time~mags,tcg.negremove)
+mins.lm<-lm(mins ~ steady, data = tcg.negremove)
+magrecov.lm<-lm(recov.rate ~ mags, data = tcg.negremove)
+magtree.lm<-lm(mags~percentcover,data=tcg.negremove)
 #defolrecov.lm<-lm(recov.rate~defol,recov.view)
 #prevyr.lm<-lm(recov.rate~prevyr,recov.view)
 
@@ -315,3 +315,7 @@ range(steady[fast.recov])
 range(steady[slow.recov])
 #[1] 0.1278892 0.3055146  mean:[1] 0.2312062
 
+##removing negative recovery rates and magnitudes
+pos.recov.rate<-which(recov.rate>0 & mags>0)
+tcg.negremove<-tcg.recov[pos.recov.rate,]
+tcg.negremove<-tcg.negremove[-2007,]

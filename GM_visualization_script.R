@@ -10,12 +10,12 @@ library(tactile)
 #------Lattice versions:-----------------------------------
 
 #recovery rate vs steady state plot:
-recovlattice<-xyplot(recov.rate ~ steady, data = tcg.recov,
+recovlattice<-xyplot(recov.rate ~ steady, data = tcg.negremove,
                     panel = function(x, y) {
-                    #ci<-predict(recov.rate.lm, interval="confidence")
-                      #upper<-ci[,3]
-                      #lower<-ci[,2]
-                    #panel.ci(x, y, upper, lower, fill="gray48",alpha = 0.4)
+                    ci<-predict(recov.rate.lm, interval="confidence")
+                      upper<-ci[,3]
+                      lower<-ci[,2]
+                    panel.ci(x, y, upper, lower, fill="gray48",alpha = 0.4)
                     panel.xyplot(x, y, pch=16,col="black")
                     panel.abline(lm(y ~ x))
                       rsumm<-summary(recov.rate.lm)
@@ -23,9 +23,9 @@ recovlattice<-xyplot(recov.rate ~ steady, data = tcg.recov,
                       f <- rsumm$fstatistic
                       p <- pf(f[1],f[2],f[3],lower.tail=F)
                     panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
-                                  x=0.13,y=0.17,cex=0.75)
+                                  x=0.13,y=0.09,cex=0.75)
                     panel.text(labels = bquote(italic(p)==.(format(p,digits = 3))),
-                                  x=0.13,y=0.14,cex=0.75)
+                                  x=0.13,y=0.07,cex=0.75)
                              },
                     ylab="Recovery Rate",
                     xlab="TCG Steady State (2012-2015)",
@@ -33,13 +33,13 @@ recovlattice<-xyplot(recov.rate ~ steady, data = tcg.recov,
 
 print(recovlattice)
 #save plot as tiff file:
-tiff("recovlattice_monthly2500.tiff", units="in", width=7, height=5, res=300)
+tiff("recovlattice_monthly2500.tiff", units="in", width=7, height=4, res=300)
 print(recovlattice)
 dev.off()
 
 
 #disturbance magnitude vs steady state plot:
-defollattice<-xyplot(mags ~ steady, data = tcg.recov,
+defollattice<-xyplot(mags ~ steady, data = tcg.negremove,
                      panel = function(x, y) {
                        ci<-predict(defol.lm, interval="confidence")
                        upper<-ci[,3]
@@ -62,18 +62,18 @@ defollattice<-xyplot(mags ~ steady, data = tcg.recov,
 
 print(defollattice)
 #save plot as tiff file:
-tiff("defollattice_2500.tiff", units="in", width=7, height=5, res=300)
+tiff("defollattice_2500.tiff", units="in", width=7, height=4, res=300)
 print(defollattice)
 dev.off()
 
 
 #recovery time vs magnitude plot:
-rtimelattice<-xyplot(recov.time ~ mags, data = tcg.recov,
+rtimelattice<-xyplot(recov.time ~ mags, data = tcg.negremove,
                      panel = function(x, y) {
-                       # ci<-predict(recov.time.lm, interval="confidence")
-                       # upper<-ci[,3]
-                       # lower<-ci[,2]
-                       # panel.ci(x, y, upper, lower, fill="gray48",alpha = 0.4)
+                        ci<-predict(recov.time.lm, interval="confidence")
+                        upper<-ci[,3]
+                        lower<-ci[,2]
+                       panel.ci(x, y, upper, lower, fill="gray48",alpha = 0.4)
                        panel.xyplot(x, y, pch=16,col="black")
                        panel.abline(lm(y ~ x))
                        rtsumm<-summary(recov.time.lm)
@@ -96,7 +96,7 @@ dev.off()
 
 
 #recovery time vs steady state plot:
-rtsteadylattice<-xyplot(recov.time ~ steady, data = tcg.recov,
+rtsteadylattice<-xyplot(recov.time ~ steady, data = tcg.negremove,
                      panel = function(x, y) {
                        # ci<-predict(recov.time.lm, interval="confidence")
                        # upper<-ci[,3]
@@ -124,12 +124,12 @@ dev.off()
 
 
 #recovery rate vs disturbance magnitude plot:
-magrecovlattice<-xyplot(recov.rate ~ mags, data = tcg.recov,
+magrecovlattice<-xyplot(recov.rate ~ mags, data = tcg.negremove,
                      panel = function(x, y) {
-                       #ci<-predict(magrecov.lm, interval="confidence")
-                       #upper<-ci[,3]
-                       #lower<-ci[,2]
-                       #panel.ci(x, y, upper, lower, fill="gray48",alpha = 0.4)
+                       ci<-predict(magrecov.lm, interval="confidence")
+                       upper<-ci[,3]
+                       lower<-ci[,2]
+                       panel.ci(x, y, upper, lower, fill="gray48",alpha = 0.4)
                        panel.xyplot(x, y, pch=16,col="black")
                        panel.abline(lm(y ~ x))
                        mrsumm<-summary(magrecov.lm)
@@ -137,9 +137,9 @@ magrecovlattice<-xyplot(recov.rate ~ mags, data = tcg.recov,
                        f <- mrsumm$fstatistic
                        p <- pf(f[1],f[2],f[3],lower.tail=F)
                        panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
-                                  x=0,y=0.20,cex=0.75)
+                                  x=0.01,y=0.095,cex=0.75)
                        panel.text(labels = bquote(italic(p)==.(format(p,digits=3))),
-                                  x=0,y=0.18,cex=0.75)
+                                  x=0.01,y=0.075,cex=0.75)
                      },
                      ylab="Recovery Rate",
                      xlab="Disturbance Magnitude")
@@ -194,7 +194,7 @@ dev.off()
 
 
 #minimum TCG value vs steady state plot:
-minslattice<-xyplot(mins ~ steady, data = tcg.recov,
+minslattice<-xyplot(mins ~ steady, data = tcg.negremove,
                         panel = function(x, y) {
                           ci<-predict(mins.lm, interval="confidence")
                           upper<-ci[,3]
@@ -222,7 +222,7 @@ dev.off()
 
 
 
-mags_hist_lattice <- histogram(~ mags, data = tcg.recov,
+mags_hist_lattice <- histogram(~ mags, data = tcg.negremove,
                                xlab="Disturbance Magnitude",
                                breaks=250,
                                col="gray48")
@@ -233,7 +233,7 @@ print(mags_hist_lattice)
 dev.off()
 
 
-recov.rate_hist_lattice <- histogram(~ recov.rate, data = tcg.recov,
+recov.rate_hist_lattice <- histogram(~ recov.rate, data = tcg.negremove,
                                xlab="Recovery Rate",
                                breaks=250,
                                col="gray48")
@@ -244,7 +244,7 @@ print(recov.rate_hist_lattice)
 dev.off()
 
 
-steady_hist_lattice <- histogram(~ steady, data = tcg.recov,
+steady_hist_lattice <- histogram(~ steady, data = tcg.negremove,
                                      xlab="Steady State TCG Values",
                                      breaks=250,
                                      col="gray48")
@@ -285,7 +285,7 @@ ggplot(tcg.recov, aes(x=`Steady State 2012-2015`,
 
 #------Categorical------------------------------------------------
 
-magrecovlattice_NLCD<-xyplot(recov.rate ~ mags | NLCD, data = tcg.recov,
+magrecovlattice_NLCD<-xyplot(recov.rate ~ mags | NLCD, data = tcg.negremove,
                         panel = function(x, y) {
                           panel.xyplot(x, y, pch=16,col="black")
                           mr.lm<-lm(y~x)
@@ -293,12 +293,12 @@ magrecovlattice_NLCD<-xyplot(recov.rate ~ mags | NLCD, data = tcg.recov,
                           r2 <- mrsumm$adj.r.squared
                           f <- mrsumm$fstatistic
                           p <- pf(f[1],f[2],f[3],lower.tail=F)
-                          #panel.abline(a = mr.lm$coefficients[1], 
-                                       #b = mr.lm$coefficients[2])
-                          #panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
-                                     #x=0.177,y=0.015,cex=0.75)
-                          #panel.text(labels = bquote(italic(p)==.(format(p,digits=3))),
-                                     #x=0.176,y=0.008,cex=0.75)
+                          panel.abline(a = mr.lm$coefficients[1], 
+                                       b = mr.lm$coefficients[2])
+                          panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
+                                     x=0.040,y=0.10,cex=0.75)
+                          panel.text(labels = bquote(italic(p)==.(format(p,digits=3))),
+                                     x=0.050,y=0.08,cex=0.75)
                         },
                         ylab="Recovery Rate",
                         xlab="Disturbance Magnitude")
@@ -310,7 +310,7 @@ print(magrecovlattice_NLCD)
 dev.off()
 
 
-recovtimelattice_NLCD<-xyplot(recov.time ~ mags | NLCD, data = tcg.recov,
+recovtimelattice_NLCD<-xyplot(recov.time ~ mags | NLCD, data = tcg.negremove,
                              panel = function(x, y) {
                                panel.xyplot(x, y, pch=16,col="black")
                                mr.lm<-lm(y~x)
