@@ -202,9 +202,18 @@ ci.d <- apply(out.pests.thin[,d.cols],2,quantile,c(0.25,0.5,0.975))
 
 i=48
 sitei = which(ci.x.names$row == i)
-plot(ci.x[2,sitei],type='l',ylim=range(obs,na.rm=TRUE),ylab="Forest Condition", col="red")
-ecoforecastR::ciEnvelope(time,ci.x[1,sitei],ci.x[3,sitei],col=ecoforecastR::col.alpha("lightBlue",0.75))
-points(time,obs[i,],pch="+",cex=0.5)
+
+tiff("timeseriesexamp.tiff", units="in", width=8, height=3, res=300)
+plot(ci.x[2,sitei],type='l',ylim=range(obs,na.rm=TRUE),
+     ylab="Forest Condition Score", 
+     col="black",
+     xlab="Month",
+     cex=1)
+ecoforecastR::ciEnvelope(time,ci.x[1,sitei],ci.x[3,sitei],col=ecoforecastR::col.alpha("lightBlue",0.60))
+points(time,obs[i,],pch="+",cex=0.5,col="navyblue")
+dev.off()
+
+
 #ecoforecastR::ciEnvelope(time,ci.d[i,sitei][1,],ci.d[i,sitei][3,],col=ecoforecastR::col.alpha("hot pink",0.75))
 
 # out<-list()

@@ -238,6 +238,7 @@ hist(recov.time)
 
 defol.lm<-lm(mags~steady,tcg.recov)
 recov.rate.lm<-lm(recov.rate~steady,tcg.recov)
+recov.steady.lm<-lm(recov.time~steady,tcg.recov)
 recov.time.lm<-lm(recov.time~mags,tcg.recov)
 mins.lm<-lm(mins ~ steady, data = tcg.recov)
 magrecov.lm<-lm(recov.rate ~ mags, data = tcg.recov)

@@ -23,9 +23,9 @@ recovlattice<-xyplot(recov.rate ~ steady, data = tcg.recov,
                       f <- rsumm$fstatistic
                       p <- pf(f[1],f[2],f[3],lower.tail=F)
                     panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
-                                  x=0.13,y=0.06,cex=0.75)
+                                  x=0.13,y=0.17,cex=0.75)
                     panel.text(labels = bquote(italic(p)==.(format(p,digits = 3))),
-                                  x=0.13,y=0.05,cex=0.75)
+                                  x=0.13,y=0.14,cex=0.75)
                              },
                     ylab="Recovery Rate",
                     xlab="TCG Steady State (2012-2015)",
@@ -33,7 +33,7 @@ recovlattice<-xyplot(recov.rate ~ steady, data = tcg.recov,
 
 print(recovlattice)
 #save plot as tiff file:
-tiff("recovlattice_monthlyNEW.tiff", units="in", width=7, height=5, res=300)
+tiff("recovlattice_monthly2500.tiff", units="in", width=7, height=5, res=300)
 print(recovlattice)
 dev.off()
 
@@ -52,9 +52,9 @@ defollattice<-xyplot(mags ~ steady, data = tcg.recov,
                        f <- dsumm$fstatistic
                        p <- pf(f[1],f[2],f[3],lower.tail=F)
                        panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
-                                  x=0.13,y=0.18,cex=0.75)
+                                  x=0.13,y=0.25,cex=0.75)
                        panel.text(labels = bquote(italic(p)==.(format(p,digits=3))),
-                                  x=0.1325,y=0.15,cex=0.75)
+                                  x=0.1325,y=0.21,cex=0.75)
                      },
                      ylab="Disturbance Magnitude",
                      xlab="TCG Steady State (2012-2015)",
@@ -62,12 +62,12 @@ defollattice<-xyplot(mags ~ steady, data = tcg.recov,
 
 print(defollattice)
 #save plot as tiff file:
-tiff("defollattice_50sites.tiff", units="in", width=7, height=5, res=300)
+tiff("defollattice_2500.tiff", units="in", width=7, height=5, res=300)
 print(defollattice)
 dev.off()
 
 
-#recovery time vs steady state plot:
+#recovery time vs magnitude plot:
 rtimelattice<-xyplot(recov.time ~ mags, data = tcg.recov,
                      panel = function(x, y) {
                        # ci<-predict(recov.time.lm, interval="confidence")
@@ -92,6 +92,34 @@ print(rtimelattice)
 #save plot as tiff file:
 tiff("rtimelattice.tiff", units="in", width=7, height=5, res=300)
 print(rtimelattice)
+dev.off()
+
+
+#recovery time vs steady state plot:
+rtsteadylattice<-xyplot(recov.time ~ steady, data = tcg.recov,
+                     panel = function(x, y) {
+                       # ci<-predict(recov.time.lm, interval="confidence")
+                       # upper<-ci[,3]
+                       # lower<-ci[,2]
+                       # panel.ci(x, y, upper, lower, fill="gray48",alpha = 0.4)
+                       panel.xyplot(x, y, pch=16,col="black")
+                       panel.abline(lm(y ~ x))
+                       rtsumm<-summary(recov.time.lm)
+                       r2 <- rtsumm$adj.r.squared
+                       f <- rtsumm$fstatistic
+                       p <- pf(f[1],f[2],f[3],lower.tail=F)
+                       panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
+                                  x=0.13,y=200,cex=0.75)
+                       panel.text(labels = bquote(italic(p)==.(format(p,digits=3))),
+                                  x=0.13,y=170,cex=0.75)
+                     },
+                     ylab="Recovery Time (growing season months)",
+                     xlab="Steady State (2012-2015)")
+
+print(rtsteadylattice)
+#save plot as tiff file:
+tiff("rtsteadylattice_2500.tiff", units="in", width=7, height=5, res=300)
+print(rtsteadylattice)
 dev.off()
 
 
@@ -179,16 +207,16 @@ minslattice<-xyplot(mins ~ steady, data = tcg.recov,
                           f <- minsumm$fstatistic
                           p <- pf(f[1],f[2],f[3],lower.tail=F)
                           panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
-                                     x=0.13,y=0.19,cex=0.75)
+                                     x=0.13,y=0.21,cex=0.75)
                           panel.text(labels = bquote(italic(p)==.(format(p,digits=3))),
-                                     x=0.132,y=0.17,cex=0.75)
+                                     x=0.132,y=0.18,cex=0.75)
                         },
                         ylab="Minimum TCG value",
                         xlab="TCG Steady State (2012-2015)")
 
 print(minslattice)
 
-tiff("minslattice_50sites.tiff", units="in", width=7, height=5, res=300)
+tiff("minslattice_2500sites.tiff", units="in", width=7, height=5, res=300)
 print(minslattice)
 dev.off()
 
