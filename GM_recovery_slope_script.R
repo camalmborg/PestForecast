@@ -143,15 +143,15 @@ for (i in geoID){
 
 
 
-###ANNUAL DATA VERSION:
-#tcgmeans<-"2021_07_08_tcg_mean_annual_50sites.csv"
-#tcgtable<-read.csv(tcgmeans)
-#tcg<-as.matrix(tcgtable[1:50,2:27])
-
-#steady<-apply(tcg[,19:21],1,mean,na.rm=T)
-#steadyall<-apply(tcg[,1:26],1,mean,na.rm=T)
-
-#the TCG 2016-onward version:
+# ###ANNUAL DATA VERSION:-----
+# tcgmeans<-"2021_07_12_sample_tcg_mean_ANNUAL_2500.csv"
+# tcgtable<-read.csv(tcgmeans)
+# tcg<-as.matrix(tcgtable[1:2500,2:27])
+# 
+# steady<-apply(tcg[,19:21],1,mean,na.rm=T)
+# steadyall<-apply(tcg[,1:26],1,mean,na.rm=T)
+# 
+# #the TCG 2016-onward version:
 # recov.rate<-vector()
 # slope<-list()
 # #ind<-list()
@@ -166,26 +166,29 @@ for (i in geoID){
 #   } else {
 #     recovcol[i]<-colnum[i] + which(tcg[i,colnum[i]:26]>=steady[i])[1]
 #   }
+#   if(recovcol[i]>26){
+#     recov<-tcg[i,colnum[i]:26]
+#   } else {
+#     recov<- tcg[i,colnum[i]:recovcol[i]]
+#   }
 #   #recovcol[i,]<-which(tcg[i,colnum[i,]:130]>steady[i])[1]
 #   #recovcol[i,]<-colnum[i,]+which(tcg[i,colnum[i,]:130]>steady[i])[1]
-#   recov <- tcg[i,colnum[i]:recovcol[i]]      
-#   ind<-1:length(recov)                      #grabs length of recov rate   
+#   #recov <- tcg[i,colnum[i]:recovcol[i]]
+#   ind<-1:length(recov)                      #grabs length of recov rate
 #   slope[[i]]<-lm(recov~ind)                      #runs the lm to find slope of recov rate, saves output
 #   recov.rate[i]<-slope[[i]]$coefficients["ind"] #stores recovery rate
 # }
-
-
-
-#magnitudes:
-mags<-steady-mins
-recov.time<-mags/recov.rate
-
-tcg.recov.mx<-cbind(steadyall,steady,colnum,mins,mags,recov.rate,recov.time)
-tcg.recov<-as.data.frame(tcg.recov.mx)
-tcg.recov$NLCD <- factor(landcover, levels=c(41,42,43,90,21),
-                              labels=c("Deciduous", "Evergreen","Mixed","Woody Wetland","Developed:open space"))
-tcg.recov$percentcover<-treecover
-#colnames(tcg.recov)<-c("Steady State (All Years)","Steady State 2012-2015","Column Number","Minimum TCG Value","Disturbance Magnitude","Recovery Rate","Recovery Time","NLCD Type","Percent Tree Cover")
+# 
+# #magnitudes:
+# mags<-steady-mins
+# recov.time<-mags/recov.rate
+# 
+# tcg.recov.mx<-cbind(steadyall,steady,colnum,mins,mags,recov.rate,recov.time)
+# tcg.recov<-as.data.frame(tcg.recov.mx)
+# tcg.recov$NLCD <- factor(landcover, levels=c(41,42,43,90,21),
+#                               labels=c("Deciduous", "Evergreen","Mixed","Woody Wetland","Developed:open space"))
+# tcg.recov$percentcover<-treecover
+# #colnames(tcg.recov)<-c("Steady State (All Years)","Steady State 2012-2015","Column Number","Minimum TCG Value","Disturbance Magnitude","Recovery Rate","Recovery Time","NLCD Type","Percent Tree Cover")
 
 
 if (FALSE){
@@ -229,11 +232,11 @@ plot(mins,mags)
 plot(mins,steady)
 
 
-hist(steady)
-hist(mags)
-hist(mins)
-hist(recov.rate)
-hist(recov.time)
+hist(steady,breaks=250)
+hist(mags,breaks=250)
+hist(mins,breaks=250)
+hist(recov.rate,breaks=250)
+#hist(recov.time,breaks=250)
 
 
 defol.lm<-lm(mags~steady,tcg.recov)
@@ -267,12 +270,6 @@ for (i in geoID){
   lines(time[100:125],tcg[i,100:125],col=i)
 }  
 
-#for recov.rate<0
-plot(time,tcg[12,],type="l",ylim=c(-0.01,0.4),col=12)
-lines(time,tcg[46,],col=46)
-
-plot(time[105:130],tcg[12,105:130],type="l",ylim=c(-0.01,0.4),col=12)
-lines(time[105:130],tcg[46,105:130],col=46)
 
 #sites with negative recovery rates
 which(recov.rate<0)
@@ -283,3 +280,38 @@ plot(steadymonths[1,],type="l",ylim=c(0.125,0.32))
 for (i in 1:50){
   lines(steadymonths[i,],col=i)
 }
+
+#plotting with slow recov rates
+tiff("tsslowrecov2.tiff", units="in", width=8, height=6, res=300)
+slow.recov<-which(recov.rate<0.02)
+plot(time[80:130],tcg[5,80:130],type="l",
+     ylim=c(-0.1,0.5))
+for (i in 1:length(slow.recov)){
+  lines(time[80:130],tcg[slow.recov[i],80:130],col=i)
+}
+dev.off()
+
+#plot fast recov rate
+tiff("tsfastrecov2.tiff", units="in", width=8, height=6, res=300)
+fast.recov<-which(recov.rate>0.03)
+plot(time[80:130],tcg[1,80:130],type="l",
+     ylim=c(-0.1,0.5))
+for (i in 1:length(fast.recov)){
+  lines(time[80:130],tcg[fast.recov[i],80:130],col=i)
+}
+dev.off()
+
+#FROM MONTHLY DATA ANALYSIS:
+range(recov.rate[fast.recov],na.rm=T)
+#[1] 0.03001213 0.19901668
+range(recov.rate[slow.recov],na.rm=T)
+#[1] -0.01115076  0.01999890
+range(mags[fast.recov])
+#[1] -0.01333913  0.23419640
+range(mags[slow.recov])
+#[1] 0.005663492 0.276134167
+range(steady[fast.recov])
+#[1] 0.1204176 0.3200356  mean:[1] 0.2385906
+range(steady[slow.recov])
+#[1] 0.1278892 0.3055146  mean:[1] 0.2312062
+
