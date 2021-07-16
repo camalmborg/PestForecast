@@ -21,33 +21,33 @@ for (i in geoID){
 }
 
 #----model with disturbance probability added:------
-pests.RW = "
-model{
-  
-  #### Data Model
-  for(t in 1:n){
-    y[t] ~ dnorm(x[t],tau_obs)
-  }
-  
-  #### Process Model
-  for(t in 2:n){
-    muN[t]<-R*x[t-1]
-    x[t] ~ dnorm(mu[t],tau_add)
-    muD[t] ~ dnorm(mu0,pa0)
-    D[t] ~ dbern(p)
-    mu[t] <- D[t]*muD[t] + (1-D[t])*muN[t]
-  }
-  
-  #### Priors
-  x[1] ~ dnorm(x_ic,tau_ic)
-  tau_obs ~ dgamma(t_obs,a_obs)
-  tau_add ~ dgamma(a_add,t_add)
-  R ~ dnorm(rmean,rprec)  #rho growth term
-  p ~ dunif(0,1)  #disturbance probability
-  mu0 ~ dnorm(-5,1) #mean of disturbed state
-  pa0 ~ dgamma(1,1) #precision of disturbed state
-}
-"
+# pests.RW = "
+# model{
+#   
+#   #### Data Model
+#   for(t in 1:n){
+#     y[t] ~ dnorm(x[t],tau_obs)
+#   }
+#   
+#   #### Process Model
+#   for(t in 2:n){
+#     muN[t]<-R*x[t-1]
+#     x[t] ~ dnorm(mu[t],tau_add)
+#     muD[t] ~ dnorm(mu0,pa0)
+#     D[t] ~ dbern(p)
+#     mu[t] <- D[t]*muD[t] + (1-D[t])*muN[t]
+#   }
+#   
+#   #### Priors
+#   x[1] ~ dnorm(x_ic,tau_ic)
+#   tau_obs ~ dgamma(t_obs,a_obs)
+#   tau_add ~ dgamma(a_add,t_add)
+#   R ~ dnorm(rmean,rprec)  #rho growth term
+#   p ~ dunif(0,1)  #disturbance probability
+#   mu0 ~ dnorm(-5,1) #mean of disturbed state
+#   pa0 ~ dgamma(1,1) #precision of disturbed state
+# }
+# "
 
 # #data for pests model:
 # data.RW = list(y=obs, n=NT,
@@ -213,7 +213,7 @@ ecoforecastR::ciEnvelope(time,ci.x[1,sitei],ci.x[3,sitei],col=ecoforecastR::col.
 points(time,obs[i,],pch="+",cex=0.5,col="navyblue")
 dev.off()
 
-tiff("timeseriesexamp.tiff", units="in", width=8, height=3, res=300)
+tiff("timeseriesexamp2.tiff", units="in", width=8, height=3, res=300)
 plot(time,obs[i,],type='l',ylim=range(obs,na.rm=TRUE),
      ylab="Forest Condition Score", 
      col="black",
