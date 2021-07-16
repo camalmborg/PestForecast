@@ -213,6 +213,14 @@ ecoforecastR::ciEnvelope(time,ci.x[1,sitei],ci.x[3,sitei],col=ecoforecastR::col.
 points(time,obs[i,],pch="+",cex=0.5,col="navyblue")
 dev.off()
 
+tiff("timeseriesexamp.tiff", units="in", width=8, height=3, res=300)
+plot(time,obs[i,],type='l',ylim=range(obs,na.rm=TRUE),
+     ylab="Forest Condition Score", 
+     col="black",
+     xlab="Month",
+     cex=1)
+dev.off()
+
 
 #ecoforecastR::ciEnvelope(time,ci.d[i,sitei][1,],ci.d[i,sitei][3,],col=ecoforecastR::col.alpha("hot pink",0.75))
 

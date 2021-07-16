@@ -1,4 +1,4 @@
-#load data for all test sites:
+##load data for all test sites:------
 time=1:130
 NT=length(time)
 geoID=1:2500
@@ -143,52 +143,52 @@ for (i in geoID){
 
 
 
-# ###ANNUAL DATA VERSION:-----
-# tcgmeans<-"2021_07_12_sample_tcg_mean_ANNUAL_2500.csv"
-# tcgtable<-read.csv(tcgmeans)
-# tcg<-as.matrix(tcgtable[1:2500,2:27])
-# 
-# steady<-apply(tcg[,19:21],1,mean,na.rm=T)
-# steadyall<-apply(tcg[,1:26],1,mean,na.rm=T)
-# 
-# #the TCG 2016-onward version:
-# recov.rate<-vector()
-# slope<-list()
-# #ind<-list()
-# mins<-vector()
-# colnum<-vector()
-# recovcol<-vector()
-# for (i in geoID){
-#   mins[i]<-min(tcg[i,22:23],na.rm=T)          #grabs min forest condition score for each site
-#   colnum[i]<-which(tcg[i,]==mins[i])           #grabs time step at which min score appears in disturbance window
-#   if(is.na(colnum[i] + which(tcg[i,colnum[i]:26]>=steady[i])[1])){
-#     recovcol[i]<-colnum[i] + 2
-#   } else {
-#     recovcol[i]<-colnum[i] + which(tcg[i,colnum[i]:26]>=steady[i])[1]
-#   }
-#   if(recovcol[i]>26){
-#     recov<-tcg[i,colnum[i]:26]
-#   } else {
-#     recov<- tcg[i,colnum[i]:recovcol[i]]
-#   }
-#   #recovcol[i,]<-which(tcg[i,colnum[i,]:130]>steady[i])[1]
-#   #recovcol[i,]<-colnum[i,]+which(tcg[i,colnum[i,]:130]>steady[i])[1]
-#   #recov <- tcg[i,colnum[i]:recovcol[i]]
-#   ind<-1:length(recov)                      #grabs length of recov rate
-#   slope[[i]]<-lm(recov~ind)                      #runs the lm to find slope of recov rate, saves output
-#   recov.rate[i]<-slope[[i]]$coefficients["ind"] #stores recovery rate
-# }
-# 
-# #magnitudes:
-# mags<-steady-mins
-# recov.time<-mags/recov.rate
-# 
-# tcg.recov.mx<-cbind(steadyall,steady,colnum,mins,mags,recov.rate,recov.time)
-# tcg.recov<-as.data.frame(tcg.recov.mx)
-# tcg.recov$NLCD <- factor(landcover, levels=c(41,42,43,90,21),
-#                               labels=c("Deciduous", "Evergreen","Mixed","Woody Wetland","Developed:open space"))
-# tcg.recov$percentcover<-treecover
-# #colnames(tcg.recov)<-c("Steady State (All Years)","Steady State 2012-2015","Column Number","Minimum TCG Value","Disturbance Magnitude","Recovery Rate","Recovery Time","NLCD Type","Percent Tree Cover")
+# ###ANNUAL TCG DATA VERSION:-----
+tcgmeans<-"2021_07_12_sample_tcg_mean_ANNUAL_2500.csv"
+tcgtable<-read.csv(tcgmeans)
+tcg<-as.matrix(tcgtable[1:2500,2:27])
+
+steady<-apply(tcg[,19:21],1,mean,na.rm=T)
+steadyall<-apply(tcg[,1:26],1,mean,na.rm=T)
+
+#the TCG 2016-onward version:
+recov.rate<-vector()
+slope<-list()
+#ind<-list()
+mins<-vector()
+colnum<-vector()
+recovcol<-vector()
+for (i in geoID){
+  mins[i]<-min(tcg[i,22:23],na.rm=T)          #grabs min forest condition score for each site
+  colnum[i]<-which(tcg[i,]==mins[i])           #grabs time step at which min score appears in disturbance window
+  if(is.na(colnum[i] + which(tcg[i,colnum[i]:26]>=steady[i])[1])){
+    recovcol[i]<-colnum[i] + 2
+  } else {
+    recovcol[i]<-colnum[i] + which(tcg[i,colnum[i]:26]>=steady[i])[1]
+  }
+  if(recovcol[i]>26){
+    recov<-tcg[i,colnum[i]:26]
+  } else {
+    recov<- tcg[i,colnum[i]:recovcol[i]]
+  }
+  #recovcol[i,]<-which(tcg[i,colnum[i,]:130]>steady[i])[1]
+  #recovcol[i,]<-colnum[i,]+which(tcg[i,colnum[i,]:130]>steady[i])[1]
+  #recov <- tcg[i,colnum[i]:recovcol[i]]
+  ind<-1:length(recov)                      #grabs length of recov rate
+  slope[[i]]<-lm(recov~ind)                      #runs the lm to find slope of recov rate, saves output
+  recov.rate[i]<-slope[[i]]$coefficients["ind"] #stores recovery rate
+}
+
+#magnitudes:
+mags<-steady-mins
+recov.time<-mags/recov.rate
+
+tcg.recov.mx<-cbind(steadyall,steady,colnum,mins,mags,recov.rate,recov.time)
+tcg.recov<-as.data.frame(tcg.recov.mx)
+tcg.recov$NLCD <- factor(landcover, levels=c(41,42,43,90,21),
+                              labels=c("Deciduous", "Evergreen","Mixed","Woody Wetland","Developed:open space"))
+tcg.recov$percentcover<-treecover
+#colnames(tcg.recov)<-c("Steady State (All Years)","Steady State 2012-2015","Column Number","Minimum TCG Value","Disturbance Magnitude","Recovery Rate","Recovery Time","NLCD Type","Percent Tree Cover")
 
 
 if (FALSE){
