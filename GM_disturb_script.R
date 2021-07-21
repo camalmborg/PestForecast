@@ -111,11 +111,12 @@ for (s in 1:ns){
 "
 
 #data and parameters for random effects model:
-data.s = list(y=obs, n=NT, ns=length(geoID),
+data.m = list(y=obs, n=NT, ns=length(geoID),
             x_ic=0, tau_ic=0.1,
             a_obs=0.1,t_obs=0.1,
             a_add=0.1,t_add=0.1,
-            rmean=0,rprec=0.00001)
+            rmean=0,rprec=0.00001,
+            m=rep(1:5,length=NT))
 
 #j.pests.RE<-list()
 #j.pests.out.RE<-list()

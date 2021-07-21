@@ -56,11 +56,11 @@ for (s in 1:ns){
   
   #### Process Model
   for(t in 2:n){
-    muN[s,t]<-R*x[s,t-1] ##+month[]?
+    muN[s,t]<-R*x[s,t-1] + month[m[t]]
     x[s,t] ~ dnorm(mu[s,t],tau_add)
-    muD[s,t] ~ dnorm(mu0,pa0) ##+month[]?
+    muD[s,t] ~ dnorm(mu0,pa0)
     D[s,t] ~ dbern(p)
-    mu[s,t] <- D[s,t]*muD[s,t] + (1-D[s,t])*muN[s,t]
+    mu[s,t] <- D[s,t]*(muD[s,t] + month[m[t]]) + (1-D[s,t])*muN[s,t]  
   }
   
   x[s,1]~dnorm(x_ic,tau_ic)
@@ -68,14 +68,14 @@ for (s in 1:ns){
 }#end loop over sites
 
   ####Month effect
-  for(t in 1:n){
+  for(t in 1:5){
   month[t] ~ dnorm(0,tau_month)
   }
   
   #### Priors
   tau_obs ~ dgamma(t_obs,a_obs)
   tau_add ~ dgamma(a_add,t_add)
-  ##tau_month ~dgamma(1,0.1) ??????
+  tau_month ~dgamma(1,0.1)
   R ~ dnorm(rmean,rprec)  #rho term
   p ~ dunif(0,1)  #disturbance probability
   mu0 ~ dnorm(-5,1) #mean of disturbed state
