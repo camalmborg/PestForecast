@@ -111,12 +111,11 @@ for (s in 1:ns){
 "
 
 #data and parameters for random effects model:
-data.m = list(y=obs, n=NT, ns=length(geoID),
+data.s = list(y=obs, n=NT, ns=length(geoID),
             x_ic=0, tau_ic=0.1,
             a_obs=0.1,t_obs=0.1,
             a_add=0.1,t_add=0.1,
-            rmean=0,rprec=0.00001,
-            m=rep(1:5,length=NT))
+            rmean=0,rprec=0.00001)
 
 #j.pests.RE<-list()
 #j.pests.out.RE<-list()
@@ -129,14 +128,14 @@ for(j in 1:nchain){
   init[[j]]<-list(tau_add=1/var(diff(samp)),tau_obs=1/var(samp))
 }
 
-j.pests <- jags.model (file = textConnection(pests),
-                      data = data.s,
+j.pests <- jags.model (file = textConnection(pests.m),
+                      data = data.m,
                       inits = init,
                       n.chains = 3)
 j.pests.out <- coda.samples (model = j.pests,
-                            variable.names = c("x","tau_add","tau_obs", "R", "p", "D", "mu0", "pa0"),
+                            variable.names = c("mu0","p","pa0","tau_add"),    #c("x","tau_add","tau_obs", "R", "p", "D", "mu0", "pa0"),
                             n.iter = 10000)
-j.pests.out.thin<-window(j.pests.out,thin=10)
+#j.pests.out.thin<-window(j.pests.out,thin=10)
 
 # j.pests.out.2500<-coda.samples(model = j.pests,
 #                                variable.names = c("x","tau_add","tau_obs", "R", "p", "D", "mu0", "pa0"),
@@ -176,7 +175,7 @@ parse.MatrixNames <- function(w, pre = "x", numeric = FALSE) {
 
 ###splitting output-----still doesn't work
 out = list(params=NULL,predict=NULL)
-mfit = as.matrix(j.pests.out.thin,chains=TRUE)
+mfit = as.matrix(j.pests.out,chains=TRUE)
 pred.cols = union(grep("x",colnames(mfit),fixed=TRUE),
                   grep("D",colnames(mfit),fixed=TRUE))
 chain.col = which(colnames(mfit)=="CHAIN")
@@ -193,18 +192,18 @@ out$params   = mat2mcmc.list(mfit[,-pred.cols])
 
 #-----visualizations:------
 
-x.cols <- grep("^x",colnames(out.pests.thin))
-ci.x <- apply(out.pests.thin[,x.cols],2,quantile,c(0.025,0.5,0.975))
+x.cols <- grep("^x",colnames(out.pests))
+ci.x <- apply(out.pests[,x.cols],2,quantile,c(0.025,0.5,0.975))
 ci.x.names = parse.MatrixNames(colnames(ci.x),numeric=TRUE)
 
 
-d.cols <- grep("^D",colnames(out.pests.thin))
-ci.d <- apply(out.pests.thin[,d.cols],2,quantile,c(0.25,0.5,0.975))
+d.cols <- grep("^D",colnames(out.pests))
+ci.d <- apply(out.pests[,d.cols],2,quantile,c(0.25,0.5,0.975))
 
 i=48
 sitei = which(ci.x.names$row == i)
 
-tiff("timeseriesexamp.tiff", units="in", width=8, height=3, res=300)
+#tiff("timeseriesexamp.tiff", units="in", width=8, height=3, res=300)
 plot(ci.x[2,sitei],type='l',ylim=range(obs,na.rm=TRUE),
      ylab="Forest Condition Score", 
      col="black",
@@ -212,7 +211,7 @@ plot(ci.x[2,sitei],type='l',ylim=range(obs,na.rm=TRUE),
      cex=1)
 ecoforecastR::ciEnvelope(time,ci.x[1,sitei],ci.x[3,sitei],col=ecoforecastR::col.alpha("lightBlue",0.60))
 points(time,obs[i,],pch="+",cex=0.5,col="navyblue")
-dev.off()
+#dev.off()
 
 tiff("timeseriesexamp2.tiff", units="in", width=8, height=3, res=300)
 plot(time,obs[i,],type='l',ylim=range(obs,na.rm=TRUE),

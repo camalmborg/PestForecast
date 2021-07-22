@@ -82,3 +82,10 @@ for (s in 1:ns){
   pa0 ~ dgamma(1,1) #precision of disturbed state
 }
 "
+
+data.m = list(y=obs, n=NT, ns=length(geoID),
+              x_ic=0, tau_ic=0.1,
+              a_obs=0.1,t_obs=0.1,
+              a_add=0.1,t_add=0.1,
+              rmean=0,rprec=0.00001,
+              m=rep(1:5,length=NT))
