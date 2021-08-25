@@ -134,7 +134,8 @@ j.pests <- jags.model (file = textConnection(pests.m),
                       n.chains = 3)
 j.pests.out <- coda.samples (model = j.pests,
                             variable.names = c("mu0","p","pa0","tau_add"),    #c("x","tau_add","tau_obs", "R", "p", "D", "mu0", "pa0"),
-                            n.iter = 10000)
+                            n.iter = 10000,
+                            thin=10)
 #j.pests.out.thin<-window(j.pests.out,thin=10)
 
 # j.pests.out.2500<-coda.samples(model = j.pests,
