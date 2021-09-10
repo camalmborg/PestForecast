@@ -112,4 +112,8 @@ recov.time.s<-mags.s/recov.rate
 tcg.recov.mx<-cbind(steadyall,steady,colnum,mins,mags,recov.rate,recov.time)
 tcg.recov<-as.data.frame(tcg.recov.mx)
 
+###regressions
+#recov rate as function of magnitude of disturbance:
 mrrreg<-lm(recov.rate~mags,tcg.recov)
+#recov rate as function of magnitude and site greenness prior to disturbance:
+anotherreg<-lm(recov.rate~mags+steady,tcg.recov)
