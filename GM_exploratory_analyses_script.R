@@ -84,12 +84,12 @@ recovcol<-vector()
 end<-length(tcg.june[1,])
 nsite<-length(tcg.june[,1])
 for (i in 1:nsite){
-  mins[i]<-min(tcg.june[i,21:23],na.rm=T)          #grabs min forest condition score for each site
+  mins[i]<-min(tcg.june[i,22:23],na.rm=T)          #grabs min forest condition score for each site
   colnum[i]<-which(tcg.june[i,]==mins[i])           #grabs time step at which min score appears in disturbance window
-  if(is.na(colnum[i] + which(tcg.june[i,colnum[i]:end]>=steady[i])[1])){
+  if(is.na(colnum[i] + which(tcg.june[i,colnum[i]:end]>=steadyall[i])[1])){
     recovcol[i]<-colnum[i] + 2
   } else {
-    recovcol[i]<-colnum[i] + which(tcg.june[i,colnum[i]:end]>=steady[i])[1]
+    recovcol[i]<-colnum[i] + which(tcg.june[i,colnum[i]:end]>=steadyall[i])[1]
   }
   if(recovcol[i]>end){
     recov<-tcg.june[i,colnum[i]:end]
@@ -108,3 +108,8 @@ mags.s<-steadyall-mins
 recov.time<-mags/recov.rate
 recov.time.s<-mags.s/recov.rate
 
+#combine data for regressions:
+tcg.recov.mx<-cbind(steadyall,steady,colnum,mins,mags,recov.rate,recov.time)
+tcg.recov<-as.data.frame(tcg.recov.mx)
+
+mrrreg<-lm(recov.rate~mags,tcg.recov)
