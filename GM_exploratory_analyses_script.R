@@ -13,47 +13,47 @@ tcg.mo<-tcg.month[,2:131]
 
 
 
-####remove may:-----
-nomay<-seq(1,130,by=5)
-tcg.nomay<-as.matrix(tcg.mo[,-nomay])
-
-#### steady state previous 3 years 2015------
-#find the non-GM disturb condition "steady state"
-steady<-apply(tcg.nomay[,73:84],1,mean,na.rm=T)
-#steadyall<-apply(tcg.nomay[,1:84],1,mean,na.rm=T)
-
-
-####the TCG 2016-onward MONTHLY version (no Mays):-----
-#ind<-list()
-recov.rate<-vector()
-slope<-list()
-mins<-vector()
-colnum<-vector()
-recovcol<-vector()
-end<-length(tcg.nomay[1,])
-nsite<-length(tcg.nomay[,1])
-for (i in 1:nsite){
-  mins[i]<-min(tcg.nomay[i,85:92],na.rm=T)          #grabs min forest condition score for each site
-  colnum[i]<-which(tcg.nomay[i,]==mins[i])           #grabs time step at which min score appears in disturbance window
-  if(is.na(colnum[i] + which(tcg.nomay[i,colnum[i]:end]>=steady[i])[1])){
-    recovcol[i]<-colnum[i] + 2
-  } else {
-    recovcol[i]<-colnum[i] + which(tcg.nomay[i,colnum[i]:end]>=steady[i])[1]
-  }
-  if(recovcol[i]>end){
-    recov<-tcg.nomay[i,colnum[i]:end]
-  } else {
-    recov<-tcg.nomay[i,colnum[i]:recovcol[i]]
-  }
-  #recov <- tcg[i,colnum[i]:recovcol[i]]      
-  ind<-1:length(recov)                      #grabs length of recov rate   
-  slope[[i]]<-lm(recov~ind)                      #runs the lm to find slope of recov rate, saves output
-  recov.rate[i]<-slope[[i]]$coefficients["ind"] #stores recovery rate
-}
-
-#magnitudes:
-mags<-steady-mins
-recov.time<-mags/recov.rate
+# ####remove may:-----
+# nomay<-seq(1,130,by=5)
+# tcg.nomay<-as.matrix(tcg.mo[,-nomay])
+# 
+# #### steady state previous 3 years 2015------
+# #find the non-GM disturb condition "steady state"
+# steady<-apply(tcg.nomay[,73:84],1,mean,na.rm=T)
+# #steadyall<-apply(tcg.nomay[,1:84],1,mean,na.rm=T)
+# 
+# 
+# ####the TCG 2016-onward MONTHLY version (no Mays):-----
+# #ind<-list()
+# recov.rate<-vector()
+# slope<-list()
+# mins<-vector()
+# colnum<-vector()
+# recovcol<-vector()
+# end<-length(tcg.nomay[1,])
+# nsite<-length(tcg.nomay[,1])
+# for (i in 1:nsite){
+#   mins[i]<-min(tcg.nomay[i,85:92],na.rm=T)          #grabs min forest condition score for each site
+#   colnum[i]<-which(tcg.nomay[i,]==mins[i])           #grabs time step at which min score appears in disturbance window
+#   if(is.na(colnum[i] + which(tcg.nomay[i,colnum[i]:end]>=steady[i])[1])){
+#     recovcol[i]<-colnum[i] + 2
+#   } else {
+#     recovcol[i]<-colnum[i] + which(tcg.nomay[i,colnum[i]:end]>=steady[i])[1]
+#   }
+#   if(recovcol[i]>end){
+#     recov<-tcg.nomay[i,colnum[i]:end]
+#   } else {
+#     recov<-tcg.nomay[i,colnum[i]:recovcol[i]]
+#   }
+#   #recov <- tcg[i,colnum[i]:recovcol[i]]      
+#   ind<-1:length(recov)                      #grabs length of recov rate   
+#   slope[[i]]<-lm(recov~ind)                      #runs the lm to find slope of recov rate, saves output
+#   recov.rate[i]<-slope[[i]]$coefficients["ind"] #stores recovery rate
+# }
+# 
+# #magnitudes:
+# mags<-steady-mins
+# recov.time<-mags/recov.rate
 
 
 
@@ -61,10 +61,20 @@ recov.time<-mags/recov.rate
 #### THE JUNE VERSION:-----
 ####just junes
 junes<-seq(2,130,by=5)
-tcg.june<-as.matrix(tcg.mo[,junes])
+tcg.june.all<-as.matrix(tcg.mo[,junes])
+
+###remove rows with missing values for disturbance window
+NA16<-which(is.na(june16))
+NA17<-which(is.na(june17))
+missing<-intersect(NA16,NA17)
+tcg.june<-tcg.june.all[-missing,]
 
 ###steady state
 steady<-apply(tcg.june[,19:21],1,mean,na.rm=T)
+steadyall<-apply(tcg.june[,1:26],1,mean,na.rm=T)
+prevyr<-tcg.june[,21]
+june16<-tcg.june[,22]
+june17<-tcg.june[,23]
 
 recov.rate<-vector()
 slope<-list()
@@ -94,4 +104,7 @@ for (i in 1:nsite){
 
 #magnitudes:
 mags<-steady-mins
+mags.s<-steadyall-mins
 recov.time<-mags/recov.rate
+recov.time.s<-mags.s/recov.rate
+
