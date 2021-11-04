@@ -1,7 +1,9 @@
 ### Daymet Data Grab Script
+library(daymetr)
+
 #load data
 #load annual condition scores:
-#cond.scores.an<-read.csv("2020_07_10_sample_score_mean_ANNUAL.csv")
+cond.scores.an<-read.csv("2020_07_10_sample_score_mean_ANNUAL.csv")
 coords<-cond.scores.an[,30:31]
 nsites<-1:5000
 sites<-cbind(nsites,coords)
@@ -17,7 +19,7 @@ for(i in nsites){
                                       internal = TRUE)
 }
 
-#can use any dm# to get day of year
+#use any dm# to get day of year
 doy <- dm[[1]]$data$yday
 
 #grabbing max temp from each site's daymet data in dm list
@@ -26,11 +28,39 @@ for (i in nsites){
    metyr= dm[[i]]$data$year
    metyears=unique(metyr)
    maxtemp[[i]]<-matrix(NA,length(metyears),366)
-#   #maxtemp[,i]<-dm[[i]]$data$tmax..deg.c.
-#   for(j in 1:nrow(dm[[i]]$data)){
-#     maxtemp[[i]][as.numeric(as.factor(metyr))[j],dm[[i]]$data$yday[j]]=dm[[i]]$data$tmax..deg.c.[j]
-#   }
+   for(j in 1:nrow(dm[[i]]$data)){
+     maxtemp[[i]][as.numeric(as.factor(metyr))[j],dm[[i]]$data$yday[j]]=dm[[i]]$data$tmax..deg.c.[j]
+   }
+print("done!", i)
 }
+#this code works^^^
+print("it worked!")
+saveRDS(maxtemp, file='maxtemp.rds')
+save(maxtemp, file='maxtemp.RData')
+#load('maxtemp.RData')
 
-#add the doy to be the first column, each of the next columns 2-9 are each site (in alphabetical order)
-#maxtemp<-cbind(doy,maxtemp)
+
+#grabbing min temp from each site's daymet data in dm list
+mintemp<-list()
+for (i in nsites){
+   metyr= dm[[i]]$data$year
+   metyears=unique(metyr)
+   mintemp[[i]]<-matrix(NA,length(metyears),366)
+   for(j in 1:nrow(dm[[i]]$data)){
+      mintemp[[i]][as.numeric(as.factor(metyr))[j],dm[[i]]$data$yday[j]]=dm[[i]]$data$tmin..deg.c.[j]
+   }
+   print("done!", i)
+}
+#this code works^^^
+print("it worked!")
+saveRDS(maxtemp, file='mintemp.rds')
+save(maxtemp, file='mintemp.RData')
+#load('mintemp.RData')
+
+
+
+
+#automating to run through x number of variables?
+#change to May-Sep grab instead of full year? 
+#   -no, we may want winter temps
+#   -separate seasons as needed later
