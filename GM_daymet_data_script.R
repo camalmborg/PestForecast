@@ -53,8 +53,26 @@ for (i in nsites){
 }
 #this code works^^^
 print("it worked!")
-saveRDS(maxtemp, file='mintemp.rds')
-save(maxtemp, file='mintemp.RData')
+#saveRDS(mintemp, file='mintemp.rds')
+save(mintemp, file='mintemp.RData')
+#load('mintemp.RData')
+
+
+#grabbing vpd from each site's daymet data in dm list
+vpd<-list()
+for (i in nsites){
+   metyr= dm[[i]]$data$year
+   metyears=unique(metyr)
+   vpd[[i]]<-matrix(NA,length(metyears),366)
+   for(j in 1:nrow(dm[[i]]$data)){
+      vpd[[i]][as.numeric(as.factor(metyr))[j],dm[[i]]$data$yday[j]]=dm[[i]]$data$#[j]
+   }
+   print("done!", i)
+}
+#this code works^^^
+print("it worked!")
+#saveRDS(vpd, file='vpd.rds')
+save(vpd, file='vpd.RData')
 #load('mintemp.RData')
 
 
