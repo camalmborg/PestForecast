@@ -90,6 +90,21 @@ for (i in nsites){
 print("it worked!")
 save(precip, file='precip.RData')
 
+
+solr<-list()
+for (i in nsites){
+  metyr=dm[[i]]$data$year
+  metyears=unique(metyr)
+  solr[[i]]<-matrix(NA,length(metyears),366)
+  for(j in 1:nrow(dm[[i]]$data)){
+    solr[[i]][as.numeric(as.factor(metyr))[j],dm[[i]]$data$yday[j]]=dm[[i]]$data$srad..W.m.2.[j]
+  }
+  print("done!")
+}
+#this code works^^^
+print("it worked!")
+save(solr, file='solr.RData')
+
 #automating to run through x number of variables?
 #change to May-Sep grab instead of full year? 
 #   -no, we may want winter temps
