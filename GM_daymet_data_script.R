@@ -35,7 +35,7 @@ print("done!", i)
 }
 #this code works^^^
 print("it worked!")
-saveRDS(maxtemp, file='maxtemp.rds')
+#saveRDS(maxtemp, file='maxtemp.rds')
 save(maxtemp, file='maxtemp.RData')
 #load('maxtemp.RData')
 
@@ -49,7 +49,7 @@ for (i in nsites){
    for(j in 1:nrow(dm[[i]]$data)){
       mintemp[[i]][as.numeric(as.factor(metyr))[j],dm[[i]]$data$yday[j]]=dm[[i]]$data$tmin..deg.c.[j]
    }
-   print("done!", i)
+   print("done!")
 }
 #this code works^^^
 print("it worked!")
@@ -65,9 +65,9 @@ for (i in nsites){
    metyears=unique(metyr)
    vpd[[i]]<-matrix(NA,length(metyears),366)
    for(j in 1:nrow(dm[[i]]$data)){
-      vpd[[i]][as.numeric(as.factor(metyr))[j],dm[[i]]$data$yday[j]]=dm[[i]]$data$#[j]
+      vpd[[i]][as.numeric(as.factor(metyr))[j],dm[[i]]$data$yday[j]]=dm[[i]]$data$vp..Pa.[j]
    }
-   print("done!", i)
+   print("done!")
 }
 #this code works^^^
 print("it worked!")
@@ -76,7 +76,19 @@ save(vpd, file='vpd.RData')
 #load('mintemp.RData')
 
 
-
+precip<-list()
+for (i in nsites){
+  metyr=dm[[i]]$data$year
+  metyears=unique(metyr)
+  precip[[i]]<-matrix(NA,length(metyears),366)
+  for(j in 1:nrow(dm[[i]]$data)){
+    precip[[i]][as.numeric(as.factor(metyr))[j],dm[[i]]$data$yday[j]]=dm[[i]]$data$prcp..mm.day.[j]
+  }
+  print("done!")
+}
+#this code works^^^
+print("it worked!")
+save(precip, file='precip.RData')
 
 #automating to run through x number of variables?
 #change to May-Sep grab instead of full year? 
