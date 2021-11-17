@@ -62,6 +62,7 @@ tcg.mo<-tcg.month[,2:131]
 ####just junes
 junes<-seq(2,130,by=5)
 tcg.june.all<-as.matrix(tcg.mo[,junes])
+cond.june<-as.matrix(cond.mo[,junes])
 
 ###remove rows with missing values for disturbance window
 NA16<-which(is.na(june16))
