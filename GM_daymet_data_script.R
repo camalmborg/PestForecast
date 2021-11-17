@@ -109,3 +109,4 @@ save(solr, file='solr.RData')
 #change to May-Sep grab instead of full year? 
 #   -no, we may want winter temps
 #   -separate seasons as needed later
+
