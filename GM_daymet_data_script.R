@@ -27,7 +27,7 @@ maxtemp<-list()
 for (i in nsites){
    metyr= dm[[i]]$data$year
    metyears=unique(metyr)
-   maxtemp[[i]]<-matrix(NA,length(metyears),366)
+   maxtemp[[i]]<-matrix(NA,length(metyears),365)
    for(j in 1:nrow(dm[[i]]$data)){
      maxtemp[[i]][as.numeric(as.factor(metyr))[j],dm[[i]]$data$yday[j]]=dm[[i]]$data$tmax..deg.c.[j]
    }
@@ -45,7 +45,7 @@ mintemp<-list()
 for (i in nsites){
    metyr= dm[[i]]$data$year
    metyears=unique(metyr)
-   mintemp[[i]]<-matrix(NA,length(metyears),366)
+   mintemp[[i]]<-matrix(NA,length(metyears),365)
    for(j in 1:nrow(dm[[i]]$data)){
       mintemp[[i]][as.numeric(as.factor(metyr))[j],dm[[i]]$data$yday[j]]=dm[[i]]$data$tmin..deg.c.[j]
    }
@@ -63,7 +63,7 @@ vpd<-list()
 for (i in nsites){
    metyr= dm[[i]]$data$year
    metyears=unique(metyr)
-   vpd[[i]]<-matrix(NA,length(metyears),366)
+   vpd[[i]]<-matrix(NA,length(metyears),365)
    for(j in 1:nrow(dm[[i]]$data)){
       vpd[[i]][as.numeric(as.factor(metyr))[j],dm[[i]]$data$yday[j]]=dm[[i]]$data$vp..Pa.[j]
    }
@@ -80,7 +80,7 @@ precip<-list()
 for (i in nsites){
   metyr=dm[[i]]$data$year
   metyears=unique(metyr)
-  precip[[i]]<-matrix(NA,length(metyears),366)
+  precip[[i]]<-matrix(NA,length(metyears),365)
   for(j in 1:nrow(dm[[i]]$data)){
     precip[[i]][as.numeric(as.factor(metyr))[j],dm[[i]]$data$yday[j]]=dm[[i]]$data$prcp..mm.day.[j]
   }
@@ -95,7 +95,7 @@ solr<-list()
 for (i in nsites){
   metyr=dm[[i]]$data$year
   metyears=unique(metyr)
-  solr[[i]]<-matrix(NA,length(metyears),366)
+  solr[[i]]<-matrix(NA,length(metyears),365)
   for(j in 1:nrow(dm[[i]]$data)){
     solr[[i]][as.numeric(as.factor(metyr))[j],dm[[i]]$data$yday[j]]=dm[[i]]$data$srad..W.m.2.[j]
   }
