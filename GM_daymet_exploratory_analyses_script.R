@@ -88,7 +88,7 @@ fall<-c(doy[245:335])
 #seasons<-c(winter,spring,summer,fall)
 
 
-##making months:
+##making months:-----------
 #monthly breaks:
 jan<-c(doy[1:31])
 feb<-c(doy[32:59])
@@ -105,6 +105,8 @@ dec<-c(doy[335:365])
 
 #------make useful for all variables:--------------
 
+###-----
+#loading the variable and dropping empty matrix column
 #load variable:
 load('maxtemp.RData')
 #load('mintemp.RData')
@@ -125,6 +127,7 @@ var<-varx
 rm(varx)
 #save(maxtemp, file='maxtemp.RData')
 
+###FOR AVERAGES, SEASONAL-----
 # avgyrvar<-matrix(NA, nrow=nsites, ncol=length(metyears))
 # for (i in 1:nsites){
 #   for (j in 1:length(metyears)){
@@ -153,7 +156,7 @@ for (i in 1:nsites){
   }
 }
 
-
+###PLOTS-----
 #plot a sample with tcg as x:
 samp<-sample(nsites,500)
 xl=c(-3,7.5) #maxtemp, winter
@@ -181,3 +184,198 @@ for (s in 1:nsites){
   points(avgsvar[[s]][1,23], mags[s], pch=20)
 }
 
+
+
+
+###FOR MAX VALUES, MONTHLY:-----
+maxvar<-list()
+for (i in 1:nsites){
+  maxvar[[i]]<-matrix(NA, nrow=12, ncol=length(metyears))
+  for (j in 1:length(metyears)){
+    for (s in 1:12){
+      if (s==1){
+        maxvar[[i]][s,j]<-max(var[[i]][j,jan])
+      }
+      if (s==2){
+        maxvar[[i]][s,j]<-max(var[[i]][j,feb])
+      }
+      if (s==3){
+        maxvar[[i]][s,j]<-max(var[[i]][j,mar])
+      }
+      if (s==4){
+        maxvar[[i]][s,j]<-max(var[[i]][j,apr])
+      }
+      if (s==5){
+        maxvar[[i]][s,j]<-max(var[[i]][j,may])
+      }
+      if (s==6){
+        maxvar[[i]][s,j]<-max(var[[i]][j,jun])
+      }
+      if (s==7){
+        maxvar[[i]][s,j]<-max(var[[i]][j,jul])
+      }
+      if (s==8){
+        maxvar[[i]][s,j]<-max(var[[i]][j,aug])
+      }
+      if (s==9){
+        maxvar[[i]][s,j]<-max(var[[i]][j,sep])
+      }
+      if (s==10){
+        maxvar[[i]][s,j]<-max(var[[i]][j,oct])
+      }
+      if (s==11){
+        maxvar[[i]][s,j]<-max(var[[i]][j,nov])
+      }
+      if (s==12){
+        maxvar[[i]][s,j]<-max(var[[i]][j,dec])
+      }
+    }
+  }
+}
+
+
+
+
+###FOR MIN VALUES, MONTHLY:-----
+minvar<-list()
+for (i in 1:nsites){
+  minvar[[i]]<-matrix(NA, nrow=12, ncol=length(metyears))
+  for (j in 1:length(metyears)){
+    for (s in 1:12){
+      if (s==1){
+        minvar[[i]][s,j]<-min(var[[i]][j,jan])
+      }
+      if (s==2){
+        minvar[[i]][s,j]<-min(var[[i]][j,feb])
+      }
+      if (s==3){
+        minvar[[i]][s,j]<-min(var[[i]][j,mar])
+      }
+      if (s==4){
+        minvar[[i]][s,j]<-min(var[[i]][j,apr])
+      }
+      if (s==5){
+        minvar[[i]][s,j]<-min(var[[i]][j,may])
+      }
+      if (s==6){
+        minvar[[i]][s,j]<-min(var[[i]][j,jun])
+      }
+      if (s==7){
+        minvar[[i]][s,j]<-min(var[[i]][j,jul])
+      }
+      if (s==8){
+        minvar[[i]][s,j]<-min(var[[i]][j,aug])
+      }
+      if (s==9){
+        minvar[[i]][s,j]<-min(var[[i]][j,sep])
+      }
+      if (s==10){
+        minvar[[i]][s,j]<-min(var[[i]][j,oct])
+      }
+      if (s==11){
+        minvar[[i]][s,j]<-min(var[[i]][j,nov])
+      }
+      if (s==12){
+        minvar[[i]][s,j]<-min(var[[i]][j,dec])
+      }
+    }
+  }
+}
+
+
+
+###FOR MEAN VALUES, MONTHLY:-----
+meanvar<-list()
+for (i in 1:nsites){
+  meanvar[[i]]<-matrix(NA, nrow=12, ncol=length(metyears))
+  for (j in 1:length(metyears)){
+    for (s in 1:12){
+      if (s==1){
+        meanvar[[i]][s,j]<-mean(var[[i]][j,jan])
+      }
+      if (s==2){
+        meanvar[[i]][s,j]<-mean(var[[i]][j,feb])
+      }
+      if (s==3){
+        meanvar[[i]][s,j]<-mean(var[[i]][j,mar])
+      }
+      if (s==4){
+        meanvar[[i]][s,j]<-mean(var[[i]][j,apr])
+      }
+      if (s==5){
+        meanvar[[i]][s,j]<-mean(var[[i]][j,may])
+      }
+      if (s==6){
+        meanvar[[i]][s,j]<-mean(var[[i]][j,jun])
+      }
+      if (s==7){
+        meanvar[[i]][s,j]<-mean(var[[i]][j,jul])
+      }
+      if (s==8){
+        meanvar[[i]][s,j]<-mean(var[[i]][j,aug])
+      }
+      if (s==9){
+        meanvar[[i]][s,j]<-mean(var[[i]][j,sep])
+      }
+      if (s==10){
+        meanvar[[i]][s,j]<-mean(var[[i]][j,oct])
+      }
+      if (s==11){
+        meanvar[[i]][s,j]<-mean(var[[i]][j,nov])
+      }
+      if (s==12){
+        meanvar[[i]][s,j]<-mean(var[[i]][j,dec])
+      }
+    }
+  }
+}
+
+
+
+
+
+###FOR MEDIAN VALUES, MONTHLY:-----
+medvar<-list()
+for (i in 1:nsites){
+  medvar[[i]]<-matrix(NA, nrow=12, ncol=length(metyears))
+  for (j in 1:length(metyears)){
+    for (s in 1:12){
+      if (s==1){
+        medvar[[i]][s,j]<-median(var[[i]][j,jan])
+      }
+      if (s==2){
+        medvar[[i]][s,j]<-median(var[[i]][j,feb])
+      }
+      if (s==3){
+        medvar[[i]][s,j]<-median(var[[i]][j,mar])
+      }
+      if (s==4){
+        medvar[[i]][s,j]<-median(var[[i]][j,apr])
+      }
+      if (s==5){
+        medvar[[i]][s,j]<-median(var[[i]][j,may])
+      }
+      if (s==6){
+        medvar[[i]][s,j]<-median(var[[i]][j,jun])
+      }
+      if (s==7){
+        medvar[[i]][s,j]<-median(var[[i]][j,jul])
+      }
+      if (s==8){
+        medvar[[i]][s,j]<-median(var[[i]][j,aug])
+      }
+      if (s==9){
+        medvar[[i]][s,j]<-median(var[[i]][j,sep])
+      }
+      if (s==10){
+        medvar[[i]][s,j]<-median(var[[i]][j,oct])
+      }
+      if (s==11){
+        medvar[[i]][s,j]<-median(var[[i]][j,nov])
+      }
+      if (s==12){
+        medvar[[i]][s,j]<-median(var[[i]][j,dec])
+      }
+    }
+  }
+}
