@@ -239,7 +239,6 @@ for (i in nsites){
 
 
 
-
 ###FOR MIN VALUES, MONTHLY:-----
 minvar<-list()
 for (i in nsites){
@@ -383,3 +382,22 @@ for (i in nsites){
     }
   }
 }
+
+
+#SAVING DATA FOR EASY REUSE:-----
+# save(maxvar, file='maxtempmax.RData')
+# #save(minvar, file='maxtempmin.RData')
+# save(meanvar, file='maxtempmean.Rdata')
+# save(medvar, file='maxtempmed.Rdata')
+# 
+# #save(maxvar, file='mintempmax.RData')
+# save(minvar, file='mintempmin.RData')
+# save(meanvar, file='mintempmean.Rdata')
+# save(medvar, file='mintempmed.Rdata')
+# 
+# save(maxvar, file='precipmax.RData')
+# save(minvar, file='precipmin.RData')
+# save(meanvar, file='precipmean.Rdata')
+# save(medvar, file='precipmed.Rdata')
+# 
+
