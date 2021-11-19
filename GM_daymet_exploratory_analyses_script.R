@@ -85,8 +85,23 @@ spring<-c(doy[60:151])
 summer<-c(doy[152:244])
 fall<-c(doy[245:335])
 #make one object:
-seasons<-c(winter,spring,summer,fall)
+#seasons<-c(winter,spring,summer,fall)
 
+
+##making months:
+#monthly breaks:
+jan<-c(doy[1:31])
+feb<-c(doy[32:59])
+mar<-c(doy[60:90])
+apr<-c(doy[91:120])
+may<-c(doy[121:151])
+jun<-c(doy[152:181])
+jul<-c(doy[182:212])
+aug<-c(doy[213:243])
+sep<-c(doy[244:273])
+oct<-c(doy[274:304])
+nov<-c(doy[305:334])
+dec<-c(doy[335:365])
 
 #------make useful for all variables:--------------
 
