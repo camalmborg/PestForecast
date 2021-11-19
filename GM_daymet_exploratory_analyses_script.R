@@ -119,7 +119,7 @@ var=maxtemp
 
 #remove the 366 day:
 varx<-list()
-for (i in 1:nsites){
+for (i in nsites){
   varx[[i]]<-var[[i]][1:26,1:365]
 }
 #replace old data:
@@ -187,9 +187,13 @@ for (s in 1:nsites){
 
 
 
+
+#-----
+#
+#-----
 ###FOR MAX VALUES, MONTHLY:-----
 maxvar<-list()
-for (i in 1:nsites){
+for (i in nsites){
   maxvar[[i]]<-matrix(NA, nrow=12, ncol=length(metyears))
   for (j in 1:length(metyears)){
     for (s in 1:12){
@@ -238,7 +242,7 @@ for (i in 1:nsites){
 
 ###FOR MIN VALUES, MONTHLY:-----
 minvar<-list()
-for (i in 1:nsites){
+for (i in nsites){
   minvar[[i]]<-matrix(NA, nrow=12, ncol=length(metyears))
   for (j in 1:length(metyears)){
     for (s in 1:12){
@@ -286,7 +290,7 @@ for (i in 1:nsites){
 
 ###FOR MEAN VALUES, MONTHLY:-----
 meanvar<-list()
-for (i in 1:nsites){
+for (i in nsites){
   meanvar[[i]]<-matrix(NA, nrow=12, ncol=length(metyears))
   for (j in 1:length(metyears)){
     for (s in 1:12){
@@ -336,7 +340,7 @@ for (i in 1:nsites){
 
 ###FOR MEDIAN VALUES, MONTHLY:-----
 medvar<-list()
-for (i in 1:nsites){
+for (i in nsites){
   medvar[[i]]<-matrix(NA, nrow=12, ncol=length(metyears))
   for (j in 1:length(metyears)){
     for (s in 1:12){
