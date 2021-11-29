@@ -1,7 +1,7 @@
 #daymet maxtemp exploratory analyses
 
 #load data:
-load('maxtemp.RData')
+#load('maxtemp.RData')
 
 #things I might need for loops if not in environment:
 #nsites=5000
@@ -108,14 +108,14 @@ dec<-c(doy[335:365])
 ###-----
 #loading the variable and dropping empty matrix column
 #load variable:
-load('maxtemp.RData')
+#load('maxtemp.RData')
 #load('mintemp.RData')
-#load('precip.RData')
+load('precip.RData')
 #load('solr.RData')
 #load('vpd.RData')
 
 #change this depending on which variable you are using:
-var=maxtemp
+var=precip
 
 #remove the 366 day:
 varx<-list()
@@ -386,11 +386,11 @@ for (i in nsites){
 
 #SAVING DATA FOR EASY REUSE:-----
 # save(maxvar, file='maxtempmax.RData')
-# #save(minvar, file='maxtempmin.RData')
+# save(minvar, file='maxtempmin.RData')
 # save(meanvar, file='maxtempmean.Rdata')
 # save(medvar, file='maxtempmed.Rdata')
 # 
-# #save(maxvar, file='mintempmax.RData')
+# save(maxvar, file='mintempmax.RData')
 # save(minvar, file='mintempmin.RData')
 # save(meanvar, file='mintempmean.Rdata')
 # save(medvar, file='mintempmed.Rdata')

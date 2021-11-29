@@ -17,12 +17,15 @@ for (s in nsites){
   points(maxvar[[s]][3,], cond.june[s,], pch=20)
 }
 
+#load desired var:
+#load('maxtempmean.RData')
+
 #with disturbance mag as x:
 #samp<-sample(nsites,500)
-xl=c(25,37) #maxtemp max
+xl=c(-10.5,1) 
 yl=c(0,max(mags,na.rm=T))
-plot(maxvar[[1]][6,23], mags[1], pch=20, ylim=yl, xlim=xl)
+plot(minvar[[1]][2,23], mags[1], pch=20, ylim=yl, xlim=xl)
 for (s in nsites){
-  points(maxvar[[s]][6,23], mags[s], pch=20)
+  points(minvar[[s]][2,23], mags[s], pch=20)
 }
 
