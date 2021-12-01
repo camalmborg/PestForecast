@@ -115,6 +115,8 @@ load('precip.RData')
 #load('vpd.RData')
 
 #change this depending on which variable you are using:
+# var=maxtemp
+# var=mintemp
 var=precip
 
 #remove the 366 day:
@@ -135,54 +137,54 @@ rm(varx)
 #   }
 # }
 
-avgsvar<-list()
-for (i in 1:nsites){
-  avgsvar[[i]]<-matrix(NA, nrow=4, ncol=length(metyears))
-  for (j in 1:length(metyears)){
-    for (s in 1:4){
-      if (s==1){
-        avgsvar[[i]][s,j]<-mean(var[[i]][j,winter])
-      }
-      if (s==2){
-        avgsvar[[i]][s,j]<-mean(var[[i]][j,spring])
-      }
-      if (s==3){
-        avgsvar[[i]][s,j]<-mean(var[[i]][j,summer])
-      }
-      if (s==4){
-        avgsvar[[i]][s,j]<-mean(var[[i]][j,fall])
-      }
-    }
-  }
-}
+# avgsvar<-list()
+# for (i in 1:nsites){
+#   avgsvar[[i]]<-matrix(NA, nrow=4, ncol=length(metyears))
+#   for (j in 1:length(metyears)){
+#     for (s in 1:4){
+#       if (s==1){
+#         avgsvar[[i]][s,j]<-mean(var[[i]][j,winter])
+#       }
+#       if (s==2){
+#         avgsvar[[i]][s,j]<-mean(var[[i]][j,spring])
+#       }
+#       if (s==3){
+#         avgsvar[[i]][s,j]<-mean(var[[i]][j,summer])
+#       }
+#       if (s==4){
+#         avgsvar[[i]][s,j]<-mean(var[[i]][j,fall])
+#       }
+#     }
+#   }
+# }
 
 ###PLOTS-----
-#plot a sample with tcg as x:
-samp<-sample(nsites,500)
-xl=c(-3,7.5) #maxtemp, winter
-yl=c(min(tcg.june,na.rm=T),max(tcg.june,na.rm=T))
-plot(avgsvar[[1]][1,], tcg.june[1,], pch=20, ylim=yl,xlim=xl)
-for (s in samp){
-  points(avgsvar[[s]][1,], tcg.june[s,], pch=20)
-}
-
-#with condition scores as x:
-samp<-sample(nsites,500)
-xl=c(20,30) #maxtemp, winter
-yl=c(min(cond.june,na.rm=T),max(cond.june,na.rm=T))
-plot(avgsvar[[1]][3,], cond.june[1,], pch=20, ylim=yl, xlim=xl)
-for (s in samp){
-  points(avgsvar[[s]][3,], cond.june[s,], pch=20)
-}
-
-#with disturbance mag as x:
-#samp<-sample(nsites,500)
-xl=c(-0.5,6) #maxtemp, winter
-yl=c(0,max(mags,na.rm=T))
-plot(avgsvar[[1]][1,23], mags[1], pch=20, ylim=yl, xlim=xl)
-for (s in 1:nsites){
-  points(avgsvar[[s]][1,23], mags[s], pch=20)
-}
+# #plot a sample with tcg as x:
+# samp<-sample(nsites,500)
+# xl=c(-3,7.5) #maxtemp, winter
+# yl=c(min(tcg.june,na.rm=T),max(tcg.june,na.rm=T))
+# plot(avgsvar[[1]][1,], tcg.june[1,], pch=20, ylim=yl,xlim=xl)
+# for (s in samp){
+#   points(avgsvar[[s]][1,], tcg.june[s,], pch=20)
+# }
+# 
+# #with condition scores as x:
+# samp<-sample(nsites,500)
+# xl=c(20,30) #maxtemp, winter
+# yl=c(min(cond.june,na.rm=T),max(cond.june,na.rm=T))
+# plot(avgsvar[[1]][3,], cond.june[1,], pch=20, ylim=yl, xlim=xl)
+# for (s in samp){
+#   points(avgsvar[[s]][3,], cond.june[s,], pch=20)
+# }
+# 
+# #with disturbance mag as x:
+# #samp<-sample(nsites,500)
+# xl=c(-0.5,6) #maxtemp, winter
+# yl=c(0,max(mags,na.rm=T))
+# plot(avgsvar[[1]][1,23], mags[1], pch=20, ylim=yl, xlim=xl)
+# for (s in 1:nsites){
+#   points(avgsvar[[s]][1,23], mags[s], pch=20)
+# }
 
 
 
