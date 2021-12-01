@@ -28,12 +28,12 @@ library(tactile)
 
 #with disturbance mag as x:
 #samp<-sample(nsites,500)
-xl=c(22,50) 
-yl=c(0,max(mags,na.rm=T))
-plot(meanvar[[1]][5,23], mags[1], pch=20, ylim=yl, xlim=xl)
-for (s in nsites){
-  points(maxvar[[s]][5,23], mags[s], pch=20)
-}
+# xl=c(22,50) 
+# yl=c(0,max(mags,na.rm=T))
+# plot(meanvar[[1]][5,23], mags[1], pch=20, ylim=yl, xlim=xl)
+# for (s in nsites){
+#   points(maxvar[[s]][5,23], mags[s], pch=20)
+# }
 
 ###PLOTTING:-----------------------------------------------
 
@@ -43,10 +43,10 @@ ms <- c(4:8)
 x <- matrix(data = NA, nrow=5000, ncol=5)
 for (m in 1:length(ms)){ 
   for (s in nsites){
-    x[s,m] <- maxvar[[s]][ms[m],18]
+    x[s,m] <- meanvar[[s]][ms[m],17]
   }
 }
-#x.17 <- x
+x.17 <- x
 #x.18 <- x
 #x.19 <- x
 #x.20 <- x
@@ -61,7 +61,7 @@ for (p in 1:length(prior5)){
   x <- matrix(data = NA, nrow=5000, ncol=5)
   for (m in 1:length(ms)){
     for (s in nsites){
-      x[s,m] <- maxvar[[s]][ms[m],prior5[p]]
+      x[s,m] <- meanvar[[s]][ms[m],prior5[p]]
     }
   }
   x.p <- cbind(x.p,x)
