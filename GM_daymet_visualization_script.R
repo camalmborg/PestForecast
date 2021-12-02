@@ -74,8 +74,10 @@ colnames(priorprecip)<-c('apr11','may11','jun11','jul11','aug11',
                          'apr14','may14','jun14','jul14','aug14',
                          'apr15','may15','jun15','jul15','aug15')
 
-precipmags<-merge(mags, x.17)
-may.lm <- lm(precipmags[,1]~precipmags[,3])
+#doing this with 2011 data to start:
+precipmags<-as.data.frame(cbind(mags, x.17))
+colnames(precipmags)<- c('mags', 'apr', 'may', 'jun', 'jul', 'aug')
+may.lm <- lm(mags~may, data = precipmags)
 
 #Plotting the precip change over 5 years Apr-Aug:
 # plot(priorprecip[1,], type ='l', ylim=c(0,max(priorprecip)), xlim=c(0,25))
@@ -83,7 +85,7 @@ may.lm <- lm(precipmags[,1]~precipmags[,3])
 #   lines(priorprecip[i,],)
 # }
 
-pmay17<-xyplot(precipmags[,1] ~ precipmags[,3], data = precipmags,
+pmay17<-xyplot(mags ~ may, data = precipmags,
                      panel = function(x, y) {
                        ci<-predict(may.lm, interval="confidence")
                        upper<-ci[,3]
@@ -91,14 +93,14 @@ pmay17<-xyplot(precipmags[,1] ~ precipmags[,3], data = precipmags,
                        panel.ci(x, y, upper, lower, fill="gray48",alpha = 0.4)
                        panel.xyplot(x, y, pch=16,col="black")
                        panel.abline(lm(y ~ x))
-                       summ<-summary(may.lm)
-                       r2 <- summ$adj.r.squared
-                       f <- summ$fstatistic
-                       p <- pf(f[1],f[2],f[3],lower.tail=F)
-                       panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
-                                   )#x=0.13,y=0.09,cex=0.75)
-                       panel.text(labels = bquote(italic(p)==.(format(p,digits = 3))),
-                      )#              x=0.13,y=0.07,cex=0.75)
+                       # summ<-summary(may.lm)
+                       # r2 <- summ$adj.r.squared
+                       # f <- summ$fstatistic
+                       # p <- pf(f[1],f[2],f[3],lower.tail=F)
+                       # panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
+                       #             )#x=0.13,y=0.09,cex=0.75)
+                       # panel.text(labels = bquote(italic(p)==.(format(p,digits = 3))),
+                      #              x=0.13,y=0.07,cex=0.75)
                       }#,
                      # ylab="Recovery Rate",
                      # xlab="TCG Steady State (2012-2015)",
