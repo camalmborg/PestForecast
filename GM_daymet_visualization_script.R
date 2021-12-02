@@ -3,6 +3,7 @@ library(ggplot2)
 library(lattice)
 library(latticeExtra)
 library(tactile)
+library(mgcv)
 
 ###PLOTS-----
 # #plot a sample with tcg as x:
@@ -78,6 +79,7 @@ colnames(priorprecip)<-c('apr11','may11','jun11','jul11','aug11',
 precipmags<-as.data.frame(cbind(mags, x.17))
 colnames(precipmags)<- c('mags', 'apr', 'may', 'jun', 'jul', 'aug')
 may.lm <- lm(mags~may, data = precipmags)
+may.gam <- gam(mags~may, data = precipmags)
 
 #Plotting the precip change over 5 years Apr-Aug:
 # plot(priorprecip[1,], type ='l', ylim=c(0,max(priorprecip)), xlim=c(0,25))
