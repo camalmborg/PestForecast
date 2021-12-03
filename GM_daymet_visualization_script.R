@@ -89,10 +89,15 @@ colnames(precipmags)<-c('mags','apr11','may11','jun11','jul11','aug11',
 # l.df<-loess.df[order(loess.df[,1]),]
 
 #Plotting the precip change over 5 years Apr-Aug:
-# plot(priorprecip[1,], type ='l', ylim=c(0,max(priorprecip)), xlim=c(0,25))
-# for (i in nsites){
-#   lines(priorprecip[i,],)
-# }
+plot(priorprecip[1,], type='l', ylim=c(0,max(priorprecip)), xlim=c(0,25))
+for (i in nsites){
+  lines(priorprecip[i,],)
+}
+
+mos<-1:25
+#pprecip<-apply(priorprecip,2,mean)
+#plot(mos,pprecip)
+precipmeans<-as.data.frame(cbind(mos,pprecip))
 
 #lattice plot example:-----
 pmay17<-xyplot(mags ~ may, data = precipmags,
@@ -148,7 +153,7 @@ precipplot<-xyplot(mags ~ mo, data = precipmags,
                  panel.xyplot(x, y, pch=20,col="royalblue3")
                  panel.lines(l[,1], l[,2],lty=1, col='black', lwd=1.5)
                  summ<-summary(precip.gam)
-                 r2 <- summ$adj.r.squared
+                 r2 <- summ$r.sq
                  f <- summ$fstatistic
                  p <- pf(f[1],f[2],f[3],lower.tail=F)
                  panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
@@ -157,11 +162,26 @@ precipplot<-xyplot(mags ~ mo, data = precipmags,
                             x=1.2,y=-0.15,cex=0.75)
                },
                 ylab="Disturbance Magnitude (TCG)",
-                xlab="Mean Temperature ",
+                xlab="Mean Precipitation (mm)",
 )
 print(precipplot)
 
 #saving plots:
 # tiff("title.tiff", units="in", width=7, height=5, res=300)
 # print(precipplot)
+# dev.off()
+
+
+preciptrend<-xyplot(pprecip ~ mos, data = precipmeans,
+                   panel = function(x, y) {
+                    panel.xyplot(x, y, pch=16,col="royalblue3")
+                    panel.abline(lm(y ~ x), col='royalblue4')
+                   },
+                   ylab="Mean Precipitation (mm)",
+                   xlab="Month (2011-2015, Apr-Aug)",
+)
+print(preciptrend)
+
+# tiff("preciptrend5yr.tiff", units="in", width=7, height=5, res=300)
+# print(preciptrend)
 # dev.off()
