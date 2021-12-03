@@ -138,6 +138,13 @@ print(pmay17)
 #prepare inputs:
 #input data is precipmags
 #mo will be the month we are using for the plot
+#columns for reference:
+#  1'mags',2'apr11',3'may11',4'jun11',5'jul11',6'aug11',
+#  7'apr12',8'may12',9'jun12',10'jul12',11'aug12',
+# 12'apr13',13'may13',14'jun13',15'jul13',16'aug13',
+# 16 'apr14',18'may14',19'jun14',20'jul14',21'aug14',
+# 22'apr15',23'may15',24'jun15',25'jul15',26'aug15')
+
 mo<-precipmags[,2]  #whatever column from precipmags we are using
 precip.gam = may.gam <- gam(mags~s(mo), data = precipmags)
   
