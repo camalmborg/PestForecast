@@ -160,3 +160,8 @@ precipplot<-xyplot(mags ~ mo, data = precipmags,
                 xlab="Mean Temperature ",
 )
 print(precipplot)
+
+#saving plots:
+# tiff("title.tiff", units="in", width=7, height=5, res=300)
+# print(precipplot)
+# dev.off()
