@@ -38,23 +38,23 @@ library(mgcv)
 
 ###PLOTTING:-----------------------------------------------
 
-#prepare data for plotting:
-#code to extract each year's values
-ms <- c(4:8) 
-x <- matrix(data = NA, nrow=5000, ncol=5)
-for (m in 1:length(ms)){ 
-  for (s in nsites){
-    x[s,m] <- meanvar[[s]][ms[m],17]
-  }
-}
-x.17 <- x
-#x.18 <- x
-#x.19 <- x
-#x.20 <- x
-#x.21 <- x
-#such that eg. x.17[,2]=May 2011
+#prepare data for plotting:-----
+# #code to extract each year's values
+# ms <- c(4:8) 
+# x <- matrix(data = NA, nrow=5000, ncol=5)
+# for (m in 1:length(ms)){ 
+#   for (s in nsites){
+#     x[s,m] <- meanvar[[s]][ms[m],17]
+#   }
+# }
+# x.17 <- x
+# #x.18 <- x
+# #x.19 <- x
+# #x.20 <- x
+# #x.21 <- x
+# #such that eg. x.17[,2]=May 2011
 
-#Cmakes big matrix with 5 months per 5 prior years for precip data (Apr-Aug, 2011-2015)
+#Makes big matrix with 5 months per 5 prior years for precip data (Apr-Aug, 2011-2015)
 prior5 <- c(17:21)
 
 x.p <- matrix(data=NA, nrow=5000)
@@ -69,20 +69,24 @@ for (p in 1:length(prior5)){
 }
 
 priorprecip<-x.p[,2:26]
-colnames(priorprecip)<-c('apr11','may11','jun11','jul11','aug11',
+# colnames(priorprecip)<-c('mags','apr11','may11','jun11','jul11','aug11',
+#                          'apr12','may12','jun12','jul12','aug12',
+#                          'apr13','may13','jun13','jul13','aug13',
+#                          'apr14','may14','jun14','jul14','aug14',
+#                          'apr15','may15','jun15','jul15','aug15')
+
+#doing this with 2011 data to start:
+precipmags<-as.data.frame(cbind(mags, priorprecip))
+colnames(precipmags)<-c('mags','apr11','may11','jun11','jul11','aug11',
                          'apr12','may12','jun12','jul12','aug12',
                          'apr13','may13','jun13','jul13','aug13',
                          'apr14','may14','jun14','jul14','aug14',
                          'apr15','may15','jun15','jul15','aug15')
-
-#doing this with 2011 data to start:
-precipmags<-as.data.frame(cbind(mags, x.17))
-colnames(precipmags)<- c('mags', 'apr', 'may', 'jun', 'jul', 'aug')
-may.lm <- lm(mags~may, data = precipmags)
-may.gam <- gam(mags~may, data = precipmags)
-may.loess <- loess(mags~may, data=precipmags)
-loess.df<-cbind(may.loess$x, may.loess$fitted)
-l.df<-loess.df[order(loess.df[,1]),]
+#may.lm <- lm(mags~may, data = precipmags)
+#may.gam <- gam(mags~s(may), data = precipmags)
+# may.loess <- loess(mags~may, data=precipmags)
+# loess.df<-cbind(may.loess$x, may.loess$fitted)
+# l.df<-loess.df[order(loess.df[,1]),]
 
 #Plotting the precip change over 5 years Apr-Aug:
 # plot(priorprecip[1,], type ='l', ylim=c(0,max(priorprecip)), xlim=c(0,25))
@@ -90,38 +94,69 @@ l.df<-loess.df[order(loess.df[,1]),]
 #   lines(priorprecip[i,],)
 # }
 
-# lines(cars$speed,plx$fit)
-# lines(cars$speed,plx$fit - qt(0.975,plx$df)*plx$se, lty=2)
-# lines(cars$speed,plx$fit + qt(0.975,plx$df)*plx$se, lty=2)
-
-
+#lattice plot example:-----
 pmay17<-xyplot(mags ~ may, data = precipmags,
                      panel = function(x, y) {
-                         ci<-predict(may.loess, se=T)
-                         ci$lower<-ci$fit-qt(0.975,ci$df)*ci$se
-                         ci$upper<-ci$fit+qt(0.975,ci$df)*ci$se
-                         lloess<-cbind(may.loess$x,ci$fit,ci$lower,ci$upper)
-                         l<-lloess[order(lloess[,1]),]
-                       #  fity<-may.gam$fitted.values
-                       #  #upper<-ci$fit+(2*ci$se.fit)
-                       #  #lower<-ci$fit-(2*ci$se.fit)
-                       # panel.ci(x, fity, upper, lower, fill='gray48', alpha=0.4)
-                       panel.xyplot(x, y, pch=16,col="black")
-                       # panel.loess(x, y, span=2/3, degree=1,
-                       #             family = c("gaussian"), evaluation=50)
-                       panel.lines(l[,1], l[,2],lty=1)
-                       panel.lines(l[,1], l[,3], lty=2)
-                       panel.lines(l[,1], l[,4], lty=2)
-                       # summ<-summary(may.lm)
-                       # r2 <- summ$adj.r.squared
-                       # f <- summ$fstatistic
-                       # p <- pf(f[1],f[2],f[3],lower.tail=F)
-                       # panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
-                       #             )#x=0.13,y=0.09,cex=0.75)
-                       # panel.text(labels = bquote(italic(p)==.(format(p,digits = 3))),
-                      #              x=0.13,y=0.07,cex=0.75)
+                         # ci<-predict(may.loess, se=T)
+                         # ci$lower<-ci$fit-qt(0.975,ci$df)*ci$se
+                         # ci$upper<-ci$fit+qt(0.975,ci$df)*ci$se
+                         # lloess<-cbind(may.loess$x,ci$fit,ci$lower,ci$upper)
+                         # l<-lloess[order(lloess[,1]),]
+                           ci<-predict(may.gam, se=T)
+                           ci$lower<-ci$fit-qt(0.975,may.gam$df.null)*ci$se.fit
+                           ci$upper<-ci$fit+qt(0.975,may.gam$df.null)*ci$se.fit
+                           l.ci<-cbind(may.gam$model$may,ci$fit,ci$lower,ci$upper)
+                           l<-l.ci[order(l.ci[,1]),]
+                       panel.ci(l[,1],l[,2],l[,4],l[,3],
+                                fill="royalblue1",alpha = 0.3)
+                       panel.xyplot(x, y, pch=20,col="royalblue3")
+                       panel.lines(l[,1], l[,2],lty=1, col='black', lwd=1.5)
+                       #panel.lines(l[,1], l[,3], lty=2, col='black')
+                       #panel.lines(l[,1], l[,4], lty=2, col='black')
+                       summ<-summary(may.lm)
+                       r2 <- summ$adj.r.squared
+                       f <- summ$fstatistic
+                       p <- pf(f[1],f[2],f[3],lower.tail=F)
+                       panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
+                                    x=1.2,y=-0.1,cex=0.75)
+                       panel.text(labels = bquote(italic(p)==.(format(p,digits = 3))),
+                                    x=1.2,y=-0.15,cex=0.75)
                       }#,
                      # ylab="Disturbance Magnitude (TCG)",
                      # xlab="Mean Temperature",
 )
 print(pmay17)
+
+
+###FINAL PLOTS:--------------------------------------------------
+
+#prepare inputs:
+#input data is precipmags
+#mo will be the month we are using for the plot
+mo<-precipmags[,2]  #whatever column from precipmags we are using
+precip.gam = may.gam <- gam(mags~s(mo), data = precipmags)
+  
+precipplot<-xyplot(mags ~ mo, data = precipmags,
+               panel = function(x, y) {
+                 ci<-predict(precip.gam, se=T)
+                 ci$lower<-ci$fit-qt(0.975,precip.gam$df.null)*ci$se.fit
+                 ci$upper<-ci$fit+qt(0.975,precip.gam$df.null)*ci$se.fit
+                 l.ci<-cbind(may.gam$model$mo,ci$fit,ci$lower,ci$upper)
+                 l<-l.ci[order(l.ci[,1]),]
+                 panel.ci(l[,1],l[,2],l[,4],l[,3],
+                          fill="royalblue1",alpha = 0.3)
+                 panel.xyplot(x, y, pch=20,col="royalblue3")
+                 panel.lines(l[,1], l[,2],lty=1, col='black', lwd=1.5)
+                 summ<-summary(precip.gam)
+                 r2 <- summ$adj.r.squared
+                 f <- summ$fstatistic
+                 p <- pf(f[1],f[2],f[3],lower.tail=F)
+                 panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
+                            x=1.2,y=-0.1,cex=0.75)
+                 panel.text(labels = bquote(italic(p)==.(format(p,digits = 3))),
+                            x=1.2,y=-0.15,cex=0.75)
+               },
+                ylab="Disturbance Magnitude (TCG)",
+                xlab="Mean Temperature ",
+)
+print(precipplot)
