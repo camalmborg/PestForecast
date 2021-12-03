@@ -145,15 +145,15 @@ print(pmay17)
 # 16 'apr14',18'may14',19'jun14',20'jul14',21'aug14',
 # 22'apr15',23'may15',24'jun15',25'jul15',26'aug15')
 
-mo<-precipmags[,2]  #whatever column from precipmags we are using
-precip.gam = may.gam <- gam(mags~s(mo), data = precipmags)
+mo<-precipmags[,7]  #whatever column from precipmags we are using
+precip.gam <- gam(mags~s(mo), data = precipmags)
   
 precipplot<-xyplot(mags ~ mo, data = precipmags,
                panel = function(x, y) {
                  ci<-predict(precip.gam, se=T)
                  ci$lower<-ci$fit-qt(0.975,precip.gam$df.null)*ci$se.fit
                  ci$upper<-ci$fit+qt(0.975,precip.gam$df.null)*ci$se.fit
-                 l.ci<-cbind(may.gam$model$mo,ci$fit,ci$lower,ci$upper)
+                 l.ci<-cbind(precip.gam$model$mo,ci$fit,ci$lower,ci$upper)
                  l<-l.ci[order(l.ci[,1]),]
                  panel.ci(l[,1],l[,2],l[,4],l[,3],
                           fill="royalblue1",alpha = 0.3)
@@ -161,12 +161,12 @@ precipplot<-xyplot(mags ~ mo, data = precipmags,
                  panel.lines(l[,1], l[,2],lty=1, col='black', lwd=1.5)
                  summ<-summary(precip.gam)
                  r2 <- summ$r.sq
-                 f <- summ$fstatistic
-                 p <- pf(f[1],f[2],f[3],lower.tail=F)
+                 #f <- summ$fstatistic
+                # p <- pf(f[1],f[2],f[3],lower.tail=F)
                  panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
-                            x=1.2,y=-0.1,cex=0.75)
-                 panel.text(labels = bquote(italic(p)==.(format(p,digits = 3))),
-                            x=1.2,y=-0.15,cex=0.75)
+                            x=1.5,y=0.3,cex=0.75)
+                 # panel.text(labels = bquote(italic(p)==.(format(p,digits = 3))),
+                 #            x=1.2,y=-0.15,cex=0.75)
                },
                 ylab="Disturbance Magnitude (TCG)",
                 xlab="Mean Precipitation (mm)",
@@ -174,9 +174,9 @@ precipplot<-xyplot(mags ~ mo, data = precipmags,
 print(precipplot)
 
 #saving plots:
-# tiff("title.tiff", units="in", width=7, height=5, res=300)
-# print(precipplot)
-# dev.off()
+tiff("precipplot_apr2012.tiff", units="in", width=8, height=5, res=300)
+print(precipplot)
+dev.off()
 
 
 preciptrend<-xyplot(pprecip ~ mos, data = precipmeans,
