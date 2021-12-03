@@ -80,6 +80,9 @@ precipmags<-as.data.frame(cbind(mags, x.17))
 colnames(precipmags)<- c('mags', 'apr', 'may', 'jun', 'jul', 'aug')
 may.lm <- lm(mags~may, data = precipmags)
 may.gam <- gam(mags~may, data = precipmags)
+may.loess <- loess(mags~may, data=precipmags)
+loess.df<-cbind(may.loess$x, may.loess$fitted)
+l.df<-loess.df[order(loess.df[,1]),]
 
 #Plotting the precip change over 5 years Apr-Aug:
 # plot(priorprecip[1,], type ='l', ylim=c(0,max(priorprecip)), xlim=c(0,25))
@@ -87,14 +90,28 @@ may.gam <- gam(mags~may, data = precipmags)
 #   lines(priorprecip[i,],)
 # }
 
+# lines(cars$speed,plx$fit)
+# lines(cars$speed,plx$fit - qt(0.975,plx$df)*plx$se, lty=2)
+# lines(cars$speed,plx$fit + qt(0.975,plx$df)*plx$se, lty=2)
+
+
 pmay17<-xyplot(mags ~ may, data = precipmags,
                      panel = function(x, y) {
-                       ci<-predict(may.lm, interval="confidence")
-                       upper<-ci[,3]
-                       lower<-ci[,2]
-                       panel.ci(x, y, upper, lower, fill="gray48",alpha = 0.4)
+                         ci<-predict(may.loess, se=T)
+                         ci$lower<-ci$fit-qt(0.975,ci$df)*ci$se
+                         ci$upper<-ci$fit+qt(0.975,ci$df)*ci$se
+                         lloess<-cbind(may.loess$x,ci$fit,ci$lower,ci$upper)
+                         l<-lloess[order(lloess[,1]),]
+                       #  fity<-may.gam$fitted.values
+                       #  #upper<-ci$fit+(2*ci$se.fit)
+                       #  #lower<-ci$fit-(2*ci$se.fit)
+                       # panel.ci(x, fity, upper, lower, fill='gray48', alpha=0.4)
                        panel.xyplot(x, y, pch=16,col="black")
-                       panel.abline(lm(y ~ x))
+                       # panel.loess(x, y, span=2/3, degree=1,
+                       #             family = c("gaussian"), evaluation=50)
+                       panel.lines(l[,1], l[,2],lty=1)
+                       panel.lines(l[,1], l[,3], lty=2)
+                       panel.lines(l[,1], l[,4], lty=2)
                        # summ<-summary(may.lm)
                        # r2 <- summ$adj.r.squared
                        # f <- summ$fstatistic
@@ -104,7 +121,7 @@ pmay17<-xyplot(mags ~ may, data = precipmags,
                        # panel.text(labels = bquote(italic(p)==.(format(p,digits = 3))),
                       #              x=0.13,y=0.07,cex=0.75)
                       }#,
-                     # ylab="Recovery Rate",
-                     # xlab="TCG Steady State (2012-2015)",
+                     # ylab="Disturbance Magnitude (TCG)",
+                     # xlab="Mean Temperature",
 )
 print(pmay17)
