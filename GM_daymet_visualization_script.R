@@ -142,10 +142,10 @@ print(pmay17)
 #  1'mags',2'apr11',3'may11',4'jun11',5'jul11',6'aug11',
 #  7'apr12',8'may12',9'jun12',10'jul12',11'aug12',
 # 12'apr13',13'may13',14'jun13',15'jul13',16'aug13',
-# 16 'apr14',18'may14',19'jun14',20'jul14',21'aug14',
+# 17 'apr14',18'may14',19'jun14',20'jul14',21'aug14',
 # 22'apr15',23'may15',24'jun15',25'jul15',26'aug15')
 
-mo<-precipmags[,7]  #whatever column from precipmags we are using
+mo<-precipmags[,26]  #whatever column from precipmags we are using
 precip.gam <- gam(mags~s(mo), data = precipmags)
   
 precipplot<-xyplot(mags ~ mo, data = precipmags,
@@ -164,7 +164,7 @@ precipplot<-xyplot(mags ~ mo, data = precipmags,
                  #f <- summ$fstatistic
                 # p <- pf(f[1],f[2],f[3],lower.tail=F)
                  panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
-                            x=1.5,y=0.3,cex=0.75)
+                            x=1.5,y=-0.12,cex=0.75)
                  # panel.text(labels = bquote(italic(p)==.(format(p,digits = 3))),
                  #            x=1.2,y=-0.15,cex=0.75)
                },
@@ -174,7 +174,7 @@ precipplot<-xyplot(mags ~ mo, data = precipmags,
 print(precipplot)
 
 #saving plots:
-tiff("precipplot_apr2012.tiff", units="in", width=8, height=5, res=300)
+tiff("precipplot_aug2015.tiff", units="in", width=8, height=5, res=300)
 print(precipplot)
 dev.off()
 
