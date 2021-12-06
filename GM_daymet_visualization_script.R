@@ -95,9 +95,10 @@ for (i in nsites){
 }
 
 mos<-1:25
-#pprecip<-apply(priorprecip,2,mean)
+yr<-c(1,1,1,1,1,2,2,2,2,2,3,3,3,3,3,4,4,4,4,4,5,5,5,5,5)
+pprecip<-apply(priorprecip,2,mean)
 #plot(mos,pprecip)
-precipmeans<-as.data.frame(cbind(mos,pprecip))
+precipmeans<-as.data.frame(cbind(yr,mos,pprecip))
 
 #lattice plot example:-----
 pmay17<-xyplot(mags ~ may, data = precipmags,
@@ -178,17 +179,17 @@ tiff("precipplot_aug2015.tiff", units="in", width=8, height=5, res=300)
 print(precipplot)
 dev.off()
 
-
 preciptrend<-xyplot(pprecip ~ mos, data = precipmeans,
                    panel = function(x, y) {
-                    panel.xyplot(x, y, pch=16,col="royalblue3")
+                    panel.xyplot(x, y, pch=16,col=yr)
                     panel.abline(lm(y ~ x), col='royalblue4')
                    },
+                   key=,
                    ylab="Mean Precipitation (mm)",
                    xlab="Month (2011-2015, Apr-Aug)",
 )
 print(preciptrend)
 
-# tiff("preciptrend5yr.tiff", units="in", width=7, height=5, res=300)
+# tiff("preciptrend5yr_color.tiff", units="in", width=7, height=5, res=300)
 # print(preciptrend)
 # dev.off()
