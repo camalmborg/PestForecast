@@ -64,18 +64,19 @@ junes<-seq(2,130,by=5)
 tcg.june.all<-as.matrix(tcg.mo[,junes])
 cond.june<-as.matrix(cond.mo[,junes])
 
+###steady state
+steady<-apply(tcg.june[,19:21],1,mean,na.rm=T)
+steadyall<-apply(tcg.june[,1:26],1,mean,na.rm=T)
+prevyr<-tcg.june.all[,21]
+june16<-tcg.june.all[,22]
+june17<-tcg.june.all[,23]
+
 ###remove rows with missing values for disturbance window
 NA16<-which(is.na(june16))
 NA17<-which(is.na(june17))
 missing<-intersect(NA16,NA17)
 tcg.june<-tcg.june.all[-missing,]
 
-###steady state
-steady<-apply(tcg.june[,19:21],1,mean,na.rm=T)
-steadyall<-apply(tcg.june[,1:26],1,mean,na.rm=T)
-prevyr<-tcg.june[,21]
-june16<-tcg.june[,22]
-june17<-tcg.june[,23]
 
 recov.rate<-vector()
 slope<-list()
