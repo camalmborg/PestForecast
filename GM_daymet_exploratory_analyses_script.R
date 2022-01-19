@@ -11,6 +11,14 @@
 
 #
 ### Extracting daymet data from list #####
+
+#load desired variable from storage:
+#meanvar<-''
+#maxvar
+#minvar
+#medvar
+#etc.
+
 #to get data for 5 prior years 2011-2015:
 prior5 <- c(17:21)
 #to get data for disturbance window 2016-2017:
@@ -34,5 +42,15 @@ for (p in 1:length(alltime)){
   rm(x) #remove last loop
 }
 
-var <- x.p[,2:((length(ms)*length(nyears))+1)] #remove NA column
+envar <- x.p[,2:((length(ms)*length(nyears))+1)] #remove NA column
 rm(x.p) #remove redundant variable
+
+#remove missing data rows:
+var <- envar[-missing,]
+
+#var mags is the mag and recov rate data with
+#the daymet data attached (eg. mean monthly precip)
+#for number of years * months specified
+#full set is all months (12) * all years (26) = 312 months
+varmags<-as.data.frame(cbind(tcg.recov, var))
+
