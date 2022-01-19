@@ -19,16 +19,20 @@ distwind <- c(22:23)
 alltime <- c(1:26)
 #number of sites and years and months:
 nsites = 1:5000
-nyears = 26
-ms = 12
+nyears = 1:26
+ms = 1:12
 
 x.p <- matrix(data=NA, nrow=5000)
 for (p in 1:length(alltime)){
-  x <- matrix(data = NA, nrow=5000, ncol=5)
+  x <- matrix(data = NA, nrow=5000, ncol=length(ms))
   for (m in 1:length(ms)){
     for (s in nsites){
       x[s,m] <- meanvar[[s]][ms[m],alltime[p]]
     }
   }
   x.p <- cbind(x.p,x)
+  rm(x) #remove last loop
 }
+
+var <- x.p[,2:((length(ms)*length(nyears))+1)] #remove NA column
+rm(x.p) #remove redundant variable
