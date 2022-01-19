@@ -12,7 +12,6 @@ tcg.month<-read.csv("2020_07_10_sample_tcg_mean_MONTHLY.csv")
 tcg.mo<-tcg.month[,2:131]
 
 
-
 # ####remove may:-----
 # nomay<-seq(1,130,by=5)
 # tcg.nomay<-as.matrix(tcg.mo[,-nomay])
@@ -62,11 +61,11 @@ tcg.mo<-tcg.month[,2:131]
 ####just junes
 junes<-seq(2,130,by=5)
 tcg.june.all<-as.matrix(tcg.mo[,junes])
-cond.june<-as.matrix(cond.mo[,junes])
+#cond.june<-as.matrix(cond.mo[,junes])
 
 ###steady state
-steady<-apply(tcg.june[,19:21],1,mean,na.rm=T)
-steadyall<-apply(tcg.june[,1:26],1,mean,na.rm=T)
+steadys<-as.matrix(apply(tcg.june.all[,19:21],1,mean,na.rm=T))
+steadyall<-apply(tcg.june.all[,1:26],1,mean,na.rm=T)
 prevyr<-tcg.june.all[,21]
 june16<-tcg.june.all[,22]
 june17<-tcg.june.all[,23]
@@ -76,8 +75,17 @@ NA16<-which(is.na(june16))
 NA17<-which(is.na(june17))
 missing<-intersect(NA16,NA17)
 tcg.june<-tcg.june.all[-missing,]
+steady<-steadys[-missing,]
 
+###site identification:
+#testing missing cols
+#tcgidsj<-cbind(tcgids,june16,june17)
+#tcgjidsmiss<-tcgidsj[missing,]
+idcols<-c(1,132,134:136)
+tcgids<-cbind(tcg.month[,idcols],june16,june17)
+tcgid<-tcgids[-missing,]
 
+### THE LOOP: calculating recovery rates
 recov.rate<-vector()
 slope<-list()
 mins<-vector()
@@ -106,16 +114,31 @@ for (i in 1:nsite){
 
 #magnitudes:
 mags<-steady-mins
-mags.s<-steadyall-mins
+#mags.s<-steadyall-mins
+
 recov.time<-mags/recov.rate
-recov.time.s<-mags.s/recov.rate
+#recov.time.s<-mags.s/recov.rate
 
 #combine data for regressions:
-tcg.recov.mx<-cbind(steadyall,steady,colnum,mins,mags,recov.rate,recov.time)
+tcg.recov.mx<-cbind(tcgid,steady,colnum,mins,mags,recov.rate,recov.time)
 tcg.recov<-as.data.frame(tcg.recov.mx)
 
-###regressions
+####Regressions#####
 #recov rate as function of magnitude of disturbance:
 mrrreg<-lm(recov.rate~mags,tcg.recov)
 #recov rate as function of magnitude and site greenness prior to disturbance:
 anotherreg<-lm(recov.rate~mags+steady,tcg.recov)
+
+#
+#
+#
+### Plotting exercises #####
+plot(tcg.recov$mags, tcg.recov$recov.rate, 
+     col=c('red', 'blue'))
+# legend('bottomleft',
+#        legend=c('22','23'), 
+#        col=c('red','blue'))
+j16<-tcg.recov[tcg.recov$colnum==22,]
+j17<-tcg.recov[tcg.recov$colnum==23,]
+hist(j17$mags,breaks=75,col=rgb(1,0,0,0.5))
+hist(j16$mags,breaks=75,col=rgb(0,0,1,0.5), add=T)
