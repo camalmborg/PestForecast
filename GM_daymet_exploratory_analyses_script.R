@@ -1,6 +1,7 @@
 ### Daymet Exploratory Analyses Automation ###
 #
 # MEANVAR TO VARIABLE #####
+#load("")
 #meanvar will load list with  mean of:
   #precip<-meanvar
   #maxtemp<-meanvar
@@ -53,4 +54,20 @@ var <- envar[-missing,]
 #for number of years * months specified
 #full set is all months (12) * all years (26) = 312 months
 varmags<-as.data.frame(cbind(tcg.recov, var))
+#
+#
+### Make testing windows for daymet data #####
+seqfx<-function(x){
+  seq(x,312,by=12)
+}
 
+#seasons:
+winter<-sort(c(seqfx(12),seqfx(1),seqfx(2)))
+spring<-sort(c(seqfx(3),seqfx(4),seqfx(5)))
+summer<-sort(c(seqfx(6),seqfx(7),seqfx(8)))
+fall<-sort(c(seqfx(9),seqfx(10),seqfx(11)))
+
+#combo seasons:
+sprsum<-sort(c(seqfx(4),seqfx(5),seqfx(6),seqfx(7),seqfx(8)))
+wintspr<-sort(c(seqfx(12),seqfx(1),seqfx(2),seqfx(3)))
+#predist <- varmags[,1:13]
