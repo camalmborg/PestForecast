@@ -137,3 +137,4 @@ varplot<-xyplot(mags ~ mo, data = vardat,
                      panel.lines(l[,1], l[,2],lty=1, col='black', lwd=1.5)
                    })
 print(varplot)
+
