@@ -10,7 +10,7 @@
   #vpd<-meanvar
   #rm(meanvar) #gets rid of redundant variable
 #1/25/2021:
-#load('maxtempmean.RData')
+load('mintempmean.RData')
 #
 ### Extracting daymet data from list #####
 
@@ -87,13 +87,13 @@ varwintspr<-var[,wintspr]
 
 ###testing windows ###   #can cbind to tcg.recov for plots
 #spring-summer group:
-predistvar<-varsprsum[,81:105]
-distwindvar<-varsprsum[,106:115]
+# predistvar<-varsprsum[,81:105]
+# distwindvar<-varsprsum[,106:115]
 #recovvar<-varsprsum[,116:130]
 
 #winter-spring group:
-#predistvar<-varwintspr[,65:84]
-#distwindvar<-varwintspr[,85:92]
+predistvar<-varwintspr[,65:84]
+distwindvar<-varwintspr[,85:92]
 #
 #
 ### Plotting section for testing relationships #####
@@ -102,15 +102,15 @@ distwindvar<-varsprsum[,106:115]
 # predistvarmags<-as.data.frame(cbind(tcg.recov$ID,tcg.recov$lat,tcg.recov$lon,
 #                       tcg.recov$steady,tcg.recov$mins,tcg.recov$steady,
 #                       tcg.recov$mags,tcg.recov$recov.rate,predistvar))
-#predistvarmags<-as.data.frame(cbind(mags,predistvar))
+predistvarmags<-as.data.frame(cbind(mags,predistvar))
 # 
 # distwindvarmags<-as.data.frame(cbind(tcg.recov$ID,tcg.recov$lat,tcg.recov$lon,
 #                        tcg.recov$steady,tcg.recov$mins,tcg.recov$steady,
 #                        tcg.recov$mags,tcg.recov$recov.rate,distwindvar))
 distwindvarmags<-as.data.frame(cbind(mags,distwindvar))
 
-#mo<-predistvarmags[,25]  #whatever month we are using
-mo<-distwindvarmags[,6]
+#mo<-predistvarmags[,21]  #whatever month we are using
+mo<-distwindvarmags[,9]
 
 ### GAM PLOT #####
 # #load libaries:
@@ -120,9 +120,11 @@ mo<-distwindvarmags[,6]
 # library(mgcv)
 
 #make the gam:
-var.gam <- gam(mags~s(mo), data = distwindvarmags)
+#vardat = predistvarmags
+vardat = distwindvarmags
+var.gam <- gam(mags~s(mo), data = vardat)
 #plot the gam:
-varplot<-xyplot(mags ~ mo, data = distwindvarmags,
+varplot<-xyplot(mags ~ mo, data = vardat,
                    panel = function(x, y) {
                      ci<-predict(var.gam, se=T)
                      ci$lower<-ci$fit-qt(0.975,var.gam$df.null)*ci$se.fit
@@ -135,4 +137,3 @@ varplot<-xyplot(mags ~ mo, data = distwindvarmags,
                      panel.lines(l[,1], l[,2],lty=1, col='black', lwd=1.5)
                    })
 print(varplot)
-
