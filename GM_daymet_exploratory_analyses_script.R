@@ -102,15 +102,15 @@ distwindvar<-varsprsum[,106:115]
 # predistvarmags<-as.data.frame(cbind(tcg.recov$ID,tcg.recov$lat,tcg.recov$lon,
 #                       tcg.recov$steady,tcg.recov$mins,tcg.recov$steady,
 #                       tcg.recov$mags,tcg.recov$recov.rate,predistvar))
-predistvarmags<-as.data.frame(cbind(mags,predistvar))
+#predistvarmags<-as.data.frame(cbind(mags,predistvar))
 # 
 # distwindvarmags<-as.data.frame(cbind(tcg.recov$ID,tcg.recov$lat,tcg.recov$lon,
 #                        tcg.recov$steady,tcg.recov$mins,tcg.recov$steady,
 #                        tcg.recov$mags,tcg.recov$recov.rate,distwindvar))
-# distwindvarmags<-as.data.frame(cbind(mags,distwindvar))
+distwindvarmags<-as.data.frame(cbind(mags,distwindvar))
 
-mo<-predistvarmags[,23]  #whatever month we are using
-#mo<-distwindvarmags[,]
+#mo<-predistvarmags[,25]  #whatever month we are using
+mo<-distwindvarmags[,6]
 
 ### GAM PLOT #####
 # #load libaries:
@@ -120,9 +120,9 @@ mo<-predistvarmags[,23]  #whatever month we are using
 # library(mgcv)
 
 #make the gam:
-var.gam <- gam(mags~s(mo), data = predistvarmags)
+var.gam <- gam(mags~s(mo), data = distwindvarmags)
 #plot the gam:
-varplot<-xyplot(mags ~ mo, data = predistvarmags,
+varplot<-xyplot(mags ~ mo, data = distwindvarmags,
                    panel = function(x, y) {
                      ci<-predict(var.gam, se=T)
                      ci$lower<-ci$fit-qt(0.975,var.gam$df.null)*ci$se.fit
