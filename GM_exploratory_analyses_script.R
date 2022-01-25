@@ -11,6 +11,8 @@ cond.an<-cond.scores.an[,2:27]
 tcg.month<-read.csv("2020_07_10_sample_tcg_mean_MONTHLY.csv")
 tcg.mo<-tcg.month[,2:131]
 
+#number of sites
+nsites = 1:5000
 
 # ####remove may:-----
 # nomay<-seq(1,130,by=5)

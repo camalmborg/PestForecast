@@ -9,7 +9,8 @@
   #solr<-meanvar
   #vpd<-meanvar
   #rm(meanvar) #gets rid of redundant variable
-
+#1/25/2021:
+#load('maxtempmean.RData')
 #
 ### Extracting daymet data from list #####
 
@@ -91,8 +92,47 @@ distwindvar<-varsprsum[,106:115]
 #recovvar<-varsprsum[,116:130]
 
 #winter-spring group:
-#predistvar<-varwintspr[]
-#distwindvar<-varwintspr[]
+#predistvar<-varwintspr[,65:84]
+#distwindvar<-varwintspr[,85:92]
 #
 #
 ### Plotting section for testing relationships #####
+#
+#join var to tcg.recov or just mags:
+# predistvarmags<-as.data.frame(cbind(tcg.recov$ID,tcg.recov$lat,tcg.recov$lon,
+#                       tcg.recov$steady,tcg.recov$mins,tcg.recov$steady,
+#                       tcg.recov$mags,tcg.recov$recov.rate,predistvar))
+predistvarmags<-as.data.frame(cbind(mags,predistvar))
+# 
+# distwindvarmags<-as.data.frame(cbind(tcg.recov$ID,tcg.recov$lat,tcg.recov$lon,
+#                        tcg.recov$steady,tcg.recov$mins,tcg.recov$steady,
+#                        tcg.recov$mags,tcg.recov$recov.rate,distwindvar))
+# distwindvarmags<-as.data.frame(cbind(mags,distwindvar))
+
+mo<-predistvarmags[,23]  #whatever month we are using
+#mo<-distwindvarmags[,]
+
+### GAM PLOT #####
+# #load libaries:
+# library(lattice)
+# library(latticeExtra)
+# library(tactile)
+# library(mgcv)
+
+#make the gam:
+var.gam <- gam(mags~s(mo), data = predistvarmags)
+#plot the gam:
+varplot<-xyplot(mags ~ mo, data = predistvarmags,
+                   panel = function(x, y) {
+                     ci<-predict(var.gam, se=T)
+                     ci$lower<-ci$fit-qt(0.975,var.gam$df.null)*ci$se.fit
+                     ci$upper<-ci$fit+qt(0.975,var.gam$df.null)*ci$se.fit
+                     l.ci<-cbind(var.gam$model$mo,ci$fit,ci$lower,ci$upper)
+                     l<-l.ci[order(l.ci[,1]),]
+                     panel.ci(l[,1],l[,2],l[,4],l[,3],
+                              fill="royalblue1",alpha = 0.3)
+                     panel.xyplot(x, y, pch=20,col="royalblue3")
+                     panel.lines(l[,1], l[,2],lty=1, col='black', lwd=1.5)
+                   })
+print(varplot)
+
