@@ -4,13 +4,13 @@
 #load('maxtemp.RData')
 
 #things I might need for loops if not in environment:
-#nsites=5000
-#metyears=1:26
-#doy <- dm[[1]]$data$yday
-# for (i in nsites){
-#   metyr= dm[[i]]$data$year
-#   metyears=unique(metyr)
-# }
+nsites=5000
+metyears=1:26
+doy <- dm[[1]]$data$yday
+for (i in nsites){
+  metyr= dm[[i]]$data$year
+  metyears=unique(metyr)
+}
 
 
 ###First Maxtemp Run:-----------
@@ -110,14 +110,15 @@ dec<-c(doy[335:365])
 #load variable:
 #load('maxtemp.RData')
 #load('mintemp.RData')
-load('precip.RData')
+#load('precip.RData')
 #load('solr.RData')
-#load('vpd.RData')
+load('vpd.RData')
 
 #change this depending on which variable you are using:
 # var=maxtemp
 # var=mintemp
-var=precip
+#var=precip
+var = vpd
 
 #remove the 366 day:
 varx<-list()
@@ -127,7 +128,7 @@ for (i in nsites){
 #replace old data:
 var<-varx
 rm(varx)
-#save(maxtemp, file='maxtemp.RData')
+#save(var, file='maxtemp.RData')
 
 ###FOR AVERAGES, SEASONAL-----
 # avgyrvar<-matrix(NA, nrow=nsites, ncol=length(metyears))
@@ -402,4 +403,7 @@ for (i in nsites){
 # save(meanvar, file='precipmean.Rdata')
 # save(medvar, file='precipmed.Rdata')
 # 
-
+save(maxvar, file='vpdmax.RData')
+save(minvar, file='vpdmin.RData')
+save(meanvar, file='vpdmean.Rdata')
+save(medvar, file='vpdmed.Rdata')
