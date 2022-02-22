@@ -10,7 +10,7 @@
   #vpd<-meanvar
   #rm(meanvar) #gets rid of redundant variable
 #1/25/2021:
-load('mintempmean.RData')
+#load('vpdmean.RData')
 #
 ### Extracting daymet data from list #####
 
@@ -87,13 +87,13 @@ varwintspr<-var[,wintspr]
 
 ###testing windows ###   #can cbind to tcg.recov for plots
 #spring-summer group:
-# predistvar<-varsprsum[,81:105]
-# distwindvar<-varsprsum[,106:115]
+predistvar<-varsprsum[,81:105]
+distwindvar<-varsprsum[,106:115]
 #recovvar<-varsprsum[,116:130]
 
-#winter-spring group:
-predistvar<-varwintspr[,65:84]
-distwindvar<-varwintspr[,85:92]
+# #winter-spring group:
+# predistvar<-varwintspr[,65:84]
+# distwindvar<-varwintspr[,85:92]
 #
 #
 ### Plotting section for testing relationships #####
@@ -109,19 +109,20 @@ predistvarmags<-as.data.frame(cbind(mags,predistvar))
 #                        tcg.recov$mags,tcg.recov$recov.rate,distwindvar))
 distwindvarmags<-as.data.frame(cbind(mags,distwindvar))
 
-#mo<-predistvarmags[,21]  #whatever month we are using
-mo<-distwindvarmags[,9]
 
 ### GAM PLOT #####
-# #load libaries:
+#load libaries:
 # library(lattice)
 # library(latticeExtra)
 # library(tactile)
 # library(mgcv)
 
+#mo<-predistvarmags[,26]  #whatever month we are using
+mo<-distwindvarmags[,11]
+
 #make the gam:
-#vardat = predistvarmags
-vardat = distwindvarmags
+vardat = predistvarmags
+#vardat = distwindvarmags
 var.gam <- gam(mags~s(mo), data = vardat)
 #plot the gam:
 varplot<-xyplot(mags ~ mo, data = vardat,
@@ -137,4 +138,8 @@ varplot<-xyplot(mags ~ mo, data = vardat,
                      panel.lines(l[,1], l[,2],lty=1, col='black', lwd=1.5)
                    })
 print(varplot)
+
+summ<-summary(var.gam)
+r2 <- summ$r.sq
+print(r2)
 
