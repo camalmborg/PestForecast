@@ -9,6 +9,15 @@ nsites<-1:5000
 sites<-cbind(nsites,coords)
 
 #put daymet data into a list
+#for single site to get dm:
+dm<-daymetr::download_daymet(site = sites$nsites[1],
+                             lat = sites$lat[1],
+                             lon = sites$lon[1],
+                             start = 1995,
+                             end = 2020,
+                             internal = TRUE)
+
+#loop version:
 dm <- list()
 for(i in nsites){
   dm[[i]] <- daymetr::download_daymet(site = sites$nsites[i],
