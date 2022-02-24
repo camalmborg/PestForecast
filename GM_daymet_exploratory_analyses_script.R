@@ -100,14 +100,14 @@ distwindvar<-varsprsum[,106:115]
 #
 #join var to tcg.recov or just mags:
 # predistvarmags<-as.data.frame(cbind(tcg.recov$ID,tcg.recov$lat,tcg.recov$lon,
-#                       tcg.recov$steady,tcg.recov$mins,tcg.recov$steady,
-#                       tcg.recov$mags,tcg.recov$recov.rate,predistvar))
-predistvarmags<-as.data.frame(cbind(mags,predistvar))
+#                        tcg.recov$steady,tcg.recov$mins,tcg.recov$steady,
+#                        tcg.recov$mags,tcg.recov$colnum,tcg.recov$recov.rate,predistvar))
+predistvarmags<-as.data.frame(cbind(mags,mins,colnum,predistvar))
 # 
 # distwindvarmags<-as.data.frame(cbind(tcg.recov$ID,tcg.recov$lat,tcg.recov$lon,
 #                        tcg.recov$steady,tcg.recov$mins,tcg.recov$steady,
-#                        tcg.recov$mags,tcg.recov$recov.rate,distwindvar))
-distwindvarmags<-as.data.frame(cbind(mags,distwindvar))
+#                        tcg.recov$mags,tcg.recov$colnum,tcg.recov$recov.rate,distwindvar))
+distwindvarmags<-as.data.frame(cbind(mags,mins,colnum,distwindvar))
 
 
 ### GAM PLOT #####
@@ -117,8 +117,8 @@ distwindvarmags<-as.data.frame(cbind(mags,distwindvar))
 # library(tactile)
 # library(mgcv)
 
-#mo<-predistvarmags[,26]  #whatever month we are using
-mo<-distwindvarmags[,11]
+mo<-predistvarmags[,20]  #whatever month we are using
+#mo<-distwindvarmags[,]
 
 #make the gam:
 vardat = predistvarmags
@@ -133,8 +133,8 @@ varplot<-xyplot(mags ~ mo, data = vardat,
                      l.ci<-cbind(var.gam$model$mo,ci$fit,ci$lower,ci$upper)
                      l<-l.ci[order(l.ci[,1]),]
                      panel.ci(l[,1],l[,2],l[,4],l[,3],
-                              fill="royalblue1",alpha = 0.3)
-                     panel.xyplot(x, y, pch=20,col="royalblue3")
+                              fill="gray",alpha = 0.3)
+                     panel.xyplot(x, y, pch=1,col=colnum)
                      panel.lines(l[,1], l[,2],lty=1, col='black', lwd=1.5)
                    })
 print(varplot)
@@ -143,3 +143,11 @@ summ<-summary(var.gam)
 r2 <- summ$r.sq
 print(r2)
 
+
+#
+#
+### plotting with colnums: -----
+#data:
+mo<-predistvarmags[,2]  #whatever month we are using
+#mo<-distwindvarmags[,6]
+plot(mo,mags,col=colnum,pch=20)
