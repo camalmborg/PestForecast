@@ -103,12 +103,15 @@ distwindvar<-varsprsum[,106:115]
 #                        tcg.recov$steady,tcg.recov$mins,tcg.recov$steady,
 #                        tcg.recov$mags,tcg.recov$colnum,tcg.recov$recov.rate,predistvar))
 predistvarmags<-as.data.frame(cbind(mags,mins,colnum,predistvar))
+pdvm16<-predistvarmags[predistvarmags$colnum==22,]
+pdvm17<-predistvarmags[predistvarmags$colnum==23,]
 # 
 # distwindvarmags<-as.data.frame(cbind(tcg.recov$ID,tcg.recov$lat,tcg.recov$lon,
 #                        tcg.recov$steady,tcg.recov$mins,tcg.recov$steady,
 #                        tcg.recov$mags,tcg.recov$colnum,tcg.recov$recov.rate,distwindvar))
 distwindvarmags<-as.data.frame(cbind(mags,mins,colnum,distwindvar))
-
+dwvm16<-distwindvarmags[distwindvarmags$colnum==22,]
+dwvm17<-distwindvarmags[distwindvarmags$colnum==23,]
 
 ### GAM PLOT #####
 #load libaries:
@@ -117,12 +120,20 @@ distwindvarmags<-as.data.frame(cbind(mags,mins,colnum,distwindvar))
 # library(tactile)
 # library(mgcv)
 
-mo<-predistvarmags[,20]  #whatever month we are using
+#mo<-predistvarmags[,20]  #whatever month we are using
 #mo<-distwindvarmags[,]
+#mo<-pdvm16[,28]
+#mo<-pdvm17[,28]
+#mo<-dwvm16[,4]
+mo<-dwvm17[,4]
 
 #make the gam:
-vardat = predistvarmags
+#vardat = predistvarmags
 #vardat = distwindvarmags
+#vardat = pdvm16
+#vardat = pdvm17
+#vardat = dwvm16
+vardat = dwvm17
 var.gam <- gam(mags~s(mo), data = vardat)
 #plot the gam:
 varplot<-xyplot(mags ~ mo, data = vardat,
@@ -134,7 +145,7 @@ varplot<-xyplot(mags ~ mo, data = vardat,
                      l<-l.ci[order(l.ci[,1]),]
                      panel.ci(l[,1],l[,2],l[,4],l[,3],
                               fill="gray",alpha = 0.3)
-                     panel.xyplot(x, y, pch=1,col=colnum)
+                     panel.xyplot(x, y, pch=20,col="gray")
                      panel.lines(l[,1], l[,2],lty=1, col='black', lwd=1.5)
                    })
 print(varplot)
