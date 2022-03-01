@@ -124,8 +124,8 @@ dwvm17<-distwindvarmags[distwindvarmags$colnum==23,]
 #mo<-distwindvarmags[,]
 #mo<-pdvm16[,28]
 #mo<-pdvm17[,28]
-#mo<-dwvm16[,4]
-mo<-dwvm17[,4]
+#mo<-dwvm16[,6]
+mo<-dwvm17[,13]
 
 #make the gam:
 #vardat = predistvarmags
@@ -159,6 +159,6 @@ print(r2)
 #
 ### plotting with colnums: -----
 #data:
-mo<-predistvarmags[,2]  #whatever month we are using
-#mo<-distwindvarmags[,6]
-plot(mo,mags,col=colnum,pch=20)
+# mo<-predistvarmags[,2]  #whatever month we are using
+# #mo<-distwindvarmags[,6]
+# plot(mo,mags,col=colnum,pch=20)
