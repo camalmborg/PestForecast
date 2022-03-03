@@ -140,17 +140,17 @@ dwvm17<-dwvm[dwvm$colnum==23,]
 #Univariate:
 #mo<-predistvarmags[,20]  #whatever month we are using
 #mo<-distwindvarmags[,]
-#mo<-pdvm16[,28]
+mo<-pdvm16[,28]
 #mo<-pdvm17[,28]
 #mo<-dwvm16[,6]
 #mo<-dwvm17[,13]
 
 ##Interactions (Multivariate):
-mt<-pdvm16[,]
+mt<-pdvm16[,24]
 #mt<-pdvm17[,]
-mp<-pdvm16[,]
+mp<-pdvm16[,46]
 #mp<-pdvm17[,]
-mv<-pdvm16[,]
+#mv<-pdvm16[,]
 #mv<-pdvm17[,]
 
 #make the gam:
@@ -190,3 +190,18 @@ print(r2)
 # plot(mo,mags,col=colnum,pch=20)
 
 ### Interactions
+### Univariate plot code copy:-----
+#plot the gam:
+varplot<-xyplot(mags ~ mo, data = vardat,
+                panel = function(x, y) {
+                  ci<-predict(var.gam, se=T)
+                  ci$lower<-ci$fit-qt(0.975,var.gam$df.null)*ci$se.fit
+                  ci$upper<-ci$fit+qt(0.975,var.gam$df.null)*ci$se.fit
+                  l.ci<-cbind(var.gam$model$mo,ci$fit,ci$lower,ci$upper)
+                  l<-l.ci[order(l.ci[,1]),]
+                  panel.ci(l[,1],l[,2],l[,4],l[,3],
+                           fill="gray",alpha = 0.3)
+                  panel.xyplot(x, y, pch=20,col="gray")
+                  panel.lines(l[,1], l[,2],lty=1, col='black', lwd=1.5)
+                })
+print(varplot)
