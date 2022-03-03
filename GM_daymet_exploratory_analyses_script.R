@@ -91,6 +91,14 @@ predistvar<-varsprsum[,81:105]
 distwindvar<-varsprsum[,106:115]
 #recovvar<-varsprsum[,116:130]
 
+###INTERACTIONS:------
+#pdv.temp<-predistvar
+#pdv.precip<-predistvar
+pdv.vpd<-predistvar
+#dwv.temp<-distwindvar
+#dwv.precip<-distwindvar
+dwv.vpd<-distwindvar
+
 # #winter-spring group:
 # predistvar<-varwintspr[,65:84]
 # distwindvar<-varwintspr[,85:92]
@@ -112,6 +120,9 @@ pdvm17<-predistvarmags[predistvarmags$colnum==23,]
 distwindvarmags<-as.data.frame(cbind(mags,mins,colnum,distwindvar))
 dwvm16<-distwindvarmags[distwindvarmags$colnum==22,]
 dwvm17<-distwindvarmags[distwindvarmags$colnum==23,]
+
+###INTERACTIONS:
+
 
 ### GAM PLOT #####
 #load libaries:
@@ -162,3 +173,5 @@ print(r2)
 # mo<-predistvarmags[,2]  #whatever month we are using
 # #mo<-distwindvarmags[,6]
 # plot(mo,mags,col=colnum,pch=20)
+
+### Interactions
