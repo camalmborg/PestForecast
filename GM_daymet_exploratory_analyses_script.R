@@ -160,27 +160,27 @@ vardat = pdvm16
 #vardat = pdvm17
 #vardat = dwvm16
 #vardat = dwvm17
-var.gam <- gam(mags~s(mo), data = vardat)
-#plot the gam:
-varplot<-xyplot(mags ~ mo, data = vardat,
-                   panel = function(x, y) {
-                     ci<-predict(var.gam, se=T)
-                     ci$lower<-ci$fit-qt(0.975,var.gam$df.null)*ci$se.fit
-                     ci$upper<-ci$fit+qt(0.975,var.gam$df.null)*ci$se.fit
-                     l.ci<-cbind(var.gam$model$mo,ci$fit,ci$lower,ci$upper)
-                     l<-l.ci[order(l.ci[,1]),]
-                     panel.ci(l[,1],l[,2],l[,4],l[,3],
-                              fill="gray",alpha = 0.3)
-                     panel.xyplot(x, y, pch=20,col="gray")
-                     panel.lines(l[,1], l[,2],lty=1, col='black', lwd=1.5)
-                   })
-print(varplot)
+var.gam <- gam(mags~s(mt)+s(mp), data = vardat)
 
 summ<-summary(var.gam)
 r2 <- summ$r.sq
 print(r2)
-
-
+#plot the gam:----
+# varplot<-xyplot(mags ~ mo, data = vardat,
+#                    panel = function(x, y) {
+#                      ci<-predict(var.gam, se=T)
+#                      ci$lower<-ci$fit-qt(0.975,var.gam$df.null)*ci$se.fit
+#                      ci$upper<-ci$fit+qt(0.975,var.gam$df.null)*ci$se.fit
+#                      l.ci<-cbind(var.gam$model$mo,ci$fit,ci$lower,ci$upper)
+#                      l<-l.ci[order(l.ci[,1]),]
+#                      panel.ci(l[,1],l[,2],l[,4],l[,3],
+#                               fill="gray",alpha = 0.3)
+#                      panel.xyplot(x, y, pch=20,col="gray")
+#                      panel.lines(l[,1], l[,2],lty=1, col='black', lwd=1.5)
+#                    })
+# print(varplot)
+#-----
+#plot.gam(var.gam)
 #
 #
 ### plotting with colnums: -----
