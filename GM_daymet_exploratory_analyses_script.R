@@ -137,20 +137,29 @@ dwvm17<-dwvm[dwvm$colnum==23,]
 # library(tactile)
 # library(mgcv)
 
+#Univariate:
 #mo<-predistvarmags[,20]  #whatever month we are using
 #mo<-distwindvarmags[,]
 #mo<-pdvm16[,28]
 #mo<-pdvm17[,28]
 #mo<-dwvm16[,6]
-mo<-dwvm17[,13]
+#mo<-dwvm17[,13]
+
+##Interactions (Multivariate):
+mt<-pdvm16[,]
+#mt<-pdvm17[,]
+mp<-pdvm16[,]
+#mp<-pdvm17[,]
+mv<-pdvm16[,]
+#mv<-pdvm17[,]
 
 #make the gam:
 #vardat = predistvarmags
 #vardat = distwindvarmags
-#vardat = pdvm16
+vardat = pdvm16
 #vardat = pdvm17
 #vardat = dwvm16
-vardat = dwvm17
+#vardat = dwvm17
 var.gam <- gam(mags~s(mo), data = vardat)
 #plot the gam:
 varplot<-xyplot(mags ~ mo, data = vardat,
