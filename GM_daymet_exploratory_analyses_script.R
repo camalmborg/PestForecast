@@ -122,7 +122,13 @@ dwvm16<-distwindvarmags[distwindvarmags$colnum==22,]
 dwvm17<-distwindvarmags[distwindvarmags$colnum==23,]
 
 ###INTERACTIONS:
+pdvm<-as.data.frame(cbind(mags,mins,colnum,pdv.temp,pdv.precip,pdv.vpd))
+dwvm<-as.data.frame(cbind(mags,mins,colnum,dwv.temp,dwv.precip,dwv.vpd))
 
+pdvm16<-pdvm[pdvm$colnum==22,]
+dwvm16<-dwvm[dwvm$colnum==22,]
+pdvm17<-pdvm[pdvm$colnum==23,]
+dwvm17<-dwvm[dwvm$colnum==23,]
 
 ### GAM PLOT #####
 #load libaries:
