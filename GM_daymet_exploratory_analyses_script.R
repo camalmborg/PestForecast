@@ -150,7 +150,7 @@ mt<-pdvm16[,24]
 #mt<-pdvm17[,]
 mp<-pdvm16[,46]
 #mp<-pdvm17[,]
-#mv<-pdvm16[,]
+mv<-pdvm16[,24]
 #mv<-pdvm17[,]
 
 #make the gam:
@@ -160,7 +160,7 @@ vardat = pdvm16
 #vardat = pdvm17
 #vardat = dwvm16
 #vardat = dwvm17
-var.gam <- gam(mags~s(mt)+s(mp), data = vardat)
+var.gam <- gam(mags~s(mt)+s(mp)+s(mv), data = vardat)
 
 summ<-summary(var.gam)
 r2 <- summ$r.sq
