@@ -183,12 +183,14 @@ pdvar16<-pdvar[pdvar$colnum==22,]
 pdvar17<-pdvar[pdvar$colnum==23,]
 
 ##Interactions (Multivariate):
-mt<-pdvar16[,]
+mt<-pdvar16[,24]
+mt2<-pdvar16[,79]
 #mt<-pdvar17[,]
-mp<-pdvar[,46]
-mp2<-pdvar[,47]
+mp<-pdvar16[,46]
+mp2<-pdvar16[,47]
 #mp<-pdvar17[,]
-mv<-pdvar[,71]
+mv<-pdvar16[,71]
+mv2<-pdvar16[,101]
 #mv<-pdvm17[,]
 
 #make the gam:
@@ -201,7 +203,7 @@ vardat = pdvar16
 #vardat = pdvm17
 #vardat = dwvm16
 #vardat = dwvm17
-var.gam <- gam(mags~s(mt)+s(mp), data = vardat)
+var.gam <- gam(mags~s(mt)+s(mt2)+s(mp)+s(mp2), data = vardat)
 
 summ<-summary(var.gam)
 r2 <- summ$r.sq
