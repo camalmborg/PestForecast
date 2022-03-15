@@ -65,12 +65,6 @@ seqfx<-function(x){
   seq(x,312,by=12) #x = month (1=jan, 2=feb, etc.)
 }
 
-#seasons:
-winter<-sort(c(seqfx(12),seqfx(1),seqfx(2)))
-spring<-sort(c(seqfx(3),seqfx(4),seqfx(5)))
-summer<-sort(c(seqfx(6),seqfx(7),seqfx(8)))
-fall<-sort(c(seqfx(9),seqfx(10),seqfx(11)))
-
 ###combo seasons
 #april-august window:
 sprsum<-sort(c(seqfx(4),seqfx(5),seqfx(6),seqfx(7),seqfx(8)))
@@ -90,6 +84,43 @@ varwintspr<-var[,wintspr]
 predistvar<-varsprsum[,81:105]
 distwindvar<-varsprsum[,106:115]
 #recovvar<-varsprsum[,116:130]
+
+###SEASONAL:------
+#seasons:
+winter<-sort(c(seqfx(12),seqfx(1),seqfx(2)))
+spring<-sort(c(seqfx(3),seqfx(4),seqfx(5)))
+summer<-sort(c(seqfx(6),seqfx(7),seqfx(8)))
+fall<-sort(c(seqfx(9),seqfx(10),seqfx(11)))
+
+#spring:
+varspr<-var[,spring]
+#summer:
+varsumm<-var[,summer]
+#winter:
+varwint<-var[,winter]
+
+#choose season:
+varseason<-varspr
+
+#grab seasonal months (three monthly values * 26 years = 78 cols)
+#grab each month of each year's season separately:
+mo1<-seq(1,ncol(varseason),by=3)
+mo2<-seq(2,ncol(varseason),by=3)
+mo3<-seq(3,ncol(varseason),by=3)
+
+#make containers for them:
+v1<-varseason[,mo1]
+v2<-varseason[,mo2]
+v3<-varseason[,mo3]
+
+#run loop to average each three-month season (whatever varseason is...)
+#result is matrix with seasonal averages for each year:
+vseas<-matrix(NA, nrow=nsite, ncol=length(nyears))
+for (i in 1:26){
+  vall<-cbind(v1[,i],v2[,i],v3[,i])
+  vmean<-apply(vall,1,mean)
+  vseas[,i]<-vmean
+}
 
 ###INTERACTIONS:------
 #pdv.temp<-predistvar
