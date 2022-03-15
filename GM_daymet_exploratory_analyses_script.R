@@ -177,17 +177,24 @@ mo<-pdvm16[,28]
 #mo<-dwvm16[,6]
 #mo<-dwvm17[,13]
 
+#for interactions across pre- and during- dist time:
+pdvar<-cbind(pdvm[,1:78],dwvm[,4:33])
+pdvar16<-pdvar[pdvar$colnum==22,]
+pdvar17<-pdvar[pdvar$colnum==23,]
+
 ##Interactions (Multivariate):
-mt<-pdvm16[,24]
-#mt<-pdvm17[,]
-mp<-pdvm16[,46]
-mp2<-pdvm16[,47]
-#mp<-pdvm17[,]
-mv<-pdvm16[,71]
+mt<-pdvar16[,]
+#mt<-pdvar17[,]
+mp<-pdvar[,46]
+mp2<-pdvar[,47]
+#mp<-pdvar17[,]
+mv<-pdvar[,71]
 #mv<-pdvm17[,]
 
 #make the gam:
-vardat = cbind(predistvarmags,distwindvarmags[,4:13])
+vardat = pdvar16
+#vardat = pdvar17
+#vardat = pdvar
 #vardat = predistvarmags
 #vardat = distwindvarmags
 #vardat = pdvm16
