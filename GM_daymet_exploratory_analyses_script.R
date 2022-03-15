@@ -153,6 +153,7 @@ dwvm16<-distwindvarmags[distwindvarmags$colnum==22,]
 dwvm17<-distwindvarmags[distwindvarmags$colnum==23,]
 
 ###INTERACTIONS:
+#making pre and dist window multivariate dataframes (include temp, precip, vpd)
 pdvm<-as.data.frame(cbind(mags,mins,colnum,pdv.temp,pdv.precip,pdv.vpd))
 dwvm<-as.data.frame(cbind(mags,mins,colnum,dwv.temp,dwv.precip,dwv.vpd))
 
@@ -180,18 +181,20 @@ mo<-pdvm16[,28]
 mt<-pdvm16[,24]
 #mt<-pdvm17[,]
 mp<-pdvm16[,46]
+mp2<-pdvm16[,47]
 #mp<-pdvm17[,]
-mv<-pdvm16[,24]
+mv<-pdvm16[,71]
 #mv<-pdvm17[,]
 
 #make the gam:
+vardat = cbind(predistvarmags,distwindvarmags[,4:13])
 #vardat = predistvarmags
 #vardat = distwindvarmags
-vardat = pdvm16
+#vardat = pdvm16
 #vardat = pdvm17
 #vardat = dwvm16
 #vardat = dwvm17
-var.gam <- gam(mags~s(mt)+s(mp)+s(mv), data = vardat)
+var.gam <- gam(mags~s(mt)+s(mp), data = vardat)
 
 summ<-summary(var.gam)
 r2 <- summ$r.sq
