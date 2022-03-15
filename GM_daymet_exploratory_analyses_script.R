@@ -167,7 +167,7 @@ dwvm17<-dwvm[dwvm$colnum==23,]
 # library(lattice)
 # library(latticeExtra)
 # library(tactile)
-# library(mgcv)
+library(mgcv)
 
 #Univariate:
 #mo<-predistvarmags[,20]  #whatever month we are using
@@ -203,7 +203,7 @@ vardat = pdvar16
 #vardat = pdvm17
 #vardat = dwvm16
 #vardat = dwvm17
-var.gam <- gam(mags~s(mt)+s(mt2)+s(mp)+s(mp2), data = vardat)
+var.gam <- gam(mags~s(mp)+s(mp2)+s(mv)+s(mv2), data = vardat)
 
 summ<-summary(var.gam)
 r2 <- summ$r.sq
