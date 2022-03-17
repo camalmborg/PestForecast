@@ -94,6 +94,8 @@ spring<-sort(c(seqfx(3),seqfx(4),seqfx(5))) #spring is march, april, may
 summer<-sort(c(seqfx(6),seqfx(7),seqfx(8))) #summer is june, july, august
 fall<-sort(c(seqfx(9),seqfx(10),seqfx(11)))
 
+junejuly<-sort(c(seqfx(6),seqfx(7)))
+
 #spring:
 varspr<-var[,spring]
 #summer:
