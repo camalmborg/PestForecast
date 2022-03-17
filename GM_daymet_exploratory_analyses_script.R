@@ -56,6 +56,7 @@ rm(envar) #remove redundant matrix
 #for number of years * months specified
 #full set is all months (12) * all years (26) = 312 months
 varmags<-as.data.frame(cbind(tcg.recov, var))
+mags<-tcg.recov[,'mags']
 #
 #
 ### Make testing windows for daymet data #####
@@ -65,7 +66,7 @@ seqfx<-function(x){
   seq(x,312,by=12) #x = month (1=jan, 2=feb, etc.)
 }
 
-###combo seasons
+###combo seasons-----
 #april-august window:
 sprsum<-sort(c(seqfx(4),seqfx(5),seqfx(6),seqfx(7),seqfx(8)))
 #december-march:
@@ -88,8 +89,8 @@ distwindvar<-varsprsum[,106:115]
 ###SEASONAL:------
 #seasons:
 winter<-sort(c(seqfx(12),seqfx(1),seqfx(2)))
-spring<-sort(c(seqfx(3),seqfx(4),seqfx(5)))
-summer<-sort(c(seqfx(6),seqfx(7),seqfx(8)))
+spring<-sort(c(seqfx(3),seqfx(4),seqfx(5))) #spring is march, april, may
+summer<-sort(c(seqfx(6),seqfx(7),seqfx(8))) #summer is june, july, august
 fall<-sort(c(seqfx(9),seqfx(10),seqfx(11)))
 
 #spring:
@@ -100,7 +101,9 @@ varsumm<-var[,summer]
 varwint<-var[,winter]
 
 #choose season:
-varseason<-varspr
+#varseason<-varspr
+varseason<-varsumm
+#varseason<-varwint
 
 #grab seasonal months (three monthly values * 26 years = 78 cols)
 #grab each month of each year's season separately:
@@ -115,12 +118,16 @@ v3<-varseason[,mo3]
 
 #run loop to average each three-month season (whatever varseason is...)
 #result is matrix with seasonal averages for each year:
-vseas<-matrix(NA, nrow=nsite, ncol=length(nyears))
-for (i in 1:26){
+vseas<-matrix(NA, nrow=nsite-(length(missing)), ncol=length(nyears))
+for (i in 1:length(nyears)){
   vall<-cbind(v1[,i],v2[,i],v3[,i])
   vmean<-apply(vall,1,mean)
   vseas[,i]<-vmean
 }
+
+#lines for saving:
+#sumvpd<-vseas
+#sumvpdmags<-as.data.frame(cbind(mags,sumvpd))
 
 ###INTERACTIONS:------
 #pdv.temp<-predistvar
@@ -172,15 +179,15 @@ library(mgcv)
 #Univariate:
 #mo<-predistvarmags[,20]  #whatever month we are using
 #mo<-distwindvarmags[,]
-mo<-pdvm16[,28]
+#mo<-pdvm16[,28]
 #mo<-pdvm17[,28]
 #mo<-dwvm16[,6]
 #mo<-dwvm17[,13]
 
 #for interactions across pre- and during- dist time:
-pdvar<-cbind(pdvm[,1:78],dwvm[,4:33])
-pdvar16<-pdvar[pdvar$colnum==22,]
-pdvar17<-pdvar[pdvar$colnum==23,]
+#pdvar<-cbind(pdvm[,1:78],dwvm[,4:33])
+#pdvar16<-pdvar[pdvar$colnum==22,]
+#pdvar17<-pdvar[pdvar$colnum==23,]
 
 ##Interactions (Multivariate):
 mt<-pdvar16[,24]
