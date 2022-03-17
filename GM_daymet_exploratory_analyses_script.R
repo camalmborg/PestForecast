@@ -57,6 +57,7 @@ rm(envar) #remove redundant matrix
 #full set is all months (12) * all years (26) = 312 months
 varmags<-as.data.frame(cbind(tcg.recov, var))
 mags<-tcg.recov[,'mags']
+colnum<-tcg.recov[,'colnum']
 #
 #
 ### Make testing windows for daymet data #####
@@ -127,15 +128,21 @@ for (i in 1:length(nyears)){
 
 #lines for saving:
 #sumvpd<-vseas
+sprallvar<-as.data.frame(cbind(mags,colnum,sprtemp,sprprecip,sprvpd))
+sumallvar<-as.data.frame(cbind(mags,colnum,sumtemp,sumprecip,sumvpd))
 #sumvpdmags<-as.data.frame(cbind(mags,sumvpd))
+sprav16<-sprallvar[sprallvar$colnum==22,]
+sprav17<-sprallvar[sprallvar$colnum==23,]
+sumav16<-sumallvar[sumallvar$colnum==22,]
+sumav17<-sumallvar[sumallvar$colnum==23,]
 
 ###INTERACTIONS:------
 #pdv.temp<-predistvar
 #pdv.precip<-predistvar
-pdv.vpd<-predistvar
+#pdv.vpd<-predistvar
 #dwv.temp<-distwindvar
 #dwv.precip<-distwindvar
-dwv.vpd<-distwindvar
+#dwv.vpd<-distwindvar
 
 # #winter-spring group:
 # predistvar<-varwintspr[,65:84]
@@ -176,7 +183,7 @@ dwvm17<-dwvm[dwvm$colnum==23,]
 # library(tactile)
 library(mgcv)
 
-#Univariate:
+#Univariate:-----
 #mo<-predistvarmags[,20]  #whatever month we are using
 #mo<-distwindvarmags[,]
 #mo<-pdvm16[,28]
@@ -189,28 +196,27 @@ library(mgcv)
 #pdvar16<-pdvar[pdvar$colnum==22,]
 #pdvar17<-pdvar[pdvar$colnum==23,]
 
-##Interactions (Multivariate):
-mt<-pdvar16[,24]
-mt2<-pdvar16[,79]
-#mt<-pdvar17[,]
-mp<-pdvar16[,46]
-mp2<-pdvar16[,47]
-#mp<-pdvar17[,]
-mv<-pdvar16[,71]
-mv2<-pdvar16[,101]
-#mv<-pdvm17[,]
+##Interactions (Multivariate):-----
+#mt<-pdvar16[,24]
+#mp<-pdvar16[,46]
+#mv<-pdvar16[,71]
+mt<-sprav16[,]
+#mt2<-sumav16
+mp<-sprav16[,48]
+mp2<-sumav16[,49]
+mv<-sprav16[,74]
+mv2<-sumav16[,75]
+
 
 #make the gam:
-vardat = pdvar16
-#vardat = pdvar17
-#vardat = pdvar
+#vardat = pdvar16
 #vardat = predistvarmags
 #vardat = distwindvarmags
 #vardat = pdvm16
 #vardat = pdvm17
-#vardat = dwvm16
-#vardat = dwvm17
-var.gam <- gam(mags~s(mp)+s(mp2)+s(mv)+s(mv2), data = vardat)
+vardat = sprav16
+#vardat = sumav17
+var.gam <- gam(mags~s(mp)+s(mp2)+s(mv2), data = vardat)
 
 summ<-summary(var.gam)
 r2 <- summ$r.sq
@@ -255,3 +261,7 @@ varplot<-xyplot(mags ~ mo, data = vardat,
                   panel.lines(l[,1], l[,2],lty=1, col='black', lwd=1.5)
                 })
 print(varplot)
+# plot(sumprecip[1,23:26],type='l', ylim=c(0,8))
+# for(i in 1:4997){
+#   lines(sumprecip[i,23:26],col=i)
+# }
