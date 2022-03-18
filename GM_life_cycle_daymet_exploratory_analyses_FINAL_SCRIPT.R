@@ -58,28 +58,35 @@ varhatch<-var[,aprilmay]
 #larval:
 varfeed<-var[,junejuly]
 
-#grab seasonal months (three monthly values * 26 years = 78 cols)
-#grab each month of each year's season separately:
-mo1<-seq(1,ncol(varseason),by=3)
-mo2<-seq(2,ncol(varseason),by=3)
+#grab seasonal months (2 monthly values * 26 years = 52 cols)
+#grab each month of each year's season separately: varhatch or varfeed
+mo1<-seq(1,ncol(varhatch),by=2)
+mo2<-seq(2,ncol(varhatch),by=2)
+mo3<-seq(1,ncol(varfeed),by=2)
+mo4<-seq(2,ncol(varfeed),by=2)
 
 #make containers for them:
-v1<-varseason[,mo1]
-v2<-varseason[,mo2]
+v1<-varhatch[,mo1]
+v2<-varhatch[,mo2]
+v3<-varhatch[,mo1]
+v4<-varhatch[,mo2]
 
 #run loop to average each three-month season (whatever varseason is...)
 #result is matrix with seasonal averages for each year:
-vstage<-matrix(NA, nrow=nsite-(length(missing)), ncol=length(nyears))
+vhstage<-matrix(NA, nrow=nsite-(length(missing)), ncol=length(nyears))
+vfstage<-matrix(NA, nrow=nsite-(length(missing)), ncol=length(nyears))
 for (i in 1:length(nyears)){
-  vall<-cbind(v1[,i],v2[,i])
-  vmean<-apply(vall,1,mean)
-  vstage[,i]<-vmean
+  vhall<-cbind(v1[,i],v2[,i])
+  vfall<-cbind(v3[,i],v4[,i])
+  vhmean<-apply(vhall,1,mean)
+  vfmean<-apply(vfall,1,mean)
+  vhstage[,i]<-vhmean
+  vfstage[,i]<-vfmean
 }
 
-#lines for saving:
-#vht<-vstage
-#vhp<-vstage
-#vhv<-vstage
+#lines for saving: t=temp, p=precip, v=vpd
+vhv<-vhstage
+vfv<-vfstage
 
 #make data frames:
 hatchallvar<-as.data.frame(cbind(mags,colnum,vht,vhp,vhv))
@@ -89,6 +96,10 @@ hatch16<-hatchallvar[hatchallvar$colnum==22,]
 hatch17<-hatchallvar[hatchallvar$colnum==23,]
 feed16<-feedallvar[feedallvar$colnum==22,]
 feed17<-feedallvar[feedallvar$colnum==23,]
+
+#make big dataset with all vars for 2016 sites:
+hf<-as.data.frame(cbind(mags,colnum,vht,vft,vhp,vfp,vhv,vfv))
+hf16<-hf[hf$colnum==22,]
 
 ### RUNNING THE GAMs
 library(mgcv)
