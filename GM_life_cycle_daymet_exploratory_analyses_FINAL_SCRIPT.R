@@ -60,3 +60,24 @@ mo2<-seq(2,ncol(varseason),by=3)
 #make containers for them:
 v1<-varseason[,mo1]
 v2<-varseason[,mo2]
+
+#run loop to average each three-month season (whatever varseason is...)
+#result is matrix with seasonal averages for each year:
+vseas<-matrix(NA, nrow=nsite-(length(missing)), ncol=length(nyears))
+for (i in 1:length(nyears)){
+  vall<-cbind(v1[,i],v2[,i],v3[,i])
+  vmean<-apply(vall,1,mean)
+  vseas[,i]<-vmean
+}
+
+#lines for saving:
+#sumvpd<-vseas
+
+#make data frames:
+sprallvar<-as.data.frame(cbind(mags,colnum,sprtemp,sprprecip,sprvpd))
+sumallvar<-as.data.frame(cbind(mags,colnum,sumtemp,sumprecip,sumvpd))
+#separate 2016 and 2017 disturbance years:
+sprav16<-sprallvar[sprallvar$colnum==22,]
+sprav17<-sprallvar[sprallvar$colnum==23,]
+sumav16<-sumallvar[sumallvar$colnum==22,]
+sumav17<-sumallvar[sumallvar$colnum==23,]
