@@ -85,7 +85,20 @@ for (i in 1:length(nyears)){
 hatchallvar<-as.data.frame(cbind(mags,colnum,vht,vhp,vhv))
 feedallvar<-as.data.frame(cbind(mags,colnum,vft,vfp,vfv))
 #separate 2016 and 2017 disturbance years:
-hatch16<-hatchallvar[sprallvar$colnum==22,]
-hatch17<-hatchallvar[sprallvar$colnum==23,]
-feed16<-feedallvar[sumallvar$colnum==22,]
-feed17<-feedallvar[sumallvar$colnum==23,]
+hatch16<-hatchallvar[hatchallvar$colnum==22,]
+hatch17<-hatchallvar[hatchallvar$colnum==23,]
+feed16<-feedallvar[feedallvar$colnum==22,]
+feed17<-feedallvar[feedallvar$colnum==23,]
+
+### RUNNING THE GAMs
+library(mgcv)
+
+# vardat = hatch16
+# vardat = feed16
+# vardat = hf16
+
+var.gam <- gam(mags~s(mp)+s(mp2)+s(mv2), data = vardat)
+summ<-summary(var.gam)
+r2 <- summ$r.sq
+print(r2)
+
