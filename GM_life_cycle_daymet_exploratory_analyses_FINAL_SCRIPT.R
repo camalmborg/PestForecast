@@ -1,3 +1,9 @@
+#script for grabbing daymet data based on insect phenology
+#pre-larval "hatch" time: months april, may
+#larval "feed" time: months june, july
+#daymet variables: maxtemp, precip, vpd > average monthly values aggregated
+#so that hatch= mean variable values for april-may, feed = mean values june-july
+
 #to get data for 5 prior years 2011-2015:
 prior5 <- c(17:21)
 #to get data for disturbance window 2016-2017:
@@ -63,21 +69,23 @@ v2<-varseason[,mo2]
 
 #run loop to average each three-month season (whatever varseason is...)
 #result is matrix with seasonal averages for each year:
-vseas<-matrix(NA, nrow=nsite-(length(missing)), ncol=length(nyears))
+vstage<-matrix(NA, nrow=nsite-(length(missing)), ncol=length(nyears))
 for (i in 1:length(nyears)){
-  vall<-cbind(v1[,i],v2[,i],v3[,i])
+  vall<-cbind(v1[,i],v2[,i])
   vmean<-apply(vall,1,mean)
-  vseas[,i]<-vmean
+  vstage[,i]<-vmean
 }
 
 #lines for saving:
-#sumvpd<-vseas
+#vht<-vstage
+#vhp<-vstage
+#vhv<-vstage
 
 #make data frames:
-sprallvar<-as.data.frame(cbind(mags,colnum,sprtemp,sprprecip,sprvpd))
-sumallvar<-as.data.frame(cbind(mags,colnum,sumtemp,sumprecip,sumvpd))
+hatchallvar<-as.data.frame(cbind(mags,colnum,vht,vhp,vhv))
+feedallvar<-as.data.frame(cbind(mags,colnum,vft,vfp,vfv))
 #separate 2016 and 2017 disturbance years:
-sprav16<-sprallvar[sprallvar$colnum==22,]
-sprav17<-sprallvar[sprallvar$colnum==23,]
-sumav16<-sumallvar[sumallvar$colnum==22,]
-sumav17<-sumallvar[sumallvar$colnum==23,]
+hatch16<-hatchallvar[sprallvar$colnum==22,]
+hatch17<-hatchallvar[sprallvar$colnum==23,]
+feed16<-feedallvar[sumallvar$colnum==22,]
+feed17<-feedallvar[sumallvar$colnum==23,]
