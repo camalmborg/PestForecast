@@ -125,9 +125,8 @@ mt6<-hf16[,49]
 # vardat = feed16
 vardat = hf16
 
-var.gam <- gam(mags~s(mp)+s(mp2)+s(mp3)+s(mp4)+s(mv)+s(mv2)+s(mv3)+s(mt)+s(mt2)+s(mt3)+s(mt4)+s(mt5)+s(mt6), data = vardat)
+var.gam <- gam(mags~s(mp)+s(mp2)+s(mv2)+s(mp4,by=mt)+s(mp3,by=mt2), data = vardat)
 summ<-summary(var.gam)
 r2 <- summ$r.sq
 print(r2)
 
-print('git works now?')
