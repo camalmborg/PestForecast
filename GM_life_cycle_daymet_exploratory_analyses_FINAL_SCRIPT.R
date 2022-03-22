@@ -107,17 +107,25 @@ library(mgcv)
 #variables to include:
 mp<-hf16[,100]
 mp2<-hf16[,101]
-#mv<-hf16[,]
-#mv2<-hf16[,]
-#mt<-hf16[,]
-#mt2<-hf16[,]
+mp3<-hf16[,102]
+mp4<-hf16[,76]
+mv<-hf16[,152]
+mv2<-hf16[,153]
+mv3<-hf16[,128]
+#mv4<-hf16[,154]
+mt<-hf16[,24]
+mt2<-hf16[,50]
+mt3<-hf16[,22]
+mt4<-hf16[,23]
+mt5<-hf16[,48]
+mt6<-hf16[,49]
 
 #data set:
 # vardat = hatch16
 # vardat = feed16
 vardat = hf16
 
-var.gam <- gam(mags~s(mp)+s(mp2)+s(mv2), data = vardat)
+var.gam <- gam(mags~s(mp)+s(mp2)+s(mp3)+s(mp4)+s(mv)+s(mv2)+s(mv3)+s(mt)+s(mt2)+s(mt3)+s(mt4)+s(mt5)+s(mt6), data = vardat)
 summ<-summary(var.gam)
 r2 <- summ$r.sq
 print(r2)
