@@ -129,4 +129,3 @@ var.gam <- gam(mags~s(mp)+s(mp2)+s(mp3)+s(mp4)+s(mv)+s(mv2)+s(mv3)+s(mt)+s(mt2)+
 summ<-summary(var.gam)
 r2 <- summ$r.sq
 print(r2)
-
