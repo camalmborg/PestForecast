@@ -104,9 +104,18 @@ hf16<-hf[hf$colnum==22,]
 ### RUNNING THE GAMs
 library(mgcv)
 
+#variables to include:
+mp<-hf16[,100]
+mp2<-hf16[,101]
+#mv<-hf16[,]
+#mv2<-hf16[,]
+#mt<-hf16[,]
+#mt2<-hf16[,]
+
+#data set:
 # vardat = hatch16
 # vardat = feed16
-# vardat = hf16
+vardat = hf16
 
 var.gam <- gam(mags~s(mp)+s(mp2)+s(mv2), data = vardat)
 summ<-summary(var.gam)
