@@ -39,7 +39,7 @@ download.NLDAS <- function(outfolder, start_date, end_date, site_id, lat.in, lon
   
   lat.in <- as.numeric(lat.in)
   lon.in <- as.numeric(lon.in)
-  #>>> this needs to change dap_base <- "http://hydro1.sci.gsfc.nasa.gov/thredds/dodsC/NLDAS_FORA0125_H.002"
+  dap_base <- "https://hydro1.gesdisc.eosdis.nasa.gov/opendap/NLDAS/NLDAS_MOS0125_M.2.0/"
   dir.create(outfolder, showWarnings = FALSE, recursive = TRUE)
   
   ylist <- seq(start_year, end_year, by = 1)
@@ -114,6 +114,13 @@ download.NLDAS <- function(outfolder, start_date, end_date, site_id, lat.in, lon
       dat.list[[j]] <- array(NA, dim = c(length(lat.in), length(lon.in), ntime))  # Go ahead and make the arrays
     }
     names(var.list) <- names(dat.list) <- var$CF.name
+    
+    ## example
+    library(ncdf4)
+    url = "https://hydro1.gesdisc.eosdis.nasa.gov/opendap/NLDAS/NLDAS_MOS0125_M.2.0/2021/NLDAS_MOS0125_M.A202101.020.nc"
+    nc = nc_open(url)
+    
+    
     
     ## get data off OpenDAP
     for (j in seq_along(days.use)) {
