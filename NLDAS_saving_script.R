@@ -114,11 +114,17 @@ download.NLDAS <- function(outfolder, start_date, end_date, site_id, lat.in, lon
       dat.list[[j]] <- array(NA, dim = c(length(lat.in), length(lon.in), ntime))  # Go ahead and make the arrays
     }
     names(var.list) <- names(dat.list) <- var$CF.name
+
+    
+    
     
     ## example
     library(ncdf4)
+    #fixed url for new NLDAS location:
     url = "https://hydro1.gesdisc.eosdis.nasa.gov/opendap/NLDAS/NLDAS_MOS0125_M.2.0/2021/NLDAS_MOS0125_M.A202101.020.nc"
     nc = nc_open(url)
+    
+
     
     
     
@@ -132,6 +138,8 @@ download.NLDAS <- function(outfolder, start_date, end_date, site_id, lat.in, lon
         hr <- stringr::str_pad(time.stamps[h], 4, pad = "0")
         dap_file <- paste0(dap_base, "/", year, "/", doy, "/", "NLDAS_FORA0125_H.A", year,
                            mo.now, day.mo, ".", hr, ".002.grb.ascii?")
+        
+        
         
         # Query lat/lon
         latlon <- RCurl::getURL(paste0(dap_file, "lat[0:1:223],lon[0:1:463]"))
