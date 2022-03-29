@@ -1,6 +1,13 @@
+#load netcdf package:
+library(ncdf4)
 
-#load package for netcdf reading:
-library(ncdf4) 
+#fixed url for new NLDAS location:
+url = "https://hydro1.gesdisc.eosdis.nasa.gov/opendap/NLDAS/NLDAS_MOS0125_M.2.0/2021/NLDAS_MOS0125_M.A202101.020.nc"
+nc = nc_open(url)
+nc_close(nc)
+
+
+
 
 ##' Download NLDAS met data
 ##'
@@ -115,19 +122,7 @@ download.NLDAS <- function(outfolder, start_date, end_date, site_id, lat.in, lon
     }
     names(var.list) <- names(dat.list) <- var$CF.name
 
-    
-    
-    
-    ## example
-    library(ncdf4)
-    #fixed url for new NLDAS location:
-    url = "https://hydro1.gesdisc.eosdis.nasa.gov/opendap/NLDAS/NLDAS_MOS0125_M.2.0/2021/NLDAS_MOS0125_M.A202101.020.nc"
-    nc = nc_open(url)
-    
 
-    
-    
-    
     ## get data off OpenDAP
     for (j in seq_along(days.use)) {
       date.now <- as.Date(days.use[j], origin = as.Date(paste0(year - 1, "-12-31")))

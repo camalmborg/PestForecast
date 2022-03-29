@@ -4,6 +4,7 @@
 #daymet variables: maxtemp, precip, vpd > average monthly values aggregated
 #so that hatch= mean variable values for april-may, feed = mean values june-july
 
+#MAKING THE DATASET-----
 #to get data for 5 prior years 2011-2015:
 prior5 <- c(17:21)
 #to get data for disturbance window 2016-2017:
@@ -85,8 +86,8 @@ for (i in 1:length(nyears)){
 }
 
 #lines for saving: t=temp, p=precip, v=vpd
-vhv<-vhstage
-vfv<-vfstage
+#vhv<-vhstage
+#vfv<-vfstage
 
 #make data frames:
 hatchallvar<-as.data.frame(cbind(mags,colnum,vht,vhp,vhv))
@@ -101,7 +102,7 @@ feed17<-feedallvar[feedallvar$colnum==23,]
 hf<-as.data.frame(cbind(mags,colnum,vht,vft,vhp,vfp,vhv,vfv))
 hf16<-hf[hf$colnum==22,]
 
-### RUNNING THE GAMs
+### RUNNING THE GAMs-----
 library(mgcv)
 
 #variables to include:
