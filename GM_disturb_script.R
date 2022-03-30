@@ -91,10 +91,9 @@ for (s in 1:ns){
   for(t in 2:n){
     muN[s,t]<-R*x[s,t-1]
     x[s,t] ~ dnorm(mu[s,t],tau_add)
-    muD[s,t] ~ dnorm(mu0,pa0)
-    D[s,t] ~ dbern(p)
-    mu[s,t] <- D[s,t]*muD[s,t] + (1-D[s,t])*muN[s,t]
-  }
+    muD[s,t] ~ dnorm(mu0,pa0)  #adding a process model on mu0[s,t] 
+    D[s,t] ~ dbern(p) ##can add a process model here for the natural population cycle
+    mu[s,t] <- D[s,t]*muD[s,t] + (1-D[s,t])*muN[s,t] 
   
   x[s,1]~dnorm(x_ic,tau_ic)
   
