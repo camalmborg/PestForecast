@@ -49,7 +49,7 @@ for (s in 1:ns){
     muD[s,t] ~ dnorm(mu0[s,t],pa0) ##step 1: process model on mu0
     D[s,t] ~ dbern(p) ##step 2: adding process model here
     mu[s,t] <- D[s,t]*muD[s,t] + (1-D[s,t])*muN[s,t]
-    mu0[s,t] <- beta0
+    mu0[s,t] <- beta0 + betaV*vpd + betaP*pcp
   }
   
   x[s,1]~dnorm(x_ic,tau_ic)
@@ -61,7 +61,9 @@ for (s in 1:ns){
   tau_add ~ dgamma(a_add,t_add)
   R ~ dnorm(rmean,rprec)  #rho term
   p ~ dunif(0,1)  #disturbance probability
-  beta0 ~ dnorm(-5,1) #mean of disturbed state
+  beta0 ~ dnorm(-5,1) #param for calculating mean of disturbed state
+  betaV ~ ###fill this in
+  betaP ~ ###fill this in
   pa0 ~ dgamma(1,1) #precision of disturbed state
   
 }
