@@ -109,7 +109,7 @@ for (s in 1:ns){
 }
 "
 
-#data and parameters for random effects model:
+#data and parameters for sites model:
 data.s = list(y=obs, n=NT, ns=length(geoID),
             x_ic=0, tau_ic=0.1,
             a_obs=0.1,t_obs=0.1,
