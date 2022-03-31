@@ -88,3 +88,6 @@ j.pests <- jags.model (file = textConnection(spongy_disturb),
                        inits = init,
                        n.chains = 3)
 
+jpout <-coda.samples(j.pests, 
+                     variable.names = "beta0",
+                     n.iter = 5000)
