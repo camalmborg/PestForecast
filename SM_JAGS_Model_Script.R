@@ -6,12 +6,22 @@
 library(rjags)
 library(coda)
 library(ecoforecastR)
-library()
+library(tidyverse)
+library(dplyr)
+
 
 #load full dataset (5000 sites):
 #model uses condition scores, not TCG raw data
 cond.scores.mo<-read.csv("2020_07_10_sample_score_mean_MONTHLY.csv")
 condscores<-cond.scores.mo[,2:131]
+
+#make vertical:
+# condscores %>%
+#   pivot_longer(
+#     cols = everything(),
+#     names_to=colnames(condscores)
+#   )
+#condscores<-as.data.frame(t(condscores))
 
 #random selection of sites for testing:
 smpl<-sample(5000,250)
@@ -40,6 +50,7 @@ for (s in 1:ns){
     D[s,t] ~ dbern(p) ##step 2: adding process model here
     mu[s,t] <- D[s,t]*muD[s,t] + (1-D[s,t])*muN[s,t]
     mu0[s,t] <- beta0
+  }
   
   x[s,1]~dnorm(x_ic,tau_ic)
   
@@ -58,7 +69,7 @@ for (s in 1:ns){
 
 #MODEL INPUTS
 #data and parameters for sites model:
-data = list(y=condscores.samp, n=NT, ns=length(nsites),
+data = list(y=condscores.samp, n=NT, ns=nsites,
               x_ic=0, tau_ic=0.1,
               a_obs=0.1,t_obs=0.1,
               a_add=0.1,t_add=0.1,
