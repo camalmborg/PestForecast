@@ -14,22 +14,22 @@ library(dplyr)
 #model uses condition scores, not TCG raw data
 cond.scores.mo<-read.csv("2020_07_10_sample_score_mean_MONTHLY.csv")
 condscores<-cond.scores.mo[,2:131]
-
-#make vertical:
-# condscores %>%
-#   pivot_longer(
-#     cols = everything(),
-#     names_to=colnames(condscores)
-#   )
-#condscores<-as.data.frame(t(condscores))
+#2016 dist mag sites:
+cs16<-condscores[hf16$X,]
 
 #random selection of sites for testing:
-smpl<-sample(5000,250)
-condscores.samp<-condscores[smpl,]
+smpl<-sample(nrow(cs16),250)
+condscores.samp<-cs16[smpl,]
 
 #number of sites, timesteps:
 nsites = nrow(condscores.samp)
 NT = ncol(condscores.samp)
+
+#load hatch-feed temp,vpd,precip dataset:
+hf16<-read.csv("hf16_dataset_03_2022.csv")
+hfnoX<-hf16[,2:ncol(hf16)]
+vpdf16<-hfnoX[,152:153]
+pcpf16<-hfnoX[,100:101]
 
 #THE MODEL:
 spongy_disturb <- "model{
@@ -49,7 +49,7 @@ for (s in 1:ns){
     muD[s,t] ~ dnorm(mu0[s,t],pa0) ##step 1: process model on mu0
     D[s,t] ~ dbern(p) ##step 2: adding process model here
     mu[s,t] <- D[s,t]*muD[s,t] + (1-D[s,t])*muN[s,t]
-    mu0[s,t] <- beta0 + betaV*vpd + betaP*pcp
+    mu0[s,t] <- beta0 + beta[1]*vpd
   }
   
   x[s,1]~dnorm(x_ic,tau_ic)
@@ -62,8 +62,8 @@ for (s in 1:ns){
   R ~ dnorm(rmean,rprec)  #rho term
   p ~ dunif(0,1)  #disturbance probability
   beta0 ~ dnorm(-5,1) #param for calculating mean of disturbed state
-  betaV ~ ###fill this in
-  betaP ~ ###fill this in
+  ##beta[1] ~ dnorm()
+  ##betaP ~ ###fill this in
   pa0 ~ dgamma(1,1) #precision of disturbed state
   
 }
