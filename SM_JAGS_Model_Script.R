@@ -18,7 +18,7 @@ condscores<-cond.scores.mo[,2:131]
 cs16<-condscores[hf16$X,]
 
 #random selection of sites for testing:
-smpl<-sample(nrow(cs16),250)
+smpl<-sample(nrow(cs16),100)
 condscores.samp<-cs16[smpl,]
 
 #number of sites, timesteps:
@@ -28,8 +28,8 @@ NT = ncol(condscores.samp)
 #load hatch-feed temp,vpd,precip dataset:
 hf16<-read.csv("hf16_dataset_03_2022.csv")
 hfnoX<-hf16[,2:ncol(hf16)]
-vpdf16<-hfnoX[,152:153]
-pcpf16<-hfnoX[,100:101]
+vpd<-hfnoX[smpl,152:153]
+pcp<-hfnoX[smpl,100:101]
 
 #THE MODEL:
 spongy_disturb <- "model{
@@ -49,7 +49,7 @@ for (s in 1:ns){
     muD[s,t] ~ dnorm(mu0[s,t],pa0) ##step 1: process model on mu0
     D[s,t] ~ dbern(p) ##step 2: adding process model here
     mu[s,t] <- D[s,t]*muD[s,t] + (1-D[s,t])*muN[s,t]
-    mu0[s,t] <- beta0 + beta[1]*vpd
+    mu0[s,t] <- beta0 + beta[1]*vpd[s,1] ## + beta[2]*vpd[s,2]
   }
   
   x[s,1]~dnorm(x_ic,tau_ic)
@@ -62,8 +62,8 @@ for (s in 1:ns){
   R ~ dnorm(rmean,rprec)  #rho term
   p ~ dunif(0,1)  #disturbance probability
   beta0 ~ dnorm(-5,1) #param for calculating mean of disturbed state
-  ##beta[1] ~ dnorm()
-  ##betaP ~ ###fill this in
+  beta[1] ~ dnorm(0,0.001)
+  ##beta[2] ~ dnorm(0,0.001)
   pa0 ~ dgamma(1,1) #precision of disturbed state
   
 }
@@ -75,7 +75,8 @@ data = list(y=condscores.samp, n=NT, ns=nsites,
               x_ic=0, tau_ic=0.1,
               a_obs=0.1,t_obs=0.1,
               a_add=0.1,t_add=0.1,
-              rmean=0,rprec=0.00001)
+              rmean=0,rprec=0.00001,
+              vpd=vpd)
 
 #initial state of model parameters
 init<-list()
@@ -91,5 +92,7 @@ j.pests <- jags.model (file = textConnection(spongy_disturb),
                        n.chains = 3)
 
 jpout <-coda.samples(j.pests, 
-                     variable.names = "beta0",
+                     variable.names = c("beta0","beta[1]"),
                      n.iter = 5000)
+
+plot(jpout)
