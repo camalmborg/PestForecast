@@ -5,9 +5,9 @@
 #THE LIBRARIES
 library(rjags)
 library(coda)
-library(ecoforecastR)
-library(tidyverse)
-library(dplyr)
+#library(ecoforecastR)
+#library(tidyverse)
+#library(dplyr)
 
 
 #load full dataset (5000 sites):
@@ -18,7 +18,7 @@ condscores<-cond.scores.mo[,2:131]
 cs16<-condscores[hf16$X,]
 
 #random selection of sites for testing:
-smpl<-sample(nrow(cs16),100)
+smpl<-sample(nrow(cs16),50)
 condscores.samp<-cs16[smpl,]
 
 #number of sites, timesteps:
@@ -62,8 +62,8 @@ for (s in 1:ns){
   R ~ dnorm(rmean,rprec)  #rho term
   p ~ dunif(0,1)  #disturbance probability
   beta0 ~ dnorm(-5,1) #param for calculating mean of disturbed state
-  beta[1] ~ dnorm(0,0.001)
-  ##beta[2] ~ dnorm(0,0.001)
+  beta[1] ~ dnorm(0,0.0001)
+  ##beta[2] ~ dnorm(0,0.0001)
   pa0 ~ dgamma(1,1) #precision of disturbed state
   
 }
@@ -93,6 +93,6 @@ j.pests <- jags.model (file = textConnection(spongy_disturb),
 
 jpout <-coda.samples(j.pests, 
                      variable.names = c("beta0","beta[1]"),
-                     n.iter = 5000)
+                     n.iter = 25000)
 
 plot(jpout)
