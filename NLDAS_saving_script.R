@@ -1,9 +1,16 @@
 #load netcdf package:
 library(ncdf4)
+#files <-read.table(file="subset_NLDAS_NOAH0125_M_002_20220406_180833.txt")
 
 #fixed url for new NLDAS location:
-url = "https://hydro1.gesdisc.eosdis.nasa.gov/opendap/NLDAS/NLDAS_MOS0125_M.2.0/2021/NLDAS_MOS0125_M.A202101.020.nc"
+url = "https://hydro1.gesdisc.eosdis.nasa.gov/dods/NLDAS_NOAH0125_M.002"
 nc = nc_open(url)
+
+#establish lat long bounding box
+bounding<-read.csv("2022_03_29_latlonboundingbox.csv")
+
+
+#scrape data for soil moisture variables:
 nc_close(nc)
 
 
