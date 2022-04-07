@@ -49,7 +49,7 @@ for (s in 1:ns){
     muD[s,t] ~ dnorm(mu0[s,t],pa0) ##step 1: process model on mu0
     D[s,t] ~ dbern(p) ##step 2: adding process model here
     mu[s,t] <- D[s,t]*muD[s,t] + (1-D[s,t])*muN[s,t]
-    mu0[s,t] <- beta0 + beta[1]*vpd[s,1] + beta[2]*vpd[s,2] + beta[3]*pcp[s,1] +bet1[4]*pcp[s,2] 
+    mu0[s,t] <- beta0 + beta[1]*vpd[s,1] + beta[2]*vpd[s,2] + beta[3]*pcp[s,1] +beta[4]*pcp[s,2] 
   }
   
   x[s,1]~dnorm(x_ic,tau_ic)
@@ -96,6 +96,6 @@ j.pests <- jags.model (file = textConnection(spongy_disturb),
 jpout <-coda.samples(j.pests, 
                      variable.names = c("beta0","beta[1]","beta[2]",
                                         "beta[3]", "beta[4]"),
-                     n.iter = 5000)
+                     n.iter = 50000)
 
 plot(jpout)
