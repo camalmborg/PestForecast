@@ -18,7 +18,8 @@ longs <- nclon[nclon>min(bounding[,2]) & nclon<max(bounding[2,])]
 
 #time:
 time <- ncvar_get(nc,"time")
-months <- c(1,86)
+#2011-2022:
+t <- time[384:518]
 
 #test lat long:
 lat <- lats[1]
@@ -27,7 +28,7 @@ lon <- longs[1]
 #scrape data for soil moisture variables:
 soilm <- ncvar_get(nc,"soilm0_200cm",
                       start=c(lon,lat,0),
-                      count=c(1,1,86))
+                      count=c(t[1],t[135]))
 # for (l in lats){
 #   for (g in longs){
 #     
