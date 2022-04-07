@@ -9,8 +9,17 @@ nc = nc_open(url)
 #establish lat long bounding box
 bounding<-read.csv("2022_03_29_latlonboundingbox.csv")
 
+#nc lat and long:
+nclat <- ncvar_get(nc,"lat")
+nclon <- ncvar_get(nc,"lon")
+
+lats <- nclat[nclat>min(bounding[,1]) & nclat<max(bounding[,1])]
+longs <- nclon[nclon>min(bounding[,2]) & nclon<max(bounding[2,])]
 
 #scrape data for soil moisture variables:
+
+
+#close nc file:
 nc_close(nc)
 
 
