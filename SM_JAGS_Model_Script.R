@@ -27,7 +27,7 @@ NT = ncol(condscores.samp)
 
 #load hatch-feed temp,vpd,precip dataset:
 hf16<-read.csv("hf16_dataset_03_2022.csv")
-hfnoX<-hf16[,2:ncol(hf16)]
+hfnoX<-as.matrix(hf16[,2:ncol(hf16)])
 vpd<-hfnoX[smpl,152:153]
 pcp<-hfnoX[smpl,100:101]
 
@@ -65,7 +65,7 @@ for (s in 1:ns){
   beta[1] ~ dnorm(0,0.0001)
   beta[2] ~ dnorm(0,0.0001)
   beta[3] ~ dnorm(0,0.0001)
-  ##beta[4] ~ dnorm(0,0.0001)
+  beta[4] ~ dnorm(0,0.0001)
   pa0 ~ dgamma(1,1) #precision of disturbed state
   
 }
