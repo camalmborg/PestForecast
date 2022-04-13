@@ -13,8 +13,8 @@ bounding<-read.csv("2022_03_29_latlonboundingbox.csv")
 nclat <- ncvar_get(nc,"lat")
 nclon <- ncvar_get(nc,"lon")
 
-lats <- nclat[nclat>min(bounding[,1]) & nclat<max(bounding[,1])]
-longs <- nclon[nclon>min(bounding[,2]) & nclon<max(bounding[2,])]
+lats <- which(nclat>min(bounding[,1]) & nclat<max(bounding[,1]))
+longs <- which(nclon>min(bounding[,2]) & nclon<max(bounding[2,]))
 
 #time:
 time <- ncvar_get(nc,"time")
@@ -27,8 +27,25 @@ lon <- longs[1]
 
 #scrape data for soil moisture variables:
 soilm <- ncvar_get(nc,"soilm0_200cm",
-                      start=c(lon,lat,0),
-                      count=c(t[1],t[length(t)]))
+                      start=c(min(longs),min(lats),434),
+                      count=c(length(longs),length(lats),length(t)))
+
+
+#example lat long:
+point<-cond.scores.mo[1,]
+plat<-point$lat
+plong<-point$lon
+pt<-c(plat,plong)
+
+gridpoints = data.frame(y = rep(seq_along(lats),times=length(longs)),
+                        x=rep(seq_along(longs),each=length(lats))) %>%
+  mutate(lat = nclat[lats[y]],lon=nclon[lats[x]])
+
+dist = (pt[1]-gridpoints$lat)^2+(pt[2]-gridpoints$lon)^2
+row = which.min(dist)
+sm = soilm[gridpoints$x[row],gridpoints$y[row],]
+
+plot(t,sm)
 # for (l in lats){
 #   for (g in longs){
 #     
