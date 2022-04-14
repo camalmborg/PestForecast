@@ -47,8 +47,16 @@ for (i in 1:nrow(pcp)){
   pcpanom[i,2]<-pcp[i,2]-pcpmeans[2]
 }
 
-##might want to make a function for that eventually^
-
+##might want to make a function for that eventually:
+anomfx<-function(x,mname,aname){
+  mname<-apply(x,2,mean)
+  aname<-matrix(NA,nrow=nrow(x),ncol=ncol(x))
+  for (i in 1:nrow(x)){
+    for (j in 1:ncol(x)){
+      aname[i,j]<-aname[i,j]-mname[j]
+    }
+  }
+}
 
 #THE MODEL:
 spongy_disturb <- "model{
@@ -115,7 +123,7 @@ j.pests <- jags.model (file = textConnection(spongy_disturb),
 jpout <-coda.samples(j.pests, 
                      variable.names = c("beta0","beta[1]","beta[2]",
                                         "beta[3]", "beta[4]"),
-                     n.iter = 5000)
+                     n.iter = 50000)
 
 plot(jpout)
 
