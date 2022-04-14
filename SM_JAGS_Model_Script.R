@@ -31,23 +31,7 @@ hf16<-read.csv("hf16_dataset_03_2022.csv")
 hfnoX<-as.matrix(hf16[,2:ncol(hf16)])
 vpd<-hfnoX[smpl,152:153]
 pcp<-hfnoX[smpl,100:101]
-#make anomoly datasets:
-# #VPD:
-# vpdmeans<-apply(vpd,2,mean)
-# vpdanom<-matrix(NA,nrow=nrow(vpd),ncol=ncol(vpd))
-# for (i in 1:nrow(vpd)){
-#   vpdanom[i,1]<-vpd[i,1]-vpdmeans[1]
-#   vpdanom[i,2]<-vpd[i,2]-vpdmeans[2]
-# }
-# #PRECIP:
-# pcpmeans<-apply(pcp,2,mean)
-# pcpanom<-matrix(NA,nrow=nrow(pcp),ncol=ncol(pcp))
-# for (i in 1:nrow(pcp)){
-#   pcpanom[i,1]<-pcp[i,1]-pcpmeans[1]
-#   pcpanom[i,2]<-pcp[i,2]-pcpmeans[2]
-# }
-
-##might want to make a function for that eventually:
+#make anomaly datasets:
 anomfx<-function(x){
   means<-apply(x,2,mean)
   anom<-matrix(NA,nrow=nrow(x),ncol=ncol(x))
@@ -58,9 +42,10 @@ anomfx<-function(x){
   }
   return(anom)
 }
-
+#anomaly output:
 vpdanom<-anomfx(vpd)
 pcpanom<-anomfx(pcp)
+
 
 #THE MODEL:
 spongy_disturb <- "model{
