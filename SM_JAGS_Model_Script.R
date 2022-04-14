@@ -25,11 +25,30 @@ condscores.samp<-cs16[smpl,]
 nsites = nrow(condscores.samp)
 NT = ncol(condscores.samp)
 
+
 #load hatch-feed temp,vpd,precip dataset:
 hf16<-read.csv("hf16_dataset_03_2022.csv")
 hfnoX<-as.matrix(hf16[,2:ncol(hf16)])
 vpd<-hfnoX[smpl,152:153]
 pcp<-hfnoX[smpl,100:101]
+#make anomoly datasets:
+#VPD:
+vpdmeans<-apply(vpd,2,mean)
+vpdanom<-matrix(NA,nrow=nrow(vpd),ncol=ncol(vpd))
+for (i in 1:nrow(vpd)){
+  vpdanom[i,1]<-vpd[i,1]-vpdmeans[1]
+  vpdanom[i,2]<-vpd[i,2]-vpdmeans[2]
+}
+#PRECIP:
+pcpmeans<-apply(pcp,2,mean)
+pcpanom<-matrix(NA,nrow=nrow(pcp),ncol=ncol(pcp))
+for (i in 1:nrow(pcp)){
+  pcpanom[i,1]<-pcp[i,1]-pcpmeans[1]
+  pcpanom[i,2]<-pcp[i,2]-pcpmeans[2]
+}
+
+##might want to make a function for that eventually^
+
 
 #THE MODEL:
 spongy_disturb <- "model{
@@ -78,7 +97,7 @@ data = list(y=condscores.samp, n=NT, ns=nsites,
               a_obs=0.1,t_obs=0.1,
               a_add=0.1,t_add=0.1,
               rmean=0,rprec=0.00001,
-              vpd=vpd, pcp=pcp)
+              vpd=vpdanom, pcp=pcpanom)
 
 #initial state of model parameters
 init<-list()
@@ -96,6 +115,8 @@ j.pests <- jags.model (file = textConnection(spongy_disturb),
 jpout <-coda.samples(j.pests, 
                      variable.names = c("beta0","beta[1]","beta[2]",
                                         "beta[3]", "beta[4]"),
-                     n.iter = 100000)
+                     n.iter = 5000)
 
 plot(jpout)
+
+#out<-as.matrix(jpout)
