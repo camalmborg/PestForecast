@@ -46,14 +46,16 @@ for (i in 1:nsite){
 }
 
 #magnitudes:
-# mags<-steady-mins
-# mags.s<-steadyall-mins
-# recov.time<-mags/recov.rate
-# recov.time.s<-mags.s/recov.rate
-# 
-# #combine data for regressions:
-# tcg.recov.mx<-cbind(steadyall,steady,colnum,mins,mags,recov.rate,recov.time)
-# tcg.recov<-as.data.frame(tcg.recov.mx)
+mags<-steady-mins
+mags.s<-steadyall-mins
+recov.time<-mags/recov.rate
+recov.time.s<-mags.s/recov.rate
+
+#combine data for regressions:
+tcg.recov.mx<-cbind(steady,colnum,mins,mags,recov.rate,recov.time)
+tcg.recov<-as.data.frame(tcg.recov.mx)
+#save a copy:
+write.csv(tcg.recov,file="Desktop/CM_BostonU/D_Research/PestForecast/SM_distmagrecov_data.csv")
 # 
 # ###regressions
 # #recov rate as function of magnitude of disturbance:
