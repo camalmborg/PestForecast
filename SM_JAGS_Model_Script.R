@@ -48,19 +48,19 @@ pcp<-hfnoX[smpl,100:101]
 # }
 
 ##might want to make a function for that eventually:
-anomfx<-function(x,aname){
+anomfx<-function(x){
   means<-apply(x,2,mean)
-  aname<-matrix(NA,nrow=nrow(x),ncol=ncol(x))
+  anom<-matrix(NA,nrow=nrow(x),ncol=ncol(x))
   for (i in 1:nrow(x)){
     for (j in 1:ncol(x)){
-      aname[i,j]<-x[i,j]-means[j]
+      anom[i,j]<-x[i,j]-means[j]
     }
   }
-  return(aname)
+  return(anom)
 }
 
-vpdanom<-anomfx(vpd,vpdanom)
-pcpanom<-anomfx(pcp,pcpanom)
+vpdanom<-anomfx(vpd)
+pcpanom<-anomfx(pcp)
 
 #THE MODEL:
 spongy_disturb <- "model{
