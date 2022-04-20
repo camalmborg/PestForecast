@@ -65,7 +65,7 @@ for (s in 1:ns){
     muD[s,t] ~ dnorm(mu0[s,t],pa0) ##step 1: process model on mu0
     D[s,t] ~ dbern(p) ##step 2: adding process model here
     mu[s,t] <- D[s,t]*muD[s,t] + (1-D[s,t])*muN[s,t]
-    mu0[s,t] <- beta0 + beta[3]*pcp[s,1] + beta[4]*pcp[s,2]
+    mu0[s,t] <- beta0 + beta[1]*vpd[s,1] + beta[2]*vpd[s,2] + beta[3]*pcp[s,1] + beta[4]*pcp[s,2]
     ##beta[1]*vpd[s,1]
     ##beta[2]*vpd[s,2]
   }
@@ -80,8 +80,8 @@ for (s in 1:ns){
   R ~ dnorm(rmean,rprec)  #rho term
   p ~ dunif(0,1)  #disturbance probability
   beta0 ~ dnorm(-5,1) #param for calculating mean of disturbed state
-  ##beta[1] ~ dnorm(0,0.0001)
-  ##beta[2] ~ dnorm(0,0.0001)
+  beta[1] ~ dnorm(0,0.0001)
+  beta[2] ~ dnorm(0,0.0001)
   beta[3] ~ dnorm(0,0.0001)
   beta[4] ~ dnorm(0,0.0001)
   pa0 ~ dgamma(1,1) #precision of disturbed state
@@ -96,7 +96,7 @@ data = list(y=condscores.samp, n=NT, ns=nsites,
               a_obs=0.1,t_obs=0.1,
               a_add=0.1,t_add=0.1,
               rmean=0,rprec=0.00001,
-              pcp=pcpanom)#vpd=vpdanom,
+              pcp=pcpanom, vpd=vpdanom)
 
 #initial state of model parameters
 init<-list()
@@ -125,3 +125,8 @@ jpout <-coda.samples(j.pests,
 #out.threevar<-jpout
 #out.justprecip<-jpout
 #out.anthroenv<-
+
+#DIC calculations:
+DIC.fullenv<-dic.samples(j.pests, n.iter=10000)
+#DIC.threevar<-dic.samples(j.pests, n.iter=10000)
+#DIC.justprecip<-dic.samples(j.pests, n.iter=10000)
