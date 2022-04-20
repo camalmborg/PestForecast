@@ -12,7 +12,7 @@ tcg.month<-read.csv("2020_07_10_sample_tcg_mean_MONTHLY.csv")
 tcg.mo<-tcg.month[,2:131]
 
 #number of sites
-nsites = 1:5000
+nsites = nrow(tcg.mo)
 
 # ####remove may:-----
 # nomay<-seq(1,130,by=5)
@@ -66,7 +66,7 @@ tcg.june.all<-as.matrix(tcg.mo[,junes])
 #cond.june<-as.matrix(cond.mo[,junes])
 
 ###steady state
-steadys<-as.matrix(apply(tcg.june.all[,19:21],1,mean,na.rm=T))
+steadys<-as.matrix(apply(tcg.june.all[,17:21],1,mean,na.rm=T))
 steadyall<-apply(tcg.june.all[,1:26],1,mean,na.rm=T)
 prevyr<-tcg.june.all[,21]
 june16<-tcg.june.all[,22]
@@ -77,7 +77,7 @@ NA16<-which(is.na(june16))
 NA17<-which(is.na(june17))
 missing<-intersect(NA16,NA17)
 tcg.june<-tcg.june.all[-missing,]
-steady<-steadys[-missing,]
+steady<-steadyall[-missing]
 
 ###site identification:
 #testing missing cols
@@ -99,19 +99,19 @@ for (i in 1:nsite){
   mins[i]<-min(tcg.june[i,22:23],na.rm=T)          #grabs min forest condition score for each site
   colnum[i]<-which(tcg.june[i,]==mins[i])           #grabs time step at which min score appears in disturbance window
   if(is.na(colnum[i] + which(tcg.june[i,colnum[i]:end]>=steadyall[i])[1])){
-    recovcol[i]<-colnum[i] + 2
-  } else {
-    recovcol[i]<-colnum[i] + which(tcg.june[i,colnum[i]:end]>=steadyall[i])[1]
-  }
-  if(recovcol[i]>end){
-    recov<-tcg.june[i,colnum[i]:end]
-  } else {
-    recov<-tcg.june[i,colnum[i]:recovcol[i]]
-  }
-  #recov <- tcg[i,colnum[i]:recovcol[i]]      
-  ind<-1:length(recov)                      #grabs length of recov rate   
-  slope[[i]]<-lm(recov~ind)                      #runs the lm to find slope of recov rate, saves output
-  recov.rate[i]<-slope[[i]]$coefficients["ind"] #stores recovery rate
+     recovcol[i]<-colnum[i] + 2
+   } else {
+     recovcol[i]<-colnum[i] + which(tcg.june[i,colnum[i]:end]>=steadyall[i])[1]
+   }
+   if(recovcol[i]>end){
+     recov<-tcg.june[i,colnum[i]:end]
+   } else {
+     recov<-tcg.june[i,colnum[i]:recovcol[i]]
+   }
+   #recov <- tcg[i,colnum[i]:recovcol[i]]      
+   ind<-1:length(recov)                      #grabs length of recov rate   
+   slope[[i]]<-lm(recov~ind)                      #runs the lm to find slope of recov rate, saves output
+   recov.rate[i]<-slope[[i]]$coefficients["ind"] #stores recovery rate
 }
 
 #magnitudes:
