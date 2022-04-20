@@ -18,7 +18,7 @@ condscores<-cond.scores.mo[,2:131]
 cs16<-condscores[hf16$X,]
 
 #random selection of sites for testing:
-smpl<-sample(nrow(cs16),50)
+smpl<-sample(nrow(cs16),100)
 condscores.samp<-cs16[smpl,]
 
 #number of sites, timesteps:
@@ -65,7 +65,9 @@ for (s in 1:ns){
     muD[s,t] ~ dnorm(mu0[s,t],pa0) ##step 1: process model on mu0
     D[s,t] ~ dbern(p) ##step 2: adding process model here
     mu[s,t] <- D[s,t]*muD[s,t] + (1-D[s,t])*muN[s,t]
-    mu0[s,t] <- beta0 + beta[1]*vpd[s,1] + beta[2]*vpd[s,2] + beta[3]*pcp[s,1] + beta[4]*pcp[s,2] 
+    mu0[s,t] <- beta0 + beta[3]*pcp[s,1] + beta[4]*pcp[s,2]
+    ##beta[1]*vpd[s,1]
+    ##beta[2]*vpd[s,2]
   }
   
   x[s,1]~dnorm(x_ic,tau_ic)
@@ -78,8 +80,8 @@ for (s in 1:ns){
   R ~ dnorm(rmean,rprec)  #rho term
   p ~ dunif(0,1)  #disturbance probability
   beta0 ~ dnorm(-5,1) #param for calculating mean of disturbed state
-  beta[1] ~ dnorm(0,0.0001)
-  beta[2] ~ dnorm(0,0.0001)
+  ##beta[1] ~ dnorm(0,0.0001)
+  ##beta[2] ~ dnorm(0,0.0001)
   beta[3] ~ dnorm(0,0.0001)
   beta[4] ~ dnorm(0,0.0001)
   pa0 ~ dgamma(1,1) #precision of disturbed state
@@ -94,7 +96,7 @@ data = list(y=condscores.samp, n=NT, ns=nsites,
               a_obs=0.1,t_obs=0.1,
               a_add=0.1,t_add=0.1,
               rmean=0,rprec=0.00001,
-              vpd=vpdanom, pcp=pcpanom)
+              pcp=pcpanom)#vpd=vpdanom,
 
 #initial state of model parameters
 init<-list()
@@ -110,10 +112,16 @@ j.pests <- jags.model (file = textConnection(spongy_disturb),
                        n.chains = 3)
 
 jpout <-coda.samples(j.pests, 
-                     variable.names = c("beta0","beta[1]","beta[2]",
+                     variable.names = c("beta0",
                                         "beta[3]", "beta[4]"),
-                     n.iter = 50000)
+                     n.iter = 100000)
 
-plot(jpout)
+#plot(jpout)
 
 #out<-as.matrix(jpout)
+
+#models for 509:
+#out.fullenv<-jpout
+#out.threevar<-jpout
+#out.justprecip<-jpout
+#out.anthroenv<-
