@@ -65,7 +65,7 @@ for (s in 1:ns){
     muD[s,t] ~ dnorm(mu0[s,t],pa0) ##step 1: process model on mu0
     D[s,t] ~ dbern(p) ##step 2: adding process model here
     mu[s,t] <- D[s,t]*muD[s,t] + (1-D[s,t])*muN[s,t]
-    mu0[s,t] <- beta0 + beta[1]*vpd[s,1] + beta[2]*vpd[s,2] + beta[3]*pcp[s,1] + beta[4]*pcp[s,2]
+    mu0[s,t] <- beta0 + beta[3]*pcp[s,1] + beta[4]*pcp[s,2]
     ##beta[1]*vpd[s,1]
     ##beta[2]*vpd[s,2]
   }
@@ -112,7 +112,7 @@ j.pests <- jags.model (file = textConnection(spongy_disturb),
                        n.chains = 3)
 
 jpout <-coda.samples(j.pests, 
-                     variable.names = c("beta0",
+                     variable.names = c("beta0", "beta[1]","beta[2]",
                                         "beta[3]", "beta[4]"),
                      n.iter = 100000)
 
@@ -127,6 +127,6 @@ jpout <-coda.samples(j.pests,
 #out.anthroenv<-
 
 #DIC calculations:
-DIC.fullenv<-dic.samples(j.pests, n.iter=10000)
+#DIC.fullenv<-dic.samples(j.pests, n.iter=10000)
 #DIC.threevar<-dic.samples(j.pests, n.iter=10000)
-#DIC.justprecip<-dic.samples(j.pests, n.iter=10000)
+DIC.justprecip<-dic.samples(j.pests, n.iter=10000)
