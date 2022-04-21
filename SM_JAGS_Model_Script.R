@@ -18,6 +18,18 @@ condscores<-cond.scores.mo[,2:131]
 #load hatch-feed temp,vpd,precip dataset:
 hf16<-read.csv("hf16_dataset_03_2022.csv")
 hfnoX<-as.matrix(hf16[,2:ncol(hf16)])
+
+##SELECT SITES:
+#2016 dist mag sites:
+cs16<-condscores[hf16$X,]
+#random selection of sites for testing:
+smpl<-sample(nrow(cs16),100)
+condscores.samp<-cs16[smpl,]
+
+#number of sites, timesteps:
+nsites = nrow(condscores.samp)
+NT = ncol(condscores.samp)
+
 #vpd and precip feeding window data:
 vpd<-hfnoX[smpl,152:153]
 pcp<-hfnoX[smpl,100:101]
@@ -36,17 +48,6 @@ anomfx<-function(x){
 vpdanom<-anomfx(vpd)
 pcpanom<-anomfx(pcp)
 
-##SELECT SITES:
-#2016 dist mag sites:
-cs16<-condscores[hf16$X,]
-
-#random selection of sites for testing:
-smpl<-sample(nrow(cs16),100)
-condscores.samp<-cs16[smpl,]
-
-#number of sites, timesteps:
-nsites = nrow(condscores.samp)
-NT = ncol(condscores.samp)
 
 #initial state of model parameters
 init<-list()
@@ -115,12 +116,22 @@ j.pests <- jags.model (file = textConnection(spongy_disturb),
                        inits = init,
                        n.chains = 3)
 
-jpout <-coda.samples(j.pests.1, 
-                     variable.names = c("beta0","x","y",
-                                        "tau_add","tau_obs", 
-                                        "R", "p", "D", 
-                                        "mu0", "pa0"),
-                     n.iter = 100000)
+for (i in 1:10){
+  jpout<-coda.samples(j.pests, 
+                      variable.names = c("beta0",
+                                         "tau_add","tau_obs", 
+                                         "R", "p", 
+                                         "pa0"),
+                      n.iter = 5000)
+  save(jpout, file=paste0("Model_1_mu0_jpout_", as.character(i),".RData"))
+}
+
+# jpout <-coda.samples(j.pests.1, 
+#                      variable.names = c("beta0","x","y",
+#                                         "tau_add","tau_obs", 
+#                                         "R", "p", "D", 
+#                                         "mu0", "pa0"),
+#                      n.iter = 100000)
 
 #plot(jpout)
 burnin=5000
