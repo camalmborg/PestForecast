@@ -23,7 +23,7 @@ hfnoX<-as.matrix(hf16[,2:ncol(hf16)])
 #2016 dist mag sites:
 cs16<-condscores[hf16$X,]
 #random selection of sites for testing:
-smpl<-sample(nrow(cs16),100)
+smpl<-sample(nrow(cs16),50)
 condscores.samp<-cs16[smpl,]
 
 #number of sites, timesteps:
@@ -120,9 +120,9 @@ for (i in 1:10){
   jpout<-coda.samples(j.pests, 
                       variable.names = c("beta0",
                                          "tau_add","tau_obs", 
-                                         "R", "p", 
                                          "pa0"),
-                      n.iter = 5000)
+                      n.iter = 2000,
+                      thin=10)
   save(jpout, file=paste0("Model_1_mu0_jpout_", as.character(i),".RData"))
 }
 
