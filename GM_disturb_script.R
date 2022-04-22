@@ -1,5 +1,6 @@
 library(ecoforecastR)
 library(rjags)
+library(coda)
 
 #load canopy condition score sample data--single site
 #GMdat<-read.csv("GM_48_mcs.csv")
@@ -275,6 +276,4 @@ hist(pa0s)
 hist(1/sqrt(out.pests[,'tau_add']))
 hist(1/sqrt(out.pests[,'tau_obs']))
 plot(out.pests[,'tau_add'],out.pests[,'tau_obs'])
-
-
 
