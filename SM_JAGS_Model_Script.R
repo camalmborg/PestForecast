@@ -129,25 +129,52 @@ for (i in 1:20){
 }
 
 
-for (i in 20:){
-  jpout<-load(file = paste0("Model_1_mu0_jpout_",as.character(i),".RData"))
+#getting jpout objects into matrix for plotting----
+#load a sample mcmcobject for the model we want to use:
+i=1
+load(file = paste0("Model_1_mu0_jpout_",as.character(i),".RData"))
+#make empty matrix with sample mcmc object's # of columns (1 per tracked param)
+out<-matrix(NA,ncol=ncol(jpout[[1]]))
+#grab each mcmc object of that model and convert to matrix:
+for (i in 20:5){
+  load(file = paste0("Model_1_mu0_jpout_",as.character(i),".RData"))
   jpmx<-as.matrix(jpout)
-  
+  out<-rbind(out,jpmx)
+  rm(jpmx)
 }
+out<-out[-1,] #removes the NA row
+
+#separate parameters into x,D 9for plotting, and other params for summary:
+param1<-c("beta0","tau_add","tau_obs", "pa0")
+#param2<-c("beta0","beta[3]","beta[4]","tau_add","tau_obs", "pa0")
+#param3<-c("beta0","beta[1]", "beta[2]", "beta[3]","beta[4]","tau_add","tau_obs", "pa0")
+
+sel.1<-grepl(paste(param1, collapse = "|"), colnames(out))
+#sel.2<-grepl(paste(param2, collapse = "|"), colnames(out))
+params<-out[,sel.1]
 
 
-# jpout <-coda.samples(j.pests.1, 
-#                      variable.names = c("beta0","x","y",
-#                                         "tau_add","tau_obs", 
-#                                         "R", "p", "D", 
-#                                         "mu0", "pa0"),
-#                      n.iter = 100000)
+x.cols <- grep("^x",colnames(out))
+ci.x <- apply(out[,x.cols],2,quantile,c(0.025,0.5,0.975))
+ci.x.names = parse.MatrixNames(colnames(ci.x),numeric=TRUE)
 
-# plot(jpout)
-# burnin=5000
-# jpoutburn <- window(jpout, start=burnin)
-# 
-# out<-as.matrix(jpouthin)
+d.cols <- grep("^D",colnames(out.pests))
+ci.d <- apply(out.pests[,d.cols],2,quantile,c(0.25,0.5,0.975))
+
+i=3
+sitei = which(ci.x.names$row == i)
+time=1:130
+NT=length(time)
+#tiff("timeseriesexamp.tiff", units="in", width=8, height=3, res=300)
+plot(ci.x[2,sitei],type='l',ylim=range(condscores.samp,na.rm=TRUE),
+     ylab="Forest Condition Score", 
+     col="black",
+     xlab="Month",
+     cex=1)
+ecoforecastR::ciEnvelope(time,ci.x[1,sitei],ci.x[3,sitei],col=ecoforecastR::col.alpha("lightBlue",0.60))
+points(time,condscores.samp[i,],pch="+",cex=0.5,col="navyblue")
+#dev.off()
+
 
 
 #DIC calculations:
