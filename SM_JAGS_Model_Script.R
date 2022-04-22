@@ -128,6 +128,14 @@ for (i in 1:20){
   save(jpout, file=paste0("Model_3_fullenv5k_jpout_", as.character(i),".RData"))
 }
 
+
+for (i in 20:){
+  jpout<-load(file = paste0("Model_1_mu0_jpout_",as.character(i),".RData"))
+  jpmx<-as.matrix(jpout)
+  
+}
+
+
 # jpout <-coda.samples(j.pests.1, 
 #                      variable.names = c("beta0","x","y",
 #                                         "tau_add","tau_obs", 
@@ -141,12 +149,6 @@ for (i in 1:20){
 # 
 # out<-as.matrix(jpouthin)
 
-#models for 509:
-#out.fullenv<-jpout
-#out.threevar<-jpout
-#out.justprecip<-jpout
-#out.anthroenv<-
-#out.mu0model<-jpout
 
 #DIC calculations:
 #DIC.fullenv<-dic.samples(j.pests, n.iter=10000)
