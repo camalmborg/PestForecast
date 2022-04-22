@@ -129,25 +129,43 @@ for (i in 1:20){
 }
 
 
+###THE REST OF THIS CODE IS FOR 509 STUFF:
 #getting jpout objects into matrix for plotting----
+
+#getting proper names for each site from looped-over-sites mcmc output:
+##' @param w mcmc object containing matrix outputs
+##' @param pre prefix (variable name) for the matrix variable to be extracted
+##' @param numeric boolean, whether to coerce class to numeric
+parse.MatrixNames <- function(w, pre = "x", numeric = FALSE) {
+  w <- sub(pre, "", w)
+  w <- sub("[", "", w, fixed = TRUE)
+  w <- sub("]", "", w, fixed = TRUE)
+  w <- matrix(unlist(strsplit(w, ",")), nrow = length(w), byrow = TRUE)
+  if (numeric) {
+    class(w) <- "numeric"
+  }
+  colnames(w) <- c("row", "col")
+  return(as.data.frame(w))
+}
+
 #load a sample mcmcobject for the model we want to use:
 model1<-"Model_1_mu0_jpout_"
 model2<-"Model_2_precip5k_jpout_"
 model3<-"Model_3_fullenv5k_jpout_"
 i=1
-load(file = paste0(model1,as.character(i),".RData"))
+load(file = paste0(model3,as.character(i),".RData"))
 #make empty matrix with sample mcmc object's # of columns (1 per tracked param)
 out<-matrix(NA,ncol=ncol(jpout[[1]]))
 #grab each mcmc object of that model and convert to matrix:
 for (i in 20:5){
-  load(file = paste0(model1,as.character(i),".RData"))
+  load(file = paste0(model3,as.character(i),".RData"))
   jpmx<-as.matrix(jpout)
   out<-rbind(out,jpmx)
   rm(jpmx)
 }
-out1<-out[-1,] #removes the NA row
+#out1<-out[-1,] #removes the NA row
 #out2<-out[-1,]
-#out3<-out[-1,]
+out3<-out[-1,]
 rm(jpout)
 
 #separate parameters into x,D for plotting, and other params for summary:
@@ -158,9 +176,14 @@ param3<-c("^beta", "beta[3]","beta[4]","tau_add","tau_obs", "pa0")
 sel.1<-grepl(paste(param1, collapse = "|"), colnames(out1))
 sel.2<-grepl(paste(param2, collapse = "|"), colnames(out2))
 sel.3<-grepl(paste(param3, collapse = "|"), colnames(out3))
-params1<-out2[,sel.1]
+params1<-out1[,sel.1]
 params2<-out2[,sel.2]
-params3<-out3[,sel.1]
+params3<-out3[,sel.3]
+
+summ1<-as.data.frame.matrix(summary(params1))
+summ2<-as.data.frame.matrix(summary(params2))
+summ3<-as.data.frame.matrix(summary(params3))
+
 
 
 x.cols.1 <- grep("^x",colnames(out1))
@@ -182,6 +205,8 @@ ci.x.names = parse.MatrixNames(colnames(ci.x.1),numeric=TRUE)
 # 
 # d.cols.3 <- grep("^D",colnames(out3))
 # ci.d.3 <- apply(out3[,d.cols.3],2,quantile,c(0.25,0.5,0.975))
+
+###FOR VISUALIZATIONS:-----
 load("modeldata.RData")
 condscores.samp<-data$y
 
