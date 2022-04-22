@@ -185,33 +185,56 @@ ci.x.names = parse.MatrixNames(colnames(ci.x.1),numeric=TRUE)
 load("modeldata.RData")
 condscores.samp<-data$y
 
-i=3
+i=34
 sitei = which(ci.x.names$row == i)
 time=1:130
 NT=length(time)
-#tiff("509_all_models.tiff", units="in", width=10, height=5, res=300)
+tiff("509_all_models_site34.tiff", units="in", width=10, height=5, res=300)
 plot(ci.x.1[2,sitei],type='l',ylim=c(-12,5),
      ylab="Forest Condition Score", 
-     col="black",
+     col="red",
      xlab="Month",
      cex=1)
-lines(ci.x.2[2,sitei])
-lines(ci.x.3[2,sitei])
-ecoforecastR::ciEnvelope(time,ci.x.1[1,sitei],ci.x.1[3,sitei],col=ecoforecastR::col.alpha("indianred1",0.20))
-ecoforecastR::ciEnvelope(time,ci.x.2[1,sitei],ci.x.2[3,sitei],col=ecoforecastR::col.alpha("lightblue1",0.20))
-ecoforecastR::ciEnvelope(time,ci.x.3[1,sitei],ci.x.3[3,sitei],col=ecoforecastR::col.alpha("greenyellow",0.20))
+lines(ci.x.2[2,sitei], col="blue")
+lines(ci.x.3[2,sitei], col="dark green")
+ecoforecastR::ciEnvelope(time,ci.x.1[1,sitei],ci.x.1[3,sitei],col=ecoforecastR::col.alpha("indianred1",0.30))
+ecoforecastR::ciEnvelope(time,ci.x.2[1,sitei],ci.x.2[3,sitei],col=ecoforecastR::col.alpha("lightblue1",0.30))
+ecoforecastR::ciEnvelope(time,ci.x.3[1,sitei],ci.x.3[3,sitei],col=ecoforecastR::col.alpha("greenyellow",0.30))
 points(time,condscores.samp[i,],pch=16,cex=0.5,col="navyblue")
-#dev.off()
+dev.off()
 
-tiff("509_Model_1_examp_site.tiff", units="in", width=8, height=3, res=300)
+
+tiff("509_Model_1_examp_site34.tiff", units="in", width=8, height=3, res=300)
 plot(ci.x.1[2,sitei],type='l',ylim=range(condscores.samp,na.rm=TRUE),
      ylab="Forest Condition Score", 
-     col="black",
+     col="red",
      xlab="Month",
      cex=1)
-ecoforecastR::ciEnvelope(time,ci.x.1[1,sitei],ci.x.1[3,sitei],col=ecoforecastR::col.alpha("lightBlue",0.60))
-points(time,condscores.samp[i,],pch="+",cex=0.5,col="navyblue")
+ecoforecastR::ciEnvelope(time,ci.x.1[1,sitei],ci.x.1[3,sitei],col=ecoforecastR::col.alpha("indianred1",0.60))
+points(time,condscores.samp[i,],pch=16,cex=0.5,col="navyblue")
 dev.off()
+
+tiff("509_Model_2_examp_site34.tiff", units="in", width=8, height=3, res=300)
+plot(ci.x.2[2,sitei],type='l',ylim=range(condscores.samp,na.rm=TRUE),
+     ylab="Forest Condition Score", 
+     col="blue",
+     xlab="Month",
+     cex=1)
+ecoforecastR::ciEnvelope(time,ci.x.2[1,sitei],ci.x.1[3,sitei],col=ecoforecastR::col.alpha("lightblue1",0.60))
+points(time,condscores.samp[i,],pch=16,cex=0.5,col="navyblue")
+dev.off()
+
+tiff("509_Model_3_examp_site34.tiff", units="in", width=8, height=3, res=300)
+plot(ci.x.3[2,sitei],type='l',ylim=range(condscores.samp,na.rm=TRUE),
+     ylab="Forest Condition Score", 
+     col="green",
+     xlab="Month",
+     cex=1)
+ecoforecastR::ciEnvelope(time,ci.x.3[1,sitei],ci.x.1[3,sitei],col=ecoforecastR::col.alpha("greenyellow",0.60))
+points(time,condscores.samp[i,],pch=16,cex=0.5,col="navyblue")
+dev.off()
+
+
 
 #DIC calculations:
 #DIC.fullenv<-dic.samples(j.pests, n.iter=10000)
