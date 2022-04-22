@@ -131,51 +131,87 @@ for (i in 1:20){
 
 #getting jpout objects into matrix for plotting----
 #load a sample mcmcobject for the model we want to use:
+model1<-"Model_1_mu0_jpout_"
+model2<-"Model_2_precip5k_jpout_"
+model3<-"Model_3_fullenv5k_jpout_"
 i=1
-load(file = paste0("Model_1_mu0_jpout_",as.character(i),".RData"))
+load(file = paste0(model1,as.character(i),".RData"))
 #make empty matrix with sample mcmc object's # of columns (1 per tracked param)
 out<-matrix(NA,ncol=ncol(jpout[[1]]))
 #grab each mcmc object of that model and convert to matrix:
 for (i in 20:5){
-  load(file = paste0("Model_1_mu0_jpout_",as.character(i),".RData"))
+  load(file = paste0(model1,as.character(i),".RData"))
   jpmx<-as.matrix(jpout)
   out<-rbind(out,jpmx)
   rm(jpmx)
 }
-out<-out[-1,] #removes the NA row
+out1<-out[-1,] #removes the NA row
+#out2<-out[-1,]
+#out3<-out[-1,]
+rm(jpout)
 
-#separate parameters into x,D 9for plotting, and other params for summary:
-param1<-c("beta0","tau_add","tau_obs", "pa0")
-#param2<-c("beta0","beta[3]","beta[4]","tau_add","tau_obs", "pa0")
-#param3<-c("beta0","beta[1]", "beta[2]", "beta[3]","beta[4]","tau_add","tau_obs", "pa0")
+#separate parameters into x,D for plotting, and other params for summary:
+param1<-c("^beta","tau_add","tau_obs", "pa0")
+param2<-c("^beta","tau_add","tau_obs", "pa0")
+param3<-c("^beta", "beta[3]","beta[4]","tau_add","tau_obs", "pa0")
 
-sel.1<-grepl(paste(param1, collapse = "|"), colnames(out))
-#sel.2<-grepl(paste(param2, collapse = "|"), colnames(out))
-params<-out[,sel.1]
+sel.1<-grepl(paste(param1, collapse = "|"), colnames(out1))
+sel.2<-grepl(paste(param2, collapse = "|"), colnames(out2))
+sel.3<-grepl(paste(param3, collapse = "|"), colnames(out3))
+params1<-out2[,sel.1]
+params2<-out2[,sel.2]
+params3<-out3[,sel.1]
 
 
-x.cols <- grep("^x",colnames(out))
-ci.x <- apply(out[,x.cols],2,quantile,c(0.025,0.5,0.975))
-ci.x.names = parse.MatrixNames(colnames(ci.x),numeric=TRUE)
+x.cols.1 <- grep("^x",colnames(out1))
+ci.x.1 <- apply(out1[,x.cols.1],2,quantile,c(0.025,0.5,0.975))
 
-d.cols <- grep("^D",colnames(out.pests))
-ci.d <- apply(out.pests[,d.cols],2,quantile,c(0.25,0.5,0.975))
+x.cols.2 <- grep("^x",colnames(out2))
+ci.x.2 <- apply(out2[,x.cols.2],2,quantile,c(0.025,0.5,0.975))
+
+x.cols.3 <- grep("^x",colnames(out3))
+ci.x.3 <- apply(out3[,x.cols.3],2,quantile,c(0.025,0.5,0.975))
+
+ci.x.names = parse.MatrixNames(colnames(ci.x.1),numeric=TRUE)
+
+# d.cols.1 <- grep("^D",colnames(out1))
+# ci.d.1 <- apply(out1[,d.cols.1],2,quantile,c(0.25,0.5,0.975))
+# 
+# d.cols.2 <- grep("^D",colnames(out2))
+# ci.d.2 <- apply(out2[,d.cols.2],2,quantile,c(0.25,0.5,0.975))
+# 
+# d.cols.3 <- grep("^D",colnames(out3))
+# ci.d.3 <- apply(out3[,d.cols.3],2,quantile,c(0.25,0.5,0.975))
+load("modeldata.RData")
+condscores.samp<-data$y
 
 i=3
 sitei = which(ci.x.names$row == i)
 time=1:130
 NT=length(time)
-#tiff("timeseriesexamp.tiff", units="in", width=8, height=3, res=300)
-plot(ci.x[2,sitei],type='l',ylim=range(condscores.samp,na.rm=TRUE),
+#tiff("509_all_models.tiff", units="in", width=10, height=5, res=300)
+plot(ci.x.1[2,sitei],type='l',ylim=c(-12,5),
      ylab="Forest Condition Score", 
      col="black",
      xlab="Month",
      cex=1)
-ecoforecastR::ciEnvelope(time,ci.x[1,sitei],ci.x[3,sitei],col=ecoforecastR::col.alpha("lightBlue",0.60))
-points(time,condscores.samp[i,],pch="+",cex=0.5,col="navyblue")
+lines(ci.x.2[2,sitei])
+lines(ci.x.3[2,sitei])
+ecoforecastR::ciEnvelope(time,ci.x.1[1,sitei],ci.x.1[3,sitei],col=ecoforecastR::col.alpha("indianred1",0.20))
+ecoforecastR::ciEnvelope(time,ci.x.2[1,sitei],ci.x.2[3,sitei],col=ecoforecastR::col.alpha("lightblue1",0.20))
+ecoforecastR::ciEnvelope(time,ci.x.3[1,sitei],ci.x.3[3,sitei],col=ecoforecastR::col.alpha("greenyellow",0.20))
+points(time,condscores.samp[i,],pch=16,cex=0.5,col="navyblue")
 #dev.off()
 
-
+tiff("509_Model_1_examp_site.tiff", units="in", width=8, height=3, res=300)
+plot(ci.x.1[2,sitei],type='l',ylim=range(condscores.samp,na.rm=TRUE),
+     ylab="Forest Condition Score", 
+     col="black",
+     xlab="Month",
+     cex=1)
+ecoforecastR::ciEnvelope(time,ci.x.1[1,sitei],ci.x.1[3,sitei],col=ecoforecastR::col.alpha("lightBlue",0.60))
+points(time,condscores.samp[i,],pch="+",cex=0.5,col="navyblue")
+dev.off()
 
 #DIC calculations:
 #DIC.fullenv<-dic.samples(j.pests, n.iter=10000)
