@@ -3,7 +3,8 @@ library(ncdf4)
 library(tidyverse)
 
 #fixed url for new NLDAS location:
-url = "https://hydro1.gesdisc.eosdis.nasa.gov/dods/NLDAS_NOAH0125_M.002"
+#url = "https://hydro1.gesdisc.eosdis.nasa.gov/dods/NLDAS_NOAH0125_M.002"
+url = "https://hydro1.gesdisc.eosdis.nasa.gov/dods/NLDAS_NOAH0125_H.002"
 nc = nc_open(url)
 
 #establish lat long bounding box
