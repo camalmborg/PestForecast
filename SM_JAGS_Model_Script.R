@@ -23,7 +23,7 @@ hfnoX<-as.matrix(hf16[,2:ncol(hf16)])
 #2016 dist mag sites:
 cs16<-condscores[hf16$X,]
 #random selection of sites for testing:
-smpl<-sample(nrow(cs16),50)
+smpl<-sample(nrow(cs16),100)
 condscores.samp<-cs16[smpl,]
 
 #number of sites, timesteps:
@@ -76,7 +76,7 @@ for (s in 1:ns){
     muD[s,t] ~ dnorm(mu0[s,t],pa0) ##step 1: process model on mu0
     D[s,t] ~ dbern(p) ##step 2: adding process model here
     mu[s,t] <- D[s,t]*muD[s,t] + (1-D[s,t])*muN[s,t]
-    mu0[s,t] <- beta0 + beta[1]*vpd[s,1] + beta[2]*vpd[s,2]+ beta[3]*pcp[s,1] + beta[4]*pcp[s,2]
+    mu0[s,t] <- beta0 + beta[1]*vpd[s,1]+ beta[2]*vpd[s,2] + beta[3]*pcp[s,1] + beta[4]*pcp[s,2]
     ##beta[1]*vpd[s,1]
     ##beta[2]*vpd[s,2]
     ##beta[3]*pcp[s,1]
@@ -116,16 +116,24 @@ j.pests <- jags.model (file = textConnection(spongy_disturb),
                        inits = init,
                        n.chains = 3)
 
+# jpout<-coda.samples(j.pests, 
+#                     variable.names = c("beta0", "beta[1]", "beta[2]",
+#                                        "beta[3]", "beta[4]",
+#                                        "tau_add","tau_obs", 
+#                                        "pa0"),
+#                     n.iter = 50000,
+#                     thin=2)
+
+
 for (i in 1:20){
-  jpout<-coda.samples(j.pests, 
-                      variable.names = c("beta0","beta[1]", "beta[2]", 
-                                         "beta[3]","beta[4]",
-                                         "x", "D",
-                                         "tau_add","tau_obs", 
+  jpout<-coda.samples(j.pests,
+                      variable.names = c("beta0", "beta[1]", "beta[2]",
+                                         "beta[3]", "beta[4]",
+                                         "tau_add","tau_obs",
                                          "pa0"),
                       n.iter = 5000,
                       thin=10)
-  save(jpout, file=paste0("Model_3_fullenv5k_jpout_", as.character(i),".RData"))
+  save(jpout, file=paste0("Model_3_fullenv5k_jpout_run2_", as.character(i),".RData"))
 }
 
 
