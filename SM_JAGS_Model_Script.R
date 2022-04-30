@@ -76,7 +76,7 @@ for (s in 1:ns){
     muD[s,t] ~ dnorm(mu0[s,t],pa0) ##step 1: process model on mu0
     D[s,t] ~ dbern(p) ##step 2: adding process model here
     mu[s,t] <- D[s,t]*muD[s,t] + (1-D[s,t])*muN[s,t]
-    mu0[s,t] <- beta0 + beta[3]*pcp[s,1] + beta[4]*pcp[s,2]
+    mu0[s,t] <- beta0 
     ##beta[1]*vpd[s,1]
     ##beta[2]*vpd[s,2]
     ##beta[3]*pcp[s,1]
@@ -95,8 +95,8 @@ for (s in 1:ns){
   beta0 ~ dnorm(-5,1) #param for calculating mean of disturbed state
   #beta[1] ~ dnorm(0,0.0001)
   #beta[2] ~ dnorm(0,0.0001)
-  beta[3] ~ dnorm(0,0.0001)
-  beta[4] ~ dnorm(0,0.0001)
+  #beta[3] ~ dnorm(0,0.0001)
+  #beta[4] ~ dnorm(0,0.0001)
   pa0 ~ dgamma(1,1) #precision of disturbed state
   
 }
@@ -108,8 +108,8 @@ data = list(y=condscores.samp, n=NT, ns=nsites,
               x_ic=0, tau_ic=0.1,
               a_obs=0.1,t_obs=0.1,
               a_add=0.1,t_add=0.1,
-              rmean=0,rprec=0.00001,
-              pcp=pcpanom)#, vpd=vpdanom)
+              rmean=0,rprec=0.00001)#,
+              #pcp=pcpanom)#, vpd=vpdanom)
 
 j.pests <- jags.model (file = textConnection(spongy_disturb),
                        data = data,
@@ -128,12 +128,11 @@ j.pests <- jags.model (file = textConnection(spongy_disturb),
 for (i in 1:20){
   jpout<-coda.samples(j.pests,
                       variable.names = c("beta0",
-                                         "beta[3]", "beta[4]",
                                          "tau_add","tau_obs",
                                          "pa0","x","D"),
                       n.iter = 5000,
                       thin=5)
-  save(jpout, file=paste0("Model_2_precip5k_jpout_run2_", as.character(i),".RData"))
+  save(jpout, file=paste0("Model_1_mu0_jpout_run2_", as.character(i),".RData"))
 }
 
 
