@@ -11,8 +11,8 @@ model1<-"Model_1_mu0_jpout_run2_"
 
 #select parameters:
 param1<-c("beta0","tau_add","tau_obs", "pa0")
-#param2<-c("^beta","tau_add","tau_obs", "pa0")
-#param3<-c("^beta", "beta[3]","beta[4]","tau_add","tau_obs", "pa0")
+#param2<-c("beta[3]","beta[4]","tau_add","tau_obs", "pa0")
+#param3<-c("beta[1]","beta[2]","beta[3]","beta[4]","tau_add","tau_obs", "pa0")
 
 #CODA SPLIT VERSION-----
 # i=1
@@ -64,33 +64,41 @@ param1<-c("beta0","tau_add","tau_obs", "pa0")
 
 
 #MCMC VIS VERSION-----
-i=1
-load(file = paste0(model1,as.character(i),".RData"))
-#make empty matrix with sample mcmc object's # of columns (1 per tracked param)
-#out<-matrix(NA,ncol=ncol(jpout[[1]]))
-#outxs<-matrix(NA,ncol=(ncol(jpout[[1]])-4)/2)
-
-#outp<-matrix(NA,ncol=4)
-outx<-matrix(NA,ncol=NT)
+outptemp<-matrix(NA,ncol=length(param1))
+outxtemp<-matrix(NA,ncol=NT)
+outdtemp<-matrix(NA,ncol=NT-1)
 
 for (i in 20:5){
   #load jpout:
   load(file = paste0(model1,as.character(i),".RData"))
   
   #split output:
-  #jpps<-MCMCchains(jpout, params=param1)
-  #jpds<-MCMCchains(jpout, params="D")
+  jpps<-MCMCchains(jpout, params=param1)
+  jpds<-MCMCchains(jpout, params="D")
   jpxs<-MCMCchains(jpout, params = "x")
-  xparam<-which(colnames(jpxs) %in% paste0("x[22,",1:131,"]"))
+  
+  #grab sites for x and D:
+  xparam<-which(colnames(jpxs) %in% paste0("x[22,",1:130,"]"))
+  dparam<-which(colnames(jpds) %in% paste0("D[22,",1:130,"]"))
   xsite<-jpxs[,xparam]
-  #outp<-rbind(outp,jpps)
-  outx<-rbind(outx,xsite)
-  #rm(jpps)
+  dsite<-jpds[,dparam]
+  outptemp<-rbind(outptemp,jpps)
+  outxtemp<-rbind(outxtemp,xsite)
+  outdtemp<-rbind(outdtemp,dsite)
+  
+  #remove big stuff
+  rm(jpps)
   rm(jpxs)
+  rm(jpds)
+  rm(xsite,dsite)
   rm(jpout)
 }
 
-#outp1<-outp[-1,] #removes the NA row
-#out2<-out[-1,]
-#out3<-out[-1,]
-rm(outp)
+outp<-outptemp[-1,] #removes the NA row
+outx<-outxtemp[-1,]
+outd<-outdtemp[-1,]
+rm(outptemp)
+rm(outxtemp)
+rm(outdtemp)
+
+
