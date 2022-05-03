@@ -70,25 +70,26 @@ load(file = paste0(model1,as.character(i),".RData"))
 #out<-matrix(NA,ncol=ncol(jpout[[1]]))
 #outxs<-matrix(NA,ncol=(ncol(jpout[[1]])-4)/2)
 
-outp<-matrix(NA,ncol=4)
-#ox<-matrix(NA,ncol=(ncol(jpout[[1]])-4)/2+50)
+#outp<-matrix(NA,ncol=4)
+outx<-matrix(NA,ncol=NT)
 
-for (i in 20:5){
+for (i in 20:19){
   #load jpout:
   load(file = paste0(model1,as.character(i),".RData"))
   
   #split output:
-  jpps<-MCMCchains(jpout, params=param1)
+  #jpps<-MCMCchains(jpout, params=param1)
   #jpds<-MCMCchains(jpout, params="D")
-  #jpxs<-MCMCchains(jpout, params = "x")
-  xparam<-grep("^x[22,",colnames(jpxs))
-  
-  outp<-rbind(outp,jpps)
- #outx<-rbind(ox,jpxs)
-  rm(jpps)
+  jpxs<-MCMCchains(jpout, params = "x")
+  xparam<-which(colnames(jpsx) %in% paste0("x[22,",1:131,"]"))
+  xsite<-jpxs[,xparam]
+  #outp<-rbind(outp,jpps)
+  outx<-rbind(outx,xsite)
+  #rm(jpps)
+  rm(jpxs)
 }
 
-outp1<-outp[-1,] #removes the NA row
+#outp1<-outp[-1,] #removes the NA row
 #out2<-out[-1,]
 #out3<-out[-1,]
 rm(jpout)
