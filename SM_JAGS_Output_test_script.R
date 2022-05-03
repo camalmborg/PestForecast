@@ -73,7 +73,7 @@ load(file = paste0(model1,as.character(i),".RData"))
 #outp<-matrix(NA,ncol=4)
 outx<-matrix(NA,ncol=NT)
 
-for (i in 20:19){
+for (i in 20:5){
   #load jpout:
   load(file = paste0(model1,as.character(i),".RData"))
   
@@ -81,16 +81,16 @@ for (i in 20:19){
   #jpps<-MCMCchains(jpout, params=param1)
   #jpds<-MCMCchains(jpout, params="D")
   jpxs<-MCMCchains(jpout, params = "x")
-  xparam<-which(colnames(jpsx) %in% paste0("x[22,",1:131,"]"))
+  xparam<-which(colnames(jpxs) %in% paste0("x[22,",1:131,"]"))
   xsite<-jpxs[,xparam]
   #outp<-rbind(outp,jpps)
   outx<-rbind(outx,xsite)
   #rm(jpps)
   rm(jpxs)
+  rm(jpout)
 }
 
 #outp1<-outp[-1,] #removes the NA row
 #out2<-out[-1,]
 #out3<-out[-1,]
-rm(jpout)
 rm(outp)
