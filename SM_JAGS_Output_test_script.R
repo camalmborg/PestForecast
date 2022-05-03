@@ -101,4 +101,59 @@ rm(outptemp)
 rm(outxtemp)
 rm(outdtemp)
 
+#summaries of model parameters:
+summ1<-as.data.frame.matrix(summary(outp))
+#summ2<-as.data.frame.matrix(summary(outp))
+#summ3<-as.data.frame.matrix(summary(outp))
+
+##VISUALIZATIONS-----
+#if you need the data again:
+#condscores.samp<-data$y
+
+#confidence intervals:
+ci.x.1 <- apply(outx,2,quantile,c(0.025,0.5,0.975))
+ci.d.1 <- apply(outd,2,quantile,c(0.025,0.5,0.975))
+# ci.x.2 <- apply(outx,2,quantile,c(0.025,0.5,0.975))
+# ci.d.2 <- apply(outd,2,quantile,c(0.025,0.5,0.975))
+# ci.x.3 <- apply(outx,2,quantile,c(0.025,0.5,0.975))
+# ci.d.3 <- apply(outd,2,quantile,c(0.025,0.5,0.975))
+
+#details for quick file naming:
+siten<-22
+mod<-"Mod1"
+modelname<-"Model 1"
+
+#time for plots:
+time=1:130
+NT=length(time)
+
+#save single model plot details:
+tiff(paste0("509", mod, "_examp_site", siten,".tiff"), 
+     units="in", width=10, height=5, res=300)
+plot(ci.x.1[2,],type='l',ylim=range(condscores.samp,na.rm=TRUE),
+     main=paste0(modelname),
+     ylab="Forest Condition Score",
+     col="red",
+     xlab="Month",
+     cex=1)
+ecoforecastR::ciEnvelope(time,ci.x.1[1,],ci.x.1[3,],col=ecoforecastR::col.alpha("indianred1",0.60))
+points(time,condscores.samp[i,],pch=16,cex=0.5,col="navyblue")
+dev.off()
+
+#save all models plot details:
+# tiff(paste0("509_allmodels_", siten, ".tiff"), 
+#      units="in", width=10, height=5, res=300)
+# plot:
+# plot(time,ci.x.1[2,],type='l',ylim=c(-12,5),
+#      ylab="Forest Condition Score", 
+#      col="red",
+#      xlab="Month",
+#      cex=1)
+# lines(time,ci.x.2[2,], col="blue")
+# lines(time,ci.x.3[2,], col="dark green")
+# ecoforecastR::ciEnvelope(time,ci.x.1[1,],ci.x.1[3,],col=ecoforecastR::col.alpha("indianred1",0.30))
+# ecoforecastR::ciEnvelope(time,ci.x.2[1,sitei],ci.x.2[3,sitei],col=ecoforecastR::col.alpha("lightblue1",0.30))
+# ecoforecastR::ciEnvelope(time,ci.x.3[1,sitei],ci.x.3[3,sitei],col=ecoforecastR::col.alpha("greenyellow",0.30))
+# points(time,condscores.samp[siten,],pch=16,cex=0.5,col="navyblue")
+# dev.off()
 
