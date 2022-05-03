@@ -156,40 +156,41 @@ parse.MatrixNames <- function(w, pre = "x", numeric = FALSE) {
 }
 
 #load a sample mcmcobject for the model we want to use:
-model1<-"Model_1_mu0_jpout_"
-model2<-"Model_2_precip5k_jpout_"
-model3<-"Model_3_fullenv5k_jpout_"
+model1<-"Model_1_mu0_jpout_run2_"
+#model2<-"Model_2_precip5k_jpout_"
+#model3<-"Model_3_fullenv5k_jpout_"
 i=1
-load(file = paste0(model3,as.character(i),".RData"))
+load(file = paste0(model1,as.character(i),".RData"))
 #make empty matrix with sample mcmc object's # of columns (1 per tracked param)
 out<-matrix(NA,ncol=ncol(jpout[[1]]))
 #grab each mcmc object of that model and convert to matrix:
-for (i in 20:5){
-  load(file = paste0(model3,as.character(i),".RData"))
+for (i in 20:10){
+  load(file = paste0(model1,as.character(i),".RData"))
   jpmx<-as.matrix(jpout)
   out<-rbind(out,jpmx)
   rm(jpmx)
 }
-#out1<-out[-1,] #removes the NA row
+out1<-out[-1,] #removes the NA row
 #out2<-out[-1,]
-out3<-out[-1,]
+#out3<-out[-1,]
 rm(jpout)
+rm(out)
 
 #separate parameters into x,D for plotting, and other params for summary:
 param1<-c("^beta","tau_add","tau_obs", "pa0")
-param2<-c("^beta","tau_add","tau_obs", "pa0")
-param3<-c("^beta", "beta[3]","beta[4]","tau_add","tau_obs", "pa0")
+#param2<-c("^beta","tau_add","tau_obs", "pa0")
+#param3<-c("^beta", "beta[3]","beta[4]","tau_add","tau_obs", "pa0")
 
 sel.1<-grepl(paste(param1, collapse = "|"), colnames(out1))
-sel.2<-grepl(paste(param2, collapse = "|"), colnames(out2))
-sel.3<-grepl(paste(param3, collapse = "|"), colnames(out3))
+#sel.2<-grepl(paste(param2, collapse = "|"), colnames(out2))
+#sel.3<-grepl(paste(param3, collapse = "|"), colnames(out3))
 params1<-out1[,sel.1]
-params2<-out2[,sel.2]
-params3<-out3[,sel.3]
+#params2<-out2[,sel.2]
+#params3<-out3[,sel.3]
 
-summ1<-as.data.frame.matrix(summary(params1))
-summ2<-as.data.frame.matrix(summary(params2))
-summ3<-as.data.frame.matrix(summary(params3))
+summ1<-summary(params1)
+#summ2<-as.data.frame.matrix(summary(params2))
+#summ3<-as.data.frame.matrix(summary(params3))
 
 
 
@@ -214,7 +215,7 @@ ci.x.names = parse.MatrixNames(colnames(ci.x.1),numeric=TRUE)
 # ci.d.3 <- apply(out3[,d.cols.3],2,quantile,c(0.25,0.5,0.975))
 
 ###FOR VISUALIZATIONS:-----
-load("modeldata.RData")
+#load("modeldata.RData")
 condscores.samp<-data$y
 
 i=34
@@ -273,5 +274,8 @@ dev.off()
 #DIC.threevar<-dic.samples(j.pests, n.iter=10000)
 #DIC.justprecip<-dic.samples(j.pests, n.iter=10000)
 #DIC.mu0model<-dic.samples(j.pests, n.iter=10000)
+
+###plots of individual sites testing:-----
+plot(1:NT,condscores.samp[81,])
 
 
