@@ -178,6 +178,13 @@ dev.off()
 library(strinr)
 library(gsubfn)
 
+load("Plots_509/summ1_run2.RData")
+load("Plots_509/summ2_run2.RData")
+load("Plots_509/summ3_run2.RData")
+
+library(stringr)
+library(gsubfn)
+
 #function for getting extracting numbers from summary dataframes:
 getNumberPart <- function(x) {
   pat <- "(-?(\\d*\\.*\\d+|\\d+\\.))"
@@ -203,23 +210,28 @@ summTable <-function(t){
 }
 
 m1t<-summTable(s1)
+m2t<-summTable(s2)
+m3t<-summTable(s3)
 
-tab=as.matrix(s1)
-slm<-matrix(NA, nrow=4, ncol=ncol(tab))
-slm[1,]<-tab[4,]
-slm[2,]<-tab[2,]
-slm[3,]<-tab[3,]
-slm[4,]<-tab[5,]
-colnames(slm)<-colnames(tab)
-rownames(slm)<-c("Mean","2.5% Q","50% Q","97.5% Q")
-
-#make the tables:
 library(knitr)
 library(kableExtra)
-library(magick)
 
-m1table<-kable(s1, digits = 3, caption = "Model 1", format = "html")# %>%
-  #save_kable(m1table, file="m1table.png", bs_theme = "flatly")
+kable(m1t, digits = 3, caption = "Model 1") %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+#kable_material(c("striped", "hover"))
+
+library(dplyr)
+
+rbtest<-as.matrix(bind_rows(as.data.frame(m1t),
+                            as.data.frame(m2t),
+                            as.data.frame(m3t)))
+rownames(rbtest)<-rep(c("Mean","2.5% Q","50% Q","97.5% Q"),times=3)
+
+kable(rbtest, digits = 3, caption="Model Parameter Estimates") %>%
+  kable_classic(full_width = F, html_font = "Cambria") %>%
+  pack_rows("Model 1: Null Model", 1, 4) %>%
+  pack_rows("Model 2: Precipitation Only Model", 5, 8) %>%
+  pack_rows("Model 3: Precipitation and VPD Model", 9, 12)
 
 
 
