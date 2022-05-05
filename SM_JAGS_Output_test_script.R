@@ -1,6 +1,7 @@
 #load libraries
 library(rjags)
 library(MCMCvis)
+library(tidyr)
 
 #testing the splitting params within loop method:
 
@@ -39,7 +40,7 @@ for (i in 20:5){
 outp<-outptemp[-1,] #removes the NA row
 rm(outptemp)
 #summaries of model parameters:
-summ1<-as.data.frame.matrix(summary(outp))
+#summ1<-as.data.frame.matrix(summary(outp))
 #summ2<-as.data.frame.matrix(summary(outp))
 #summ3<-as.data.frame.matrix(summary(outp))
 
@@ -171,4 +172,30 @@ ecoforecastR::ciEnvelope(time[2:NT],ci.d.1[1,],ci.d.1[3,],col=ecoforecastR::col.
 ecoforecastR::ciEnvelope(time[2:NT],ci.d.2[1,],ci.d.2[3,],col=ecoforecastR::col.alpha("lightblue1",0.30))
 ecoforecastR::ciEnvelope(time[2:NT],ci.d.3[1,],ci.d.3[3,],col=ecoforecastR::col.alpha("greenyellow",0.30))
 dev.off()
+
+
+##SUMMARIES-----
+library(strinr)
+library(gsubfn)
+
+#function for getting extracting numbers from summary dataframes:
+getNumberPart <- function(x) {
+  pat <- "(-?(\\d*\\.*\\d+|\\d+\\.))"
+  strapply(x, pattern=pat, FUN=as.numeric, simplify=TRUE, empty=NA)
+}
+
+#summaries:
+s1<-getNumberPart(summ1)
+s2<-getNumberPart(summ2)
+s3<-getNumberPart(summ3)
+
+#make the tables:
+library(knitr)
+library(kableExtra)
+library(magick)
+
+m1table<-kable(s1, digits = 3, caption = "Model 1", format = "html") %>%
+  save_kable(m1table, file="m1table.png", bs_theme = "flatly")
+
+
 
