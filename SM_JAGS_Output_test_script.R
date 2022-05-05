@@ -185,17 +185,41 @@ getNumberPart <- function(x) {
 }
 
 #summaries:
-s1<-getNumberPart(summ1)
-s2<-getNumberPart(summ2)
-s3<-getNumberPart(summ3)
+s1<-getNumberPart(summ1)[-2,][-5,]
+s2<-getNumberPart(summ2)[-2,][-5,]
+s3<-getNumberPart(summ3)[-2,][-5,]
+
+#create new data frame with quantiles and means:
+summTable <-function(t){
+  tab=as.matrix(t)
+  m<-matrix(NA, nrow=4, ncol=ncol(tab))
+  m[1,]<-tab[4,]
+  m[2,]<-tab[2,]
+  m[3,]<-tab[3,]
+  m[4,]<-tab[5,]
+  colnames(m)<-colnames(tab)
+  rownames(m)<-c("Mean","2.5% Q","50% Q","97.5% Q")
+  return(m)
+}
+
+m1t<-summTable(s1)
+
+tab=as.matrix(s1)
+slm<-matrix(NA, nrow=4, ncol=ncol(tab))
+slm[1,]<-tab[4,]
+slm[2,]<-tab[2,]
+slm[3,]<-tab[3,]
+slm[4,]<-tab[5,]
+colnames(slm)<-colnames(tab)
+rownames(slm)<-c("Mean","2.5% Q","50% Q","97.5% Q")
 
 #make the tables:
 library(knitr)
 library(kableExtra)
 library(magick)
 
-m1table<-kable(s1, digits = 3, caption = "Model 1", format = "html") %>%
-  save_kable(m1table, file="m1table.png", bs_theme = "flatly")
+m1table<-kable(s1, digits = 3, caption = "Model 1", format = "html")# %>%
+  #save_kable(m1table, file="m1table.png", bs_theme = "flatly")
 
 
 
