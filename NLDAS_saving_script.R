@@ -3,8 +3,8 @@ library(ncdf4)
 library(tidyverse)
 
 #fixed url for new NLDAS location:
-#url = "https://hydro1.gesdisc.eosdis.nasa.gov/dods/NLDAS_NOAH0125_M.002"
-url = "https://hydro1.gesdisc.eosdis.nasa.gov/dods/NLDAS_NOAH0125_H.002"
+url = "https://hydro1.gesdisc.eosdis.nasa.gov/dods/NLDAS_NOAH0125_M.002"
+#url = "https://hydro1.gesdisc.eosdis.nasa.gov/dods/NLDAS_NOAH0125_H.002"
 nc = nc_open(url)
 
 #establish lat long bounding box
@@ -32,21 +32,41 @@ soilm <- ncvar_get(nc,"soilm0_200cm",
                       count=c(length(longs),length(lats),length(t)))
 
 
-#example lat long:
-point<-cond.scores.mo[1,]
-plat<-point$lat
-plong<-point$lon
-pt<-c(plat,plong)
+# #example lat long:
+# point<-cond.scores.mo[30,]
+# plat<-point$lat
+# plong<-point$lon
+# pt<-c(plat,plong)
+# 
+# gridpoints = data.frame(y = rep(seq_along(lats),times=length(longs)),
+#                         x=rep(seq_along(longs),each=length(lats))) %>%
+#   mutate(lat = nclat[lats[y]],lon=nclon[lats[x]])
+# 
+# dist = (pt[1]-gridpoints$lat)^2+(pt[2]-gridpoints$lon)^2
+# row = which.min(dist)
+# sm = soilm[gridpoints$x[row],gridpoints$y[row],]
+# 
+# plot(t,sm)
 
-gridpoints = data.frame(y = rep(seq_along(lats),times=length(longs)),
-                        x=rep(seq_along(longs),each=length(lats))) %>%
-  mutate(lat = nclat[lats[y]],lon=nclon[lats[x]])
-
-dist = (pt[1]-gridpoints$lat)^2+(pt[2]-gridpoints$lon)^2
-row = which.min(dist)
-sm = soilm[gridpoints$x[row],gridpoints$y[row],]
-
-plot(t,sm)
+soilm.sites<-matrix(data=NA, nrow=nrow(cond.scores.mo), ncol=length(t))
+for (p in 1:nrow(cond.scores.mo)){
+  point<-cond.scores.mo[p,] #select site
+  plat<-point$lat           #grab lat and long
+  plong<-point$lon
+  pt<-c(plat,plong)
+  
+  #find which gridpoint that site is in:
+  gridpoints = data.frame(y = rep(seq_along(lats),times=length(longs)),
+                          x=rep(seq_along(longs),each=length(lats))) %>%
+    mutate(lat = nclat[lats[y]],lon=nclon[lats[x]])
+  
+  dist = (pt[1]-gridpoints$lat)^2+(pt[2]-gridpoints$lon)^2
+  row = which.min(dist)
+  
+  #grab sm data, put in matrix:
+  soilm.sites[p,]<-soilm[gridpoints$x[row],gridpoints$y[row],]
+  
+}
 # for (l in lats){
 #   for (g in longs){
 #     
