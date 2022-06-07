@@ -2,6 +2,7 @@
 library(ncdf4)
 library(tidyverse)
 
+#####GET SOIL MOISTURE DATA FROM NASA GESDISC-----
 #fixed url for new NLDAS location:
 url = "https://hydro1.gesdisc.eosdis.nasa.gov/dods/NLDAS_NOAH0125_M.002"
 #url = "https://hydro1.gesdisc.eosdis.nasa.gov/dods/NLDAS_NOAH0125_H.002"
@@ -73,5 +74,46 @@ for (p in 1:nrow(cond.scores.mo)){
 #close nc file:
 nc_close(nc)
 
+#### Make dataset with soil moisture for hatching and feeding windows
+#hatch = April/May avg
+#feed = June/July avg
 
+#grab years--predisturb window:
+yr11<-2:5
+yr12<-14:17
+yr13<-26:29
+yr14<-38:41
+yr15<-50:53
+
+#soilm for each:
+sm11<-soilm.sites[,yr11]
+sm12<-soilm.sites[,yr12]
+sm13<-soilm.sites[,yr13]
+sm14<-soilm.sites[,yr14]
+sm15<-soilm.sites[,yr15]
+
+#get hatch and feed avgs for each:
+hfmeans<-function(x){
+  hfmean<-cbind(apply(x[,1:2],1,mean),
+          apply(x[,3:4],1,mean))
+  return(hfmean)
+}
+
+#hatch and feed avgs and anomaly function:
+# sm11hf<-hfmeans(sm11)
+# sm12hf<-hfmeans(sm12)
+# sm13hf<-hfmeans(sm13)
+# sm14hf<-hfmeans(sm14)
+# sm15hf<-hfmeans(sm15)
+
+sm11hf<-anomfx(hfmeans(sm11))
+sm12hf<-anomfx(hfmeans(sm12))
+sm13hf<-anomfx(hfmeans(sm13))
+sm14hf<-anomfx(hfmeans(sm14))
+sm15hf<-anomfx(hfmeans(sm15))
+
+# smpredist<-cbind(sm11hf,sm12hf,sm13hf,sm14hf,sm15hf)
+smpredistanom<-cbind(sm11hf,sm12hf,sm13hf,sm14hf,sm15hf)
+
+##### THE SOIL MOISTURE ANALYSES-----
 
