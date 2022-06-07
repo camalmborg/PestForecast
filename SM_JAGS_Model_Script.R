@@ -35,7 +35,7 @@ vpd<-hfnoX[smpl,152:153]
 pcp<-hfnoX[smpl,100:101]
 #make anomaly datasets:
 anomfx<-function(x){
-  means<-apply(x,2,mean)
+  means<-apply(x,2,mean, na.rm=T)
   anom<-matrix(NA,nrow=nrow(x),ncol=ncol(x))
   for (i in 1:nrow(x)){
     for (j in 1:ncol(x)){
