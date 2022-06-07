@@ -19,8 +19,9 @@ longs <- which(nclon>min(bounding[,2]) & nclon<max(bounding[2,]))
 
 #time:
 time <- ncvar_get(nc,"time")
+#for data that is Jan 1, 1979-April 1, 2022
 #2015-2022:
-t <- time[434:518]
+t <- time[387:520] #match start below with first # here
 
 #test lat long:
 lat <- lats[1]
@@ -28,7 +29,7 @@ lon <- longs[1]
 
 #scrape data for soil moisture variables:
 soilm <- ncvar_get(nc,"soilm0_200cm",
-                      start=c(min(longs),min(lats),434),
+                      start=c(min(longs),min(lats),387),
                       count=c(length(longs),length(lats),length(t)))
 
 
@@ -48,6 +49,7 @@ soilm <- ncvar_get(nc,"soilm0_200cm",
 # 
 # plot(t,sm)
 
+###MAKE A MATRIX OF SOIL MOISTURE FOR EACH POINT 
 soilm.sites<-matrix(data=NA, nrow=nrow(cond.scores.mo), ncol=length(t))
 for (p in 1:nrow(cond.scores.mo)){
   point<-cond.scores.mo[p,] #select site
@@ -67,11 +69,9 @@ for (p in 1:nrow(cond.scores.mo)){
   soilm.sites[p,]<-soilm[gridpoints$x[row],gridpoints$y[row],]
   
 }
-# for (l in lats){
-#   for (g in longs){
-#     
-#   }
-# }
 
 #close nc file:
 nc_close(nc)
+
+
+
