@@ -14,7 +14,7 @@ dmdjs<-cbind(distmagsdata,js)
 #make empty matrix for 0,1 data:
 distprob<-matrix(NA,nrow=nrow(condscores),ncol=1)
 #disturbance threshold:
-d = -2
+d = quantile(dmdjs[,8:10],c(0.25),na.rm=T) #selecting 75%ile of dist
 #determine if disturbance (condscore < d threshold) occurs
 for (i in 1:nrow(condscores)){
   if (dmdjs[i,]$colnum == 21 & dmdjs[i,]$X2015.06.01_score_mean <= d){
@@ -27,3 +27,5 @@ for (i in 1:nrow(condscores)){
         distprob[i,] <- 0
             }
 }
+
+
