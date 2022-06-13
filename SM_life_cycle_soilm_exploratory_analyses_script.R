@@ -21,7 +21,12 @@ smf14<-vardat[,8]
 smf15<-vardat[,10]
 
 
-var.gam <- gam(mags~s(smh13), data = vardat)
+var.gam <- gam(vardat[,1]~s(smf15), data = vardat)
 summ<-summary(var.gam)
 r2 <- summ$r.sq
-print(r2)
+#print(r2)
+
+#thers<-matrix(NA, nrow=50, ncol=1)
+thers[6,]<-r2
+
+plot(soilmdata$V1,distmagrecov$mags)
