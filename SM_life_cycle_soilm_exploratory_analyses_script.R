@@ -10,23 +10,27 @@ distmagrecov<-read.csv("SM_distmagrecov_data.csv")
 library(mgcv)
 
 #data set:
-vardat = cbind(distmagrecov$mags,soilmdata)
+magssoilm = cbind(distmagrecov$colnum,distmagrecov$mags,soilmdata)
+colnames(magssoilm)<-c("colnum","mags","h11","f11","h12","f12","h13","f13",
+                       "h14","f14","h15","f15")
+
+vardat = magssoilm[magssoilm$colnum==23,]
 
 #choose soilm year eg. soilm[,1]==hatch soilm 2011
-smh13<-vardat[,5]
-smh14<-vardat[,7]
-smh15<-vardat[,9]
-smf13<-vardat[,6]
-smf14<-vardat[,8]
-smf15<-vardat[,10]
+smh13<-vardat[,7]
+smh14<-vardat[,9]
+smh15<-vardat[,11]
+smf13<-vardat[,8]
+smf14<-vardat[,10]
+smf15<-vardat[,12]
 
 
-var.gam <- gam(vardat[,1]~s(smf15), data = vardat)
+var.gam <- gam(vardat[,2]~s(f15), data = vardat)
 summ<-summary(var.gam)
 r2 <- summ$r.sq
-#print(r2)
+print(r2)
 
 #thers<-matrix(NA, nrow=50, ncol=1)
-thers[6,]<-r2
+#thers[8,]<-r2
 
-plot(soilmdata$V1,distmagrecov$mags)
+#plot(vardat$h13,vardat$mags)
