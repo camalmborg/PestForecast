@@ -49,6 +49,7 @@ soilm <- ncvar_get(nc,"soilm0_200cm",
 # sm = soilm[gridpoints$x[row],gridpoints$y[row],]
 # 
 # plot(t,sm)
+load(file = "cond_scores_mo.csv")
 
 ###MAKE A MATRIX OF SOIL MOISTURE FOR EACH POINT 
 soilm.sites<-matrix(data=NA, nrow=nrow(cond.scores.mo), ncol=length(t))
@@ -100,20 +101,22 @@ hfmeans<-function(x){
 }
 
 #hatch and feed avgs and anomaly function:
-# sm11hf<-hfmeans(sm11)
-# sm12hf<-hfmeans(sm12)
-# sm13hf<-hfmeans(sm13)
-# sm14hf<-hfmeans(sm14)
-# sm15hf<-hfmeans(sm15)
+sm11hf<-hfmeans(sm11)
+sm12hf<-hfmeans(sm12)
+sm13hf<-hfmeans(sm13)
+sm14hf<-hfmeans(sm14)
+sm15hf<-hfmeans(sm15)
 
-sm11hf<-anomfx(hfmeans(sm11))
-sm12hf<-anomfx(hfmeans(sm12))
-sm13hf<-anomfx(hfmeans(sm13))
-sm14hf<-anomfx(hfmeans(sm14))
-sm15hf<-anomfx(hfmeans(sm15))
+# sm11hf<-anomfx(hfmeans(sm11))
+# sm12hf<-anomfx(hfmeans(sm12))
+# sm13hf<-anomfx(hfmeans(sm13))
+# sm14hf<-anomfx(hfmeans(sm14))
+# sm15hf<-anomfx(hfmeans(sm15))
 
-# smpredist<-cbind(sm11hf,sm12hf,sm13hf,sm14hf,sm15hf)
-smpredistanom<-cbind(sm11hf,sm12hf,sm13hf,sm14hf,sm15hf)
+smpredist<-cbind(sm11hf,sm12hf,sm13hf,sm14hf,sm15hf)
+#smpredistanom<-cbind(sm11hf,sm12hf,sm13hf,sm14hf,sm15hf)
 
-##### THE SOIL MOISTURE ANALYSES-----
+#save data:
+write.csv(smpredist, "soil_moisture_data.csv")
+#write.csv(smpredistanom,"soil_moisture_anom_data.csv")
 

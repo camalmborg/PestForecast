@@ -28,4 +28,13 @@ for (i in 1:nrow(condscores)){
             }
 }
 
+disturbed<-dmdjs[which(distprob==1),]
+csdist<-condscores[which(distprob==1),]
 
+### Running analyses -----
+#vardat = hf16
+
+#var.gam <- gam(mags~s(mp)+s(mp2)+s(mp3)+s(mp4)+s(mv)+s(mv2)+s(mv3)+s(mv4), data = vardat)
+summ<-summary(var.gam)
+r2 <- summ$r.sq
+print(r2)
