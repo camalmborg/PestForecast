@@ -33,16 +33,27 @@ csdist<-condscores[which(distprob==1),]
 
 
 
-### Running analyses -----
+##### Running analyses -----
+##load library
+library(mgcv)
 
-#load environmental data:
+##load environmental data
 dmhatch<-read.csv("hatch_daymet_allvar.csv")
 dmfeed<-read.csv("feed_daymet_allvar.csv")
 soilm<-read.csv("soil_moisture_data.csv")[-missing,2:11]
+soilmh<-soilm[,seq(1,length(soilm),by=2)]
+soilmf<-soilm[,seq(2,length(soilm),by=2)]
 
-#vardat = hf16
+##create vardat
+#choose the variable you want to test:
+var = dmhatch[,20]
+vardat = as.data.frame(cbind(distprob[-missing,], var))
+colnames(vardat)<-c("distprob","var")
 
-#var.gam <- gam(mags~s(mp)+s(mp2)+s(mp3)+s(mp4)+s(mv)+s(mv2)+s(mv3)+s(mv4), data = vardat)
-summ<-summary(var.gam)
-r2 <- summ$r.sq
-print(r2)
+plot(vardat$var,vardat$distprob)
+
+#run the gams
+#var.gam <- gam(distprob~s(var), data = vardat)
+#summ<-summary(var.gam)
+#r2 <- summ$r.sq
+#print(r2)
