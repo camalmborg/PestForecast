@@ -52,8 +52,8 @@ colnames(vardat)<-c("distprob","var")
 
 plot(vardat$var,vardat$distprob)
 
-#run the gams
-#var.gam <- gam(distprob~s(var), data = vardat)
-#summ<-summary(var.gam)
+#run the glms
+var.glm <- glm(distprob~var, data = vardat, family="binomial")
+summ<-summary(var.glm)
 #r2 <- summ$r.sq
 #print(r2)
