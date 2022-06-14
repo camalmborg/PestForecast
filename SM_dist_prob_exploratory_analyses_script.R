@@ -14,7 +14,7 @@ dmdjs<-cbind(distmagsdata,js)
 #make empty matrix for 0,1 data:
 distprob<-matrix(NA,nrow=nrow(condscores),ncol=1)
 #disturbance threshold:
-d = quantile(dmdjs[,8:10],c(0.50),na.rm=T) #selecting 75%ile of dist
+d = quantile(dmdjs[,8:10],c(0.20),na.rm=T) #selecting 75%ile of dist
 #determine if disturbance (condscore < d threshold) occurs
 for (i in 1:nrow(condscores)){
   if (dmdjs[i,]$colnum == 21 & dmdjs[i,]$X2015.06.01_score_mean <= d){
@@ -50,9 +50,12 @@ var = dmfeed[,50]
 vardat = as.data.frame(cbind(distprob[-missing,], var))
 colnames(vardat)<-c("distprob","var")
 
+#plot:
 plot(vardat$var,vardat$distprob)
+lineseq<-seq(0,max(vardat$var,na.rm=T),by=0.1)
+lines(lineseq,pnorm(lineseq,mean(vardat$var),sd(vardat$var)),type='l')
 
-#run the glms
+#run the glms:
 var.glm <- glm(distprob~var, data = vardat, family=binomial)
 summ<-summary(var.glm)
 #print(summ$coefficients)
