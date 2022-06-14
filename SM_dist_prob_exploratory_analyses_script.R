@@ -31,7 +31,15 @@ for (i in 1:nrow(condscores)){
 disturbed<-dmdjs[which(distprob==1),]
 csdist<-condscores[which(distprob==1),]
 
+
+
 ### Running analyses -----
+
+#load environmental data:
+dmhatch<-read.csv("hatch_daymet_allvar.csv")
+dmfeed<-read.csv("feed_daymet_allvar.csv")
+soilm<-read.csv("soil_moisture_data.csv")[-missing,2:11]
+
 #vardat = hf16
 
 #var.gam <- gam(mags~s(mp)+s(mp2)+s(mp3)+s(mp4)+s(mv)+s(mv2)+s(mv3)+s(mv4), data = vardat)

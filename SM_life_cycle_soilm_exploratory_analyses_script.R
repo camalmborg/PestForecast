@@ -17,12 +17,12 @@ colnames(magssoilm)<-c("colnum","mags","h11","f11","h12","f12","h13","f13",
 vardat = magssoilm[magssoilm$colnum==23,]
 
 #choose soilm year eg. soilm[,1]==hatch soilm 2011
-smh13<-vardat[,7]
-smh14<-vardat[,9]
-smh15<-vardat[,11]
-smf13<-vardat[,8]
-smf14<-vardat[,10]
-smf15<-vardat[,12]
+# smh13<-vardat[,7]
+# smh14<-vardat[,9]
+# smh15<-vardat[,11]
+# smf13<-vardat[,8]
+# smf14<-vardat[,10]
+# smf15<-vardat[,12]
 
 
 var.gam <- gam(vardat[,2]~s(f15), data = vardat)
