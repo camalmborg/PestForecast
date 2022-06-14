@@ -14,7 +14,7 @@ dmdjs<-cbind(distmagsdata,js)
 #make empty matrix for 0,1 data:
 distprob<-matrix(NA,nrow=nrow(condscores),ncol=1)
 #disturbance threshold:
-d = quantile(dmdjs[,8:10],c(0.25),na.rm=T) #selecting 75%ile of dist
+d = quantile(dmdjs[,8:10],c(0.50),na.rm=T) #selecting 75%ile of dist
 #determine if disturbance (condscore < d threshold) occurs
 for (i in 1:nrow(condscores)){
   if (dmdjs[i,]$colnum == 21 & dmdjs[i,]$X2015.06.01_score_mean <= d){
@@ -46,14 +46,16 @@ soilmf<-soilm[,seq(2,length(soilm),by=2)]
 
 ##create vardat
 #choose the variable you want to test:
-var = dmhatch[,20]
+var = dmfeed[,50]
 vardat = as.data.frame(cbind(distprob[-missing,], var))
 colnames(vardat)<-c("distprob","var")
 
 plot(vardat$var,vardat$distprob)
 
 #run the glms
-var.glm <- glm(distprob~var, data = vardat, family="binomial")
+var.glm <- glm(distprob~var, data = vardat, family=binomial)
 summ<-summary(var.glm)
-#r2 <- summ$r.sq
-#print(r2)
+#print(summ$coefficients)
+
+#McFaddens R2
+#with(summary(var.glm), 1 - deviance/null.deviance)
