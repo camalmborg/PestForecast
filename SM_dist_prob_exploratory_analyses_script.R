@@ -3,8 +3,26 @@
 #load condition scores (finding where prob of dist = 0,1)
 cond.scores.mo<-read.csv("2020_07_10_sample_score_mean_MONTHLY.csv")
 condscores<-cond.scores.mo[,2:131]
-junes<-c(102,107,112)
-js<-condscores[,junes]
+jjunes<-c(102,107,112)
+junes<-seq(2,length(condscores[1,]),by=5)
+js<-condscores[,jjunes]
+
+#Look at all june scores:
+jconds<-condscores[,junes]
+jmeans<-apply(jconds,2,mean,na.rm=T)
+
+#2016 group:
+minj2016<-min(jconds$X2016.06.01_score_mean[1:1000],na.rm=T)
+bin1.2016<-jconds$X2016.06.01_score_mean[1:1000]
+bin2.2016<-jconds$X2016.06.01_score_mean[1001:2000]
+bin3.2016<-jconds$X2016.06.01_score_mean[2001:3000]
+bin4.2016<-jconds$X2016.06.01_score_mean[3001:4000]
+bin5.2016<-jconds$X2016.06.01_score_mean[4001:5000]
+
+
+minj2017<-min(jconds$X2017.06.01_score_mean[1:1000],na.rm=T)
+
+
 
 #load tcg data for column numbers:
 distmagsdata<-read.csv("SM_distmagrecov_data.csv")
