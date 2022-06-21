@@ -11,6 +11,14 @@ js<-condscores[,jjunes]
 jconds<-condscores[,junes]
 jmeans<-apply(jconds,2,mean,na.rm=T)
 
+#2015 group:
+minj2015<-min(jconds$X2015.06.01_score_mean[1:1000],na.rm=T)
+bin1.2015<-jconds$X2015.06.01_score_mean[1:1000]
+bin2.2015<-jconds$X2015.06.01_score_mean[1001:2000]
+bin3.2015<-jconds$X2015.06.01_score_mean[2001:3000]
+bin4.2015<-jconds$X2015.06.01_score_mean[3001:4000]
+bin5.2015<-jconds$X2015.06.01_score_mean[4001:5000]
+
 #2016 group:
 minj2016<-min(jconds$X2016.06.01_score_mean[1:1000],na.rm=T)
 bin1.2016<-jconds$X2016.06.01_score_mean[1:1000]
@@ -42,7 +50,7 @@ bd5<-dmdjs$mags[4001:5000]
 #make empty matrix for 0,1 data:
 distprob<-matrix(NA,nrow=nrow(condscores),ncol=1)
 #disturbance threshold:
-d = quantile(dmdjs[,8:10],c(0.20),na.rm=T) #selecting 75%ile of dist
+d = quantile(dmdjs[,8:10],c(0.01),na.rm=T) #selecting 75%ile of dist
 #determine if disturbance (condscore < d threshold) occurs
 for (i in 1:nrow(condscores)){
   if (dmdjs[i,]$colnum == 21 & dmdjs[i,]$X2015.06.01_score_mean <= d){
