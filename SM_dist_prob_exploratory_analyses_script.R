@@ -11,6 +11,15 @@ js<-condscores[,jjunes]
 jconds<-condscores[,junes]
 jmeans<-apply(jconds,2,mean,na.rm=T)
 
+#previous 5 yr mean group:
+prev5<-jconds[,16:20]
+p5<-apply(prev5,1,mean)
+bin1.2010.4<-apply(prev5[1:1000,],1,mean)
+bin2.2010.4<-apply(prev5[1001:2000,],1,mean)
+bin3.2010.4<-apply(prev5[2001:3000,],1,mean)
+bin4.2010.4<-apply(prev5[3001:4000,],1,mean)
+bin5.2010.4<-apply(prev5[4001:5000,],1,mean)
+
 #2015 group:
 minj2015<-min(jconds$X2015.06.01_score_mean[1:1000],na.rm=T)
 bin1.2015<-jconds$X2015.06.01_score_mean[1:1000]
