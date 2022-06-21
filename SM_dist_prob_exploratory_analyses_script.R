@@ -21,12 +21,22 @@ bin5.2016<-jconds$X2016.06.01_score_mean[4001:5000]
 
 
 minj2017<-min(jconds$X2017.06.01_score_mean[1:1000],na.rm=T)
-
+bin1.2017<-jconds$X2017.06.01_score_mean[1:1000]
+bin2.2017<-jconds$X2017.06.01_score_mean[1001:2000]
+bin3.2017<-jconds$X2017.06.01_score_mean[2001:3000]
+bin4.2017<-jconds$X2017.06.01_score_mean[3001:4000]
+bin5.2017<-jconds$X2017.06.01_score_mean[4001:5000]
 
 
 #load tcg data for column numbers:
 distmagsdata<-read.csv("SM_distmagrecov_data.csv")
 dmdjs<-cbind(distmagsdata,js)
+
+bd1<-dmdjs$mags[1:1000]
+bd2<-dmdjs$mags[1001:2000]
+bd3<-dmdjs$mags[2001:3000]
+bd4<-dmdjs$mags[3001:4000]
+bd5<-dmdjs$mags[4001:5000]
 
 #adding 0,1 for disturbance occurrence:
 #make empty matrix for 0,1 data:
