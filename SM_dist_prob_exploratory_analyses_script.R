@@ -5,7 +5,7 @@ cond.scores.mo<-read.csv("2020_07_10_sample_score_mean_MONTHLY.csv")
 condscores<-cond.scores.mo[,2:131]
 jjunes<-c(102,107,112)
 junes<-seq(2,length(condscores[1,]),by=5)
-js<-condscores[,jjunes]
+js<-condscores[,junes]
 
 #Look at all june scores:
 jconds<-condscores[,junes]
@@ -59,7 +59,7 @@ bd5<-dmdjs$mags[4001:5000]
 #make empty matrix for 0,1 data:
 distprob<-matrix(NA,nrow=nrow(condscores),ncol=1)
 #disturbance threshold:
-d = quantile(dmdjs[,8:10],c(0.01),na.rm=T) #selecting 75%ile of dist
+d = quantile(dmdjs[,23:27],c(0.01),na.rm=T) #selecting dist sites 1% quant in prev 5 yr
 #determine if disturbance (condscore < d threshold) occurs
 for (i in 1:nrow(condscores)){
   if (dmdjs[i,]$colnum == 21 & dmdjs[i,]$X2015.06.01_score_mean <= d){
