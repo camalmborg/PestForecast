@@ -95,15 +95,22 @@ var = dmfeed[,50]
 vardat = as.data.frame(cbind(distprob[-missing,], var))
 colnames(vardat)<-c("distprob","var")
 
-#plot:
-plot(vardat$var,vardat$distprob)
-lineseq<-seq(0,max(vardat$var,na.rm=T),by=0.1)
-lines(lineseq,pnorm(lineseq,mean(vardat$var),sd(vardat$var)),type='l')
+#load gam lib:
+library(mgcv)
+#variable:
+var<-
+#run the gams:
+var.gam<-gam(distprob~s(var))
 
-#run the glms:
-var.glm <- glm(distprob~var, data = vardat, family=binomial)
-summ<-summary(var.glm)
-#print(summ$coefficients)
+# #plot:
+# plot(vardat$var,vardat$distprob)
+# lineseq<-seq(0,max(vardat$var,na.rm=T),by=0.1)
+# lines(lineseq,pnorm(lineseq,mean(vardat$var),sd(vardat$var)),type='l')
+
+# #run the glms:
+# var.glm <- glm(distprob~var, data = vardat, family=binomial)
+# summ<-summary(var.glm)
+# #print(summ$coefficients)
 
 #McFaddens R2
 #with(summary(var.glm), 1 - deviance/null.deviance)
