@@ -73,6 +73,23 @@ for (i in 1:nrow(condscores)){
             }
 }
 
+####time series version:-----
+distprob<-matrix(NA,nrow=nrow(condscores),ncol=3)
+#disturbance threshold:
+d = quantile(dmdjs[,23:27],c(0.01),na.rm=T) #selecting dist sites 1% quant in prev 5 yr
+#determine if disturbance (condscore < d threshold) occurs
+for (i in 1:nrow(condscores)){
+  if (dmdjs[i,]$colnum == 21 & dmdjs[i,]$X2015.06.01_score_mean <= d){
+    distprob[i,1]<- 1
+  } else if (dmdjs[i,]$colnum == 22 & dmdjs[i,]$X2016.06.01_score_mean <= d){
+    distprob[i,2]<- 1
+  } else if (dmdjs[i,]$colnum == 23 & dmdjs[i,]$X2017.06.01_score_mean <= d){
+    distprob[i,3]<- 1
+  } else {
+    distprob[i,] <- 0
+  }
+}
+##-----
 disturbed<-dmdjs[which(distprob==1),]
 csdist<-condscores[which(distprob==1),]
 
@@ -91,26 +108,32 @@ soilmf<-soilm[,seq(2,length(soilm),by=2)]
 
 ##create vardat
 #choose the variable you want to test:
-var = dmfeed[,50]
-vardat = as.data.frame(cbind(distprob[-missing,], var))
-colnames(vardat)<-c("distprob","var")
+vs<-c()
+vars = dmfeed[,vs]
+vardat = as.data.frame(cbind(distprob[-missing,], vars))
+colnames(vardat)<-c("distprob","var1")#,"var2","var3","var4")
 
-#load gam lib:
-library(mgcv)
-#variable:
-var<-
-#run the gams:
-var.gam<-gam(distprob~s(var))
+##load gam lib:
+#library(mgcv)
+
+##run the gams:
+var.gam<-gam(distprob~s(var4), data=vardat)
+#plot.gam(var.gam)
+summ<-summary(var.gam)
+r2 <- summ$r.sq
+print(r2)
 
 # #plot:
-# plot(vardat$var,vardat$distprob)
-# lineseq<-seq(0,max(vardat$var,na.rm=T),by=0.1)
-# lines(lineseq,pnorm(lineseq,mean(vardat$var),sd(vardat$var)),type='l')
+#varr<-
+plot(vardat$var2,vardat$distprob)
+lineseq<-seq(0,max(vardat$var2,na.rm=T),by=0.1)
+lines(lineseq,pnorm(lineseq,mean(vardat$var2),sd(vardat$var2)),type='l')
 
 # #run the glms:
-# var.glm <- glm(distprob~var, data = vardat, family=binomial)
+#var.glm <- glm(distprob~var, data = vardat, family=binomial)
 # summ<-summary(var.glm)
 # #print(summ$coefficients)
+#plot(var.glm)
 
 #McFaddens R2
 #with(summary(var.glm), 1 - deviance/null.deviance)
