@@ -116,9 +116,9 @@ vars = dmhatch[,vs]
 vardat = as.data.frame(cbind(distprob[-missing,], vars))
 #pre-d colnames:
 colnames(vardat)<-c("dist2015","dist2016","dist2017",
-                    "temp2010","temp2011","temp2012","temp2013","temp2014","temp2015",
-                    "pcp2010","pcp2011","pcp2012","pcp2013","pcp2014","pcp2015",
-                    "vpd2010","vpd2011","vpd2012","vpd2013","vpd2014","vpd2015")
+                    "temp2010","temp2011","temp2012","temp2013","temp2014",
+                    "pcp2010","pcp2011","pcp2012","pcp2013","pcp2014",
+                    "vpd2010","vpd2011","vpd2012","vpd2013","vpd2014")
 #dist colnames:
 # colnames(vardat)<-c("dist2015","dist2016","dist2017",
 #                     "temp2015","temp2016","temp2017",
@@ -128,7 +128,7 @@ colnames(vardat)<-c("dist2015","dist2016","dist2017",
 #library(mgcv)
 
 ##run the gams:
-var.gam<-gam(distprob~s(var4), data=vardat)
+var.gam<-gam(dist2015~s(temp2010), data=vardat)
 #plot.gam(var.gam)
 summ<-summary(var.gam)
 r2 <- summ$r.sq
