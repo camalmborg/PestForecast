@@ -88,10 +88,11 @@ for (i in 1:nrow(condscores)){
   } else {
     distprob[i,] <- 0
   }
+  distprob[is.na(distprob)] <- 0
 }
 ##-----
-disturbed<-dmdjs[which(distprob==1),]
-csdist<-condscores[which(distprob==1),]
+#disturbed<-dmdjs[which(distprob==1),]
+#csdist<-condscores[which(distprob==1),]
 
 
 
@@ -106,12 +107,22 @@ soilm<-read.csv("soil_moisture_data.csv")[-missing,2:11]
 soilmh<-soilm[,seq(1,length(soilm),by=2)]
 soilmf<-soilm[,seq(2,length(soilm),by=2)]
 
-##create vardat
-#choose the variable you want to test:
-vs<-c()
-vars = dmfeed[,vs]
+##create vardat: 
+#choose the variable you want to test (FROM DAYMET SET):
+vs=c(19,20,21,22,23,45,46,47,48,49,71,72,73,74,75) #predist=2009-2014 | dist=2015-2016; pre-dist: vs=c(19,20,21,22,23,45,46,47,48,49,71,72,73,74,75)
+                                                   #dist: vs=c(24,25,26,50,51,52,76,77,78)
+#choose hatch or feed:
+vars = dmhatch[,vs]
 vardat = as.data.frame(cbind(distprob[-missing,], vars))
-colnames(vardat)<-c("distprob","var1")#,"var2","var3","var4")
+#pre-d colnames:
+colnames(vardat)<-c("dist2015","dist2016","dist2017",
+                    "temp2010","temp2011","temp2012","temp2013","temp2014","temp2015",
+                    "pcp2010","pcp2011","pcp2012","pcp2013","pcp2014","pcp2015",
+                    "vpd2010","vpd2011","vpd2012","vpd2013","vpd2014","vpd2015")
+#dist colnames:
+# colnames(vardat)<-c("dist2015","dist2016","dist2017",
+#                     "temp2015","temp2016","temp2017",
+#                     "pcp2015","pcp2016","pcp2017")
 
 ##load gam lib:
 #library(mgcv)
