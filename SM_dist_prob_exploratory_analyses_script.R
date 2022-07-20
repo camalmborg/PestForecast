@@ -55,23 +55,23 @@ bd3<-dmdjs$mags[2001:3000]
 bd4<-dmdjs$mags[3001:4000]
 bd5<-dmdjs$mags[4001:5000]
 
-#adding 0,1 for disturbance occurrence:
-#make empty matrix for 0,1 data:
-distprob<-matrix(NA,nrow=nrow(condscores),ncol=1)
-#disturbance threshold:
-d = quantile(dmdjs[,23:27],c(0.01),na.rm=T) #selecting dist sites 1% quant in prev 5 yr
-#determine if disturbance (condscore < d threshold) occurs
-for (i in 1:nrow(condscores)){
-  if (dmdjs[i,]$colnum == 21 & dmdjs[i,]$X2015.06.01_score_mean <= d){
-    distprob[i,]<- 1
-    } else if (dmdjs[i,]$colnum == 22 & dmdjs[i,]$X2016.06.01_score_mean <= d){
-        distprob[i,]<- 1
-    } else if (dmdjs[i,]$colnum == 23 & dmdjs[i,]$X2017.06.01_score_mean <= d){
-        distprob[i,]<- 1
-    } else {
-        distprob[i,] <- 0
-            }
-}
+# #adding 0,1 for disturbance occurrence:
+# #make empty matrix for 0,1 data:
+# distprob<-matrix(NA,nrow=nrow(condscores),ncol=1)
+# #disturbance threshold:
+# d = quantile(dmdjs[,23:27],c(0.01),na.rm=T) #selecting dist sites 1% quant in prev 5 yr
+# #determine if disturbance (condscore < d threshold) occurs
+# for (i in 1:nrow(condscores)){
+#   if (dmdjs[i,]$colnum == 21 & dmdjs[i,]$X2015.06.01_score_mean <= d){
+#     distprob[i,]<- 1
+#     } else if (dmdjs[i,]$colnum == 22 & dmdjs[i,]$X2016.06.01_score_mean <= d){
+#         distprob[i,]<- 1
+#     } else if (dmdjs[i,]$colnum == 23 & dmdjs[i,]$X2017.06.01_score_mean <= d){
+#         distprob[i,]<- 1
+#     } else {
+#         distprob[i,] <- 0
+#             }
+# }
 
 ####time series version:-----
 distprob<-matrix(NA,nrow=nrow(condscores),ncol=3)
@@ -101,19 +101,19 @@ for (i in 1:nrow(condscores)){
 library(mgcv)
 
 ##load environmental data
-dmhatch<-read.csv("hatch_daymet_allvar.csv")
-dmfeed<-read.csv("feed_daymet_allvar.csv")
+dmhatch<-read.csv("hatch_daymet_allvar.csv")[,-1]
+dmfeed<-read.csv("feed_daymet_allvar.csv")[,-1]
 #soilm<-read.csv("soil_moisture_data.csv")[-missing,2:11]
 #soilmh<-soilm[,seq(1,length(soilm),by=2)]
 #soilmf<-soilm[,seq(2,length(soilm),by=2)]
 
 ##create vardat: 
 #choose the variable you want to test (FROM DAYMET SET):
-vs=c(19,20,21,22,23,45,46,47,48,49,71,72,73,74,75)
-#vs=c(24,25,26,50,51,52,76,77,78) #predist=2009-2014 | dist=2015-2016; pre-dist: vs=c(19,20,21,22,23,45,46,47,48,49,71,72,73,74,75)
-                                                   #dist: vs=c(24,25,26,50,51,52,76,77,78)
+vs=c(16:20,42:46,68:72) #pre-dist (2010-2014)
+#vs=c(21:23,47:49,73:75) #dist (2015-2017)
+
 #choose hatch or feed:
-vars = dmfeed[,vs]
+vars = dmhatch[,vs]
 vardat = as.data.frame(cbind(distprob, vars))
 #pre-d colnames:
 colnames(vardat)<-c("dist2015","dist2016","dist2017",
@@ -130,7 +130,7 @@ colnames(vardat)<-c("dist2015","dist2016","dist2017",
 #library(mgcv)
 
 ##run the gams:
-var.gam<-gam(dist2016~s(vpd2010), data=vardat, family="binomial")
+var.gam<-gam(dist2015~s(temp2012), data=vardat, family="binomial")
 #plot.gam(var.gam)
 summ<-summary(var.gam)
 r2 <- summ$r.sq
