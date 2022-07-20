@@ -89,12 +89,14 @@ for (i in 1:length(nyears)){
 }
 
 #lines for saving: t=temp, p=precip, v=vpd
-vhv<-vhstage
-vfv<-vfstage
+vhp<-vhstage
+vfp<-vfstage
 
 #make data frames:
 hatchallvar<-as.data.frame(cbind(mags,colnum,vht,vhp,vhv))
 feedallvar<-as.data.frame(cbind(mags,colnum,vft,vfp,vfv))
+hatchallvar<-as.data.frame(cbind(vht,vhp,vhv))
+feedallvar<-as.data.frame(cbind(vft,vfp,vfv))
 #write.csv(hf, "HF_Daymet_TPV_DATA.csv")
 write.csv(hatchallvar,"hatch_daymet_allvar.csv")
 write.csv(feedallvar,"feed_daymet_allvar.csv")
