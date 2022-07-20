@@ -12,6 +12,7 @@ distwind <- c(22:23)
 #to get whole time:
 alltime <- c(1:26)
 #number of sites and years and months:
+nsite=5000
 nsites = 1:5000
 nyears = 1:26
 ms = 1:12
@@ -32,7 +33,7 @@ envar <- x.p[,2:((length(ms)*length(nyears))+1)] #remove NA column
 rm(x.p) #remove redundant variable
 
 #remove missing data rows:
-var <- envar[-missing,]
+var <- envar#[-missing,]
 rm(envar) #remove redundant matrix
 
 #var mags is the mag and recov rate data with
@@ -69,13 +70,15 @@ mo4<-seq(2,ncol(varfeed),by=2)
 #make containers for them:
 v1<-varhatch[,mo1]
 v2<-varhatch[,mo2]
-v3<-varhatch[,mo1]
-v4<-varhatch[,mo2]
+v3<-varfeed[,mo3]
+v4<-varfeed[,mo4]
 
 #run loop to average each three-month season (whatever varseason is...)
+vhstage<-matrix(NA, nrow=nsite, ncol=length(nyears))
+vfstage<-matrix(NA, nrow=nsite, ncol=length(nyears))
 #result is matrix with seasonal averages for each year:
-vhstage<-matrix(NA, nrow=nsite-(length(missing)), ncol=length(nyears))
-vfstage<-matrix(NA, nrow=nsite-(length(missing)), ncol=length(nyears))
+#vhstage<-matrix(NA, nrow=nsite-(length(missing)), ncol=length(nyears))
+#vfstage<-matrix(NA, nrow=nsite-(length(missing)), ncol=length(nyears))
 for (i in 1:length(nyears)){
   vhall<-cbind(v1[,i],v2[,i])
   vfall<-cbind(v3[,i],v4[,i])
@@ -86,12 +89,22 @@ for (i in 1:length(nyears)){
 }
 
 #lines for saving: t=temp, p=precip, v=vpd
-#vhv<-vhstage
-#vfv<-vfstage
+vhv<-vhstage
+vfv<-vfstage
 
 #make data frames:
 hatchallvar<-as.data.frame(cbind(mags,colnum,vht,vhp,vhv))
 feedallvar<-as.data.frame(cbind(mags,colnum,vft,vfp,vfv))
+#write.csv(hf, "HF_Daymet_TPV_DATA.csv")
+write.csv(hatchallvar,"hatch_daymet_allvar.csv")
+write.csv(feedallvar,"feed_daymet_allvar.csv")
+
+#fixing hatch/feed mess up:
+hf.2<-hf
+cols.2<-c(27:52,79:104,131:156)
+feedallvar<-hf.2[,cols.2]
+hatchallvar<-hf.2[-cols.2]
+
 #separate 2016 and 2017 disturbance years:
 hatch16<-hatchallvar[hatchallvar$colnum==22,]
 hatch17<-hatchallvar[hatchallvar$colnum==23,]
@@ -99,7 +112,7 @@ feed16<-feedallvar[feedallvar$colnum==22,]
 feed17<-feedallvar[feedallvar$colnum==23,]
 
 #make big dataset with all vars for 2016 sites:
-hf<-as.data.frame(cbind(mags,colnum,vht,vft,vhp,vfp,vhv,vfv))
+hf<-as.data.frame(cbind(vht,vft,vhp,vfp,vhv,vfv))
 hf16<-hf[hf$colnum==22,]
 
 ### RUNNING THE GAMs-----
