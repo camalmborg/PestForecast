@@ -103,17 +103,18 @@ library(mgcv)
 ##load environmental data
 dmhatch<-read.csv("hatch_daymet_allvar.csv")
 dmfeed<-read.csv("feed_daymet_allvar.csv")
-soilm<-read.csv("soil_moisture_data.csv")[-missing,2:11]
-soilmh<-soilm[,seq(1,length(soilm),by=2)]
-soilmf<-soilm[,seq(2,length(soilm),by=2)]
+#soilm<-read.csv("soil_moisture_data.csv")[-missing,2:11]
+#soilmh<-soilm[,seq(1,length(soilm),by=2)]
+#soilmf<-soilm[,seq(2,length(soilm),by=2)]
 
 ##create vardat: 
 #choose the variable you want to test (FROM DAYMET SET):
-vs=c(19,20,21,22,23,45,46,47,48,49,71,72,73,74,75) #predist=2009-2014 | dist=2015-2016; pre-dist: vs=c(19,20,21,22,23,45,46,47,48,49,71,72,73,74,75)
+vs=c(19,20,21,22,23,45,46,47,48,49,71,72,73,74,75)
+#vs=c(24,25,26,50,51,52,76,77,78) #predist=2009-2014 | dist=2015-2016; pre-dist: vs=c(19,20,21,22,23,45,46,47,48,49,71,72,73,74,75)
                                                    #dist: vs=c(24,25,26,50,51,52,76,77,78)
 #choose hatch or feed:
-vars = dmhatch[,vs]
-vardat = as.data.frame(cbind(distprob[-missing,], vars))
+vars = dmfeed[,vs]
+vardat = as.data.frame(cbind(distprob, vars))
 #pre-d colnames:
 colnames(vardat)<-c("dist2015","dist2016","dist2017",
                     "temp2010","temp2011","temp2012","temp2013","temp2014",
@@ -122,13 +123,14 @@ colnames(vardat)<-c("dist2015","dist2016","dist2017",
 #dist colnames:
 # colnames(vardat)<-c("dist2015","dist2016","dist2017",
 #                     "temp2015","temp2016","temp2017",
-#                     "pcp2015","pcp2016","pcp2017")
+#                     "pcp2015","pcp2016","pcp2017",
+#                     "vpd2015","vpd2016","vpd2017")
 
 ##load gam lib:
 #library(mgcv)
 
 ##run the gams:
-var.gam<-gam(dist2015~s(temp2010), data=vardat)
+var.gam<-gam(dist2016~s(vpd2010), data=vardat, family="binomial")
 #plot.gam(var.gam)
 summ<-summary(var.gam)
 r2 <- summ$r.sq
@@ -136,9 +138,9 @@ print(r2)
 
 # #plot:
 #varr<-
-plot(vardat$var2,vardat$distprob)
-lineseq<-seq(0,max(vardat$var2,na.rm=T),by=0.1)
-lines(lineseq,pnorm(lineseq,mean(vardat$var2),sd(vardat$var2)),type='l')
+# plot(vardat$var2,vardat$distprob)
+# lineseq<-seq(0,max(vardat$var2,na.rm=T),by=0.1)
+# lines(lineseq,pnorm(lineseq,mean(vardat$var2),sd(vardat$var2)),type='l')
 
 # #run the glms:
 #var.glm <- glm(distprob~var, data = vardat, family=binomial)
