@@ -41,8 +41,8 @@ rm(envar) #remove redundant matrix
 #for number of years * months specified
 #full set is all months (12) * all years (26) = 312 months
 #varmags<-as.data.frame(cbind(tcg.recov, var))
-mags<-tcg.recov[,'mags']
-colnum<-tcg.recov[,'colnum']
+#mags<-tcg.recov[,'mags']
+#colnum<-tcg.recov[,'colnum']
 
 #quick function for making sequences to extract monthly values:
 seqfx<-function(x){
@@ -55,10 +55,34 @@ seqfx<-function(x){
 aprilmay<-sort(c(seqfx(4),seqfx(5)))
 junejuly<-sort(c(seqfx(6),seqfx(7)))
 
+#winter months section:
+dect<-c(seqfx(12))[17:23] #[17:23] takes 2011-2017 months
+jant<-c(seqfx(1))[17:23]
+febt<-c(seqfx(2))[17:23]
+mart<-c(seqfx(3))[17:23]
+
+#springsummer:
 #prelarval:
 varhatch<-var[,aprilmay]
 #larval:
 varfeed<-var[,junejuly]
+
+#winter temps data:
+wintermonths<-c(dect,jant,febt,mart)
+varwint<-var[,wintermonths]
+colnames(varwint)<-as.character(wintermonths)
+#load distmags data:
+distmagrecov<-read.csv("SM_distmagrecov_data.csv")
+#make dataset:
+varwintmags <- as.data.frame(cbind(distmagrecov$mags,distmagrecov$colnum,varwint))
+colnames(varwintmags)<-c("mags", "colnum",
+                    "dec2011","dec2012","dec2013","dec2014","dec2015","dec2016","dec2017",
+                    "jan2011","jan2012","jan2013","jan2014","jan2015","jan2016","jan2017",
+                    "feb2011","feb2012","feb2013","feb2014","feb2015","feb2016","feb2017",
+                    "mar2011","mar2012","mar2013","mar2014","mar2015","mar2016","mar2017")
+
+
+
 
 #grab seasonal months (2 monthly values * 26 years = 52 cols)
 #grab each month of each year's season separately: varhatch or varfeed
@@ -139,9 +163,12 @@ mt6<-hf16[,49]
 #data set:
 # vardat = hatch16
 # vardat = feed16
-vardat = hf16
+# vardat = hf16
+vardat = varwintmags[varwintmags$colnum == 21,] #21=2015 dist, 22=2016 dist, 23=2017 dist
 
-var.gam <- gam(mags~s(mp)+s(mp2)+s(mp3)+s(mp4)+s(mv)+s(mv2)+s(mv3)+s(mv4), data = vardat)
+
+#var.gam <- gam(mags~s(mp)+s(mp2)+s(mp3)+s(mp4)+s(mv)+s(mv2)+s(mv3)+s(mv4), data = vardat)
+var.gam <- gam(mags ~ s(dec2011), data=vardat)
 summ<-summary(var.gam)
 r2 <- summ$r.sq
 print(r2)
