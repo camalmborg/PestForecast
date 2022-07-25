@@ -121,54 +121,90 @@ hatchallvar<-as.data.frame(cbind(mags,colnum,vht,vhp,vhv))
 feedallvar<-as.data.frame(cbind(mags,colnum,vft,vfp,vfv))
 hatchallvar<-as.data.frame(cbind(vht,vhp,vhv))
 feedallvar<-as.data.frame(cbind(vft,vfp,vfv))
-#write.csv(hf, "HF_Daymet_TPV_DATA.csv")
+#save them
 write.csv(hatchallvar,"hatch_daymet_allvar.csv")
 write.csv(feedallvar,"feed_daymet_allvar.csv")
 
-#fixing hatch/feed mess up:
-hf.2<-hf
-cols.2<-c(27:52,79:104,131:156)
-feedallvar<-hf.2[,cols.2]
-hatchallvar<-hf.2[-cols.2]
+# #fixing hatch/feed mess up:
+# hf.2<-hf
+# cols.2<-c(27:52,79:104,131:156)
+# feedallvar<-hf.2[,cols.2]
+# hatchallvar<-hf.2[-cols.2]
 
-#separate 2016 and 2017 disturbance years:
-hatch16<-hatchallvar[hatchallvar$colnum==22,]
-hatch17<-hatchallvar[hatchallvar$colnum==23,]
-feed16<-feedallvar[feedallvar$colnum==22,]
-feed17<-feedallvar[feedallvar$colnum==23,]
+# #separate 2016 and 2017 disturbance years:
+# hatch16<-hatchallvar[hatchallvar$colnum==22,]
+# hatch17<-hatchallvar[hatchallvar$colnum==23,]
+# feed16<-feedallvar[feedallvar$colnum==22,]
+# feed17<-feedallvar[feedallvar$colnum==23,]
 
-#make big dataset with all vars for 2016 sites:
-hf<-as.data.frame(cbind(vht,vft,vhp,vfp,vhv,vfv))
-hf16<-hf[hf$colnum==22,]
+# #make big dataset with all vars for 2016 sites:
+# hf<-as.data.frame(cbind(vht,vft,vhp,vfp,vhv,vfv))
+# hf16<-hf[hf$colnum==22,]
+# 
 
-### RUNNING THE GAMs-----
-library(mgcv)
+hatchss<-read.csv("hatch_daymet_allvar.csv")[,2:79]
+feedss<-read.csv("feed_daymet_allvar.csv")[,2:79]
+temps<-c(1:26)
+precips<-c(27:52)
+vpds<-c(53:78)
 
-#variables to include:
+hfss<-cbind(distmagrecov$mags,distmagrecov$colnum,hatchss[,temps],feedss[,temps],hatchss[,precips],feedss[,precips],hatchss[,vpds],feedss[,vpds])
+names(hfss)[names(hfss) == 'distmagrecov$mags'] <- 'mags'
+names(hfss)[names(hfss) == 'distmagrecov$colnum'] <- 'colnum'
+hf16<-hfss[hfss$colnum == 22,]
+
+# ### RUNNING THE GAMs-----
+# library(mgcv)
+# 
+# #variables to include:
 mp<-hf16[,100]
 mp2<-hf16[,101]
 mp3<-hf16[,74]
 mp4<-hf16[,75]
-mv<-hf16[,126]
-mv2<-hf16[,127]
-mv3<-hf16[,152]
-mv4<-hf16[,153]
-mt<-hf16[,24]
-mt2<-hf16[,50]
-mt3<-hf16[,22]
-mt4<-hf16[,23]
-mt5<-hf16[,48]
-mt6<-hf16[,49]
+mp5<-hf16[,76]
+mp6<-hf16[,102]
+mv<-hf16[,152]
+mv2<-hf16[,153]
+mv3<-hf16[,126]
+mv4<-hf16[,127]
+mv5<-hf16[,128]
+mv6<-hf16[,154]
+# mt<-hf16[,24]
+# mt2<-hf16[,50]
+# mt3<-hf16[,22]
+# mt4<-hf16[,23]
+# mt5<-hf16[,48]
+# mt6<-hf16[,49]
 
 #data set:
 # vardat = hatch16
 # vardat = feed16
 # vardat = hf16
-vardat = varwintmags[varwintmags$colnum == 21,] #21=2015 dist, 22=2016 dist, 23=2017 dist
+
+vardat = hf16
+
+#vardat = varwintmags[varwintmags$colnum == 22,] #21=2015 dist, 22=2016 dist, 23=2017 dist
+
+#var.gam <- gam(mags~s(mp)+s(mp2), data = vardat) #just precip
+#var.gam <- gam(mags~s(mp)+s(mp2)+s(mp3)+s(mp4), data = vardat) #just precip
+#var.gam <- gam(mags~s(mp)+s(mp2)+s(mp3)+s(mp4)+s(mp5)+s(mp6), data = vardat) #just precip
+#var.gam <- gam(mags~s(mp)+s(mp2)+s(mv)+s(mv2), data = vardat) #precip/vpd feed
+#var.gam <- gam(mags~s(mp)+s(mp2)+s(mp3)+s(mp4)+s(mv)+s(mv2), data = vardat) #preciphatch,feed/vpdfeed
+#var.gam <- gam(mags~s(mp)+s(mp2)+s(mp3)+s(mp4)+s(mv)+s(mv2)+s(mv3)+s(mv4), data = vardat) #preciphatch,feed/vpdfeed
+#var.gam <- gam(mags~s(mp)+s(mp2)+s(mp3)+s(mp4)+s(mv3)+s(mv4), data = vardat)
+#var.gam <- gam(mags~s(mp)+s(mp2)+s(mp3)+s(mp4)+s(mv4), data = vardat)
+#var.gam <- gam(mags~s(mp)+s(mp2)+s(mp3)+s(mp4)+s(mp5)+s(mp6)+s(mv3)+s(mv4), data = vardat)
+#var.gam <- gam(mags~s(mp)+s(mp2)+s(mp3)+s(mp4)+s(mp5)+s(mp6)+s(mv3)+s(mv4)+s(mv5), data = vardat)
+#var.gam <- gam(mags~s(mp)+s(mp2)+s(mp3)+s(mp4)+s(mp5)+s(mv4), data = vardat)
+#var.gam <- gam(mags~s(mp)+s(mp2)+s(mp3)+s(mp4)+s(mp5)+s(mp6)+s(mv)+s(mv2)+s(mv3)+s(mv4)+s(mv5)+s(mv6), data = vardat)
+#var.gam <- gam(mags~s(mp)+s(mp2)+s(mp3)+s(mp4)+s(mp5)+s(mp6)+s(mv)+s(mv2)+s(mv3)+s(mv4), data = vardat)
+#var.gam <- gam(mags~s(mp)+s(mp2)+s(mp6)+s(mv)+s(mv2)+s(mv6), data = vardat)
+#var.gam <- gam(mags~s(mp)+s(mp2)+s(mp5)+s(mp6)+s(mv4)+s(mv5), data = vardat)
+#var.gam <- gam(mags~s(mp)+s(mp2)+s(mv)+s(mv2)+s(mv3)+s(mv4), data = vardat)
+var.gam <- gam(mags~s(mp)+s(mp2)+s(mv)+s(mv2)+s(mv3)+s(mv4), data = vardat)
 
 
-#var.gam <- gam(mags~s(mp)+s(mp2)+s(mp3)+s(mp4)+s(mv)+s(mv2)+s(mv3)+s(mv4), data = vardat)
-var.gam <- gam(mags ~ s(dec2011), data=vardat)
+#var.gam <- gam(mags ~  s(jan2016)+ s(mar2016), data=vardat)
 summ<-summary(var.gam)
 r2 <- summ$r.sq
 print(r2)
