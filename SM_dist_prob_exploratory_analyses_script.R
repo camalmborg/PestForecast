@@ -109,28 +109,28 @@ dmfeed<-read.csv("feed_daymet_allvar.csv")[,-1]
 
 ##create vardat: 
 #choose the variable you want to test (FROM DAYMET SET):
-vs=c(16:20,42:46,68:72) #pre-dist (2010-2014)
-#vs=c(21:23,47:49,73:75) #dist (2015-2017)
+#vs=c(16:20,42:46,68:72) #pre-dist (2010-2014)
+vs=c(21:23,47:49,73:75) #dist (2015-2017)
 
 #choose hatch or feed:
-vars = dmhatch[,vs]
+vars = dmfeed[,vs]
 vardat = as.data.frame(cbind(distprob, vars))
 #pre-d colnames:
-colnames(vardat)<-c("dist2015","dist2016","dist2017",
-                    "temp2010","temp2011","temp2012","temp2013","temp2014",
-                    "pcp2010","pcp2011","pcp2012","pcp2013","pcp2014",
-                    "vpd2010","vpd2011","vpd2012","vpd2013","vpd2014")
-#dist colnames:
 # colnames(vardat)<-c("dist2015","dist2016","dist2017",
-#                     "temp2015","temp2016","temp2017",
-#                     "pcp2015","pcp2016","pcp2017",
-#                     "vpd2015","vpd2016","vpd2017")
+#                     "temp2010","temp2011","temp2012","temp2013","temp2014",
+#                     "pcp2010","pcp2011","pcp2012","pcp2013","pcp2014",
+#                     "vpd2010","vpd2011","vpd2012","vpd2013","vpd2014")
+#dist colnames:
+colnames(vardat)<-c("dist2015","dist2016","dist2017",
+                    "temp2015","temp2016","temp2017",
+                    "pcp2015","pcp2016","pcp2017",
+                    "vpd2015","vpd2016","vpd2017")
 
 ##load gam lib:
 #library(mgcv)
 
 ##run the gams:
-var.gam<-gam(dist2015~s(temp2012), data=vardat, family="binomial")
+var.gam<-gam(dist2017~s(vpd2017), data=vardat, family="binomial")
 #plot.gam(var.gam)
 summ<-summary(var.gam)
 r2 <- summ$r.sq
