@@ -154,7 +154,7 @@ names(hfss)[names(hfss) == 'distmagrecov$colnum'] <- 'colnum'
 hf16<-hfss[hfss$colnum == 22,]
 
 # ### RUNNING THE GAMs-----
-# library(mgcv)
+library(mgcv)
 # 
 # #variables to include:
 mp<-hf16[,100]
@@ -204,11 +204,16 @@ vardat = hf16
 #var.gam <- gam(mags~s(mp)+s(mp2)+s(mp5)+s(mp6)+s(mv5), data = vardat)
 #var.gam <- gam(mags~s(mp)+s(mp2)+s(mp5)+s(mp6)+s(mv3)+s(mv4)+s(mv5), data = vardat)
 #var.gam <- gam(mags~s(mp)+s(mp2)+s(mp5)+s(mp6)+s(mv)+s(mv2)+s(mv5), data = vardat)
-var.gam <- gam(mags~s(mp)+s(mp2)+s(mp5)+s(mp6)+s(mv)+s(mv2)+s(mv3)+s(mv4), data = vardat)
+#var.gam <- gam(mags~s(mp)+s(mp2)+s(mp5)+s(mp6)+s(mv4)+s(mv5), data = vardat)
+#var.gam <- gam(mags~s(mp)+s(mp2)+s(mp5)+s(mp6)+s(mv2)+s(mv4)+s(mv5)+s(mv6), data = vardat)
+#var.gam <- gam(mags~s(mp)+s(mp2)+s(mp5)+s(mp6)+s(mv4)+s(mv5)+s(mv6), data = vardat)
+var.gam <- gam(mags~s(mp)+s(mp2)+s(mp5)+s(mp6)+s(mv5)+s(mv6), data = vardat)
 
 
 #var.gam <- gam(mags ~  s(jan2016)+ s(mar2016), data=vardat)
 summ<-summary(var.gam)
 r2 <- summ$r.sq
 print(r2)
+
+print(summ)
 
