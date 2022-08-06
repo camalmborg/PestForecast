@@ -78,7 +78,7 @@ for (s in 1:ns){
     muD[s,t] ~ dnorm(mu0[s,t],pa0) ##step 1: process model on mu0
     D[s,t] ~ dbern(p) ##step 2: adding process model here
     mu[s,t] <- D[s,t]*muD[s,t] + (1-D[s,t])*muN[s,t]
-    mu0[s,t] <- beta0 
+    mu0[s,t] <- beta0 + beta[1]*pcp[s,1] + beta[2]*pcp[s,2] + beta[3]*pcp[s,3] + beta[4]*pcp[s,4]
     ##beta[1]*vpd[s,1]
     ##beta[2]*vpd[s,2]
     ##beta[1]*pcp[s,1]
@@ -97,10 +97,10 @@ for (s in 1:ns){
   R ~ dnorm(rmean,rprec)  #rho term
   p ~ dunif(0,1)  #disturbance probability
   beta0 ~ dnorm(-5,1) #param for calculating mean of disturbed state
-  #beta[1] ~ dnorm(0,0.0001)
-  #beta[2] ~ dnorm(0,0.0001)
-  #beta[3] ~ dnorm(0,0.0001)
-  #beta[4] ~ dnorm(0,0.0001)
+  beta[1] ~ dnorm(0,0.0001)
+  beta[2] ~ dnorm(0,0.0001)
+  beta[3] ~ dnorm(0,0.0001)
+  beta[4] ~ dnorm(0,0.0001)
   pa0 ~ dgamma(1,1) #precision of disturbed state
   
 }
@@ -143,10 +143,10 @@ for (i in 1:20){
                       variable.names = c("beta0", "beta[1]", "beta[2]",
                                          "beta[3]", "beta[4]",
                                          "tau_add","tau_obs",
-                                         "pa0"),
-                      n.iter = 50000,
+                                         "pa0", "x", "D"),
+                      n.iter = 20000,
                       thin=5)
-  save(jpout, file=paste0("Model_2_pcp_jpout_esarun1_", as.character(i),".RData"))
+  save(jpout, file=paste0("Model_2_pcp_jpout_esarun2_", as.character(i),".RData"))
 }
 
 
@@ -170,40 +170,42 @@ parse.MatrixNames <- function(w, pre = "x", numeric = FALSE) {
 }
 
 #load a sample mcmcobject for the model we want to use:
-model1<-"Model_1_mu0_jpout_run2_"
+#model1<-"Model_1_mu0_jpout_run2_"
 #model2<-"Model_2_precip5k_jpout_"
 #model3<-"Model_3_fullenv5k_jpout_"
+model1<-"Model_1_mu0_jpout_esarun1_"
+model2<-"Model_2_pcp_jpout_esarun1_"
 i=1
-load(file = paste0(model1,as.character(i),".RData"))
+load(file = paste0(model2,as.character(i),".RData"))
 #make empty matrix with sample mcmc object's # of columns (1 per tracked param)
 out<-matrix(NA,ncol=ncol(jpout[[1]]))
 #grab each mcmc object of that model and convert to matrix:
 for (i in 20:10){
-  load(file = paste0(model1,as.character(i),".RData"))
+  load(file = paste0(model2,as.character(i),".RData"))
   jpmx<-as.matrix(jpout)
   out<-rbind(out,jpmx)
   rm(jpmx)
 }
-out1<-out[-1,] #removes the NA row
-#out2<-out[-1,]
+#out1<-out[-1,] #removes the NA row
+out2<-out[-1,]
 #out3<-out[-1,]
 rm(jpout)
 rm(out)
 
 #separate parameters into x,D for plotting, and other params for summary:
 param1<-c("^beta","tau_add","tau_obs", "pa0")
-#param2<-c("^beta","tau_add","tau_obs", "pa0")
+param2<-c("^beta","tau_add","tau_obs", "pa0")
 #param3<-c("^beta", "beta[3]","beta[4]","tau_add","tau_obs", "pa0")
 
 sel.1<-grepl(paste(param1, collapse = "|"), colnames(out1))
-#sel.2<-grepl(paste(param2, collapse = "|"), colnames(out2))
+sel.2<-grepl(paste(param2, collapse = "|"), colnames(out2))
 #sel.3<-grepl(paste(param3, collapse = "|"), colnames(out3))
 params1<-out1[,sel.1]
-#params2<-out2[,sel.2]
+params2<-out2[,sel.2]
 #params3<-out3[,sel.3]
 
 summ1<-summary(params1)
-#summ2<-as.data.frame.matrix(summary(params2))
+summ2<-as.data.frame.matrix(summary(params2))
 #summ3<-as.data.frame.matrix(summary(params3))
 
 
@@ -213,17 +215,17 @@ ci.x.1 <- apply(out1[,x.cols.1],2,quantile,c(0.025,0.5,0.975))
 
 x.cols.2 <- grep("^x",colnames(out2))
 ci.x.2 <- apply(out2[,x.cols.2],2,quantile,c(0.025,0.5,0.975))
-
-x.cols.3 <- grep("^x",colnames(out3))
-ci.x.3 <- apply(out3[,x.cols.3],2,quantile,c(0.025,0.5,0.975))
+# 
+# x.cols.3 <- grep("^x",colnames(out3))
+# ci.x.3 <- apply(out3[,x.cols.3],2,quantile,c(0.025,0.5,0.975))
 
 ci.x.names = parse.MatrixNames(colnames(ci.x.1),numeric=TRUE)
 
 # d.cols.1 <- grep("^D",colnames(out1))
 # ci.d.1 <- apply(out1[,d.cols.1],2,quantile,c(0.25,0.5,0.975))
 # 
-# d.cols.2 <- grep("^D",colnames(out2))
-# ci.d.2 <- apply(out2[,d.cols.2],2,quantile,c(0.25,0.5,0.975))
+d.cols.2 <- grep("^D",colnames(out2))
+ci.d.2 <- apply(out2[,d.cols.2],2,quantile,c(0.25,0.5,0.975))
 # 
 # d.cols.3 <- grep("^D",colnames(out3))
 # ci.d.3 <- apply(out3[,d.cols.3],2,quantile,c(0.25,0.5,0.975))
@@ -232,54 +234,54 @@ ci.x.names = parse.MatrixNames(colnames(ci.x.1),numeric=TRUE)
 #load("modeldata.RData")
 condscores.samp<-data$y
 
-i=34
+i=1
 sitei = which(ci.x.names$row == i)
 time=1:130
 NT=length(time)
-tiff("509_all_models_site34.tiff", units="in", width=10, height=5, res=300)
+tiff("ESA_bothmodels_site1.tiff", units="in", width=10, height=5, res=300)
 plot(ci.x.1[2,sitei],type='l',ylim=c(-12,5),
      ylab="Forest Condition Score", 
      col="red",
      xlab="Month",
      cex=1)
 lines(ci.x.2[2,sitei], col="blue")
-lines(ci.x.3[2,sitei], col="dark green")
+#lines(ci.x.3[2,sitei], col="dark green")
 ecoforecastR::ciEnvelope(time,ci.x.1[1,sitei],ci.x.1[3,sitei],col=ecoforecastR::col.alpha("indianred1",0.30))
 ecoforecastR::ciEnvelope(time,ci.x.2[1,sitei],ci.x.2[3,sitei],col=ecoforecastR::col.alpha("lightblue1",0.30))
-ecoforecastR::ciEnvelope(time,ci.x.3[1,sitei],ci.x.3[3,sitei],col=ecoforecastR::col.alpha("greenyellow",0.30))
+#ecoforecastR::ciEnvelope(time,ci.x.3[1,sitei],ci.x.3[3,sitei],col=ecoforecastR::col.alpha("greenyellow",0.30))
 points(time,condscores.samp[i,],pch=16,cex=0.5,col="navyblue")
 dev.off()
 
 
-tiff("509_Model_1_examp_site34.tiff", units="in", width=8, height=3, res=300)
+tiff("ESA_Model_1_site1.tiff", units="in", width=8, height=3, res=300)
 plot(ci.x.1[2,sitei],type='l',ylim=range(condscores.samp,na.rm=TRUE),
-     ylab="Forest Condition Score", 
+     ylab="Forest Condition Score",
      col="red",
      xlab="Month",
      cex=1)
 ecoforecastR::ciEnvelope(time,ci.x.1[1,sitei],ci.x.1[3,sitei],col=ecoforecastR::col.alpha("indianred1",0.60))
 points(time,condscores.samp[i,],pch=16,cex=0.5,col="navyblue")
 dev.off()
-
-tiff("509_Model_2_examp_site34.tiff", units="in", width=8, height=3, res=300)
-plot(ci.x.2[2,sitei],type='l',ylim=range(condscores.samp,na.rm=TRUE),
-     ylab="Forest Condition Score", 
-     col="blue",
-     xlab="Month",
-     cex=1)
-ecoforecastR::ciEnvelope(time,ci.x.2[1,sitei],ci.x.1[3,sitei],col=ecoforecastR::col.alpha("lightblue1",0.60))
-points(time,condscores.samp[i,],pch=16,cex=0.5,col="navyblue")
-dev.off()
-
-tiff("509_Model_3_examp_site34.tiff", units="in", width=8, height=3, res=300)
-plot(ci.x.3[2,sitei],type='l',ylim=range(condscores.samp,na.rm=TRUE),
-     ylab="Forest Condition Score", 
-     col="green",
-     xlab="Month",
-     cex=1)
-ecoforecastR::ciEnvelope(time,ci.x.3[1,sitei],ci.x.1[3,sitei],col=ecoforecastR::col.alpha("greenyellow",0.60))
-points(time,condscores.samp[i,],pch=16,cex=0.5,col="navyblue")
-dev.off()
+# 
+# tiff("509_Model_2_examp_site34.tiff", units="in", width=8, height=3, res=300)
+# plot(ci.x.2[2,sitei],type='l',ylim=range(condscores.samp,na.rm=TRUE),
+#      ylab="Forest Condition Score", 
+#      col="blue",
+#      xlab="Month",
+#      cex=1)
+# ecoforecastR::ciEnvelope(time,ci.x.2[1,sitei],ci.x.1[3,sitei],col=ecoforecastR::col.alpha("lightblue1",0.60))
+# points(time,condscores.samp[i,],pch=16,cex=0.5,col="navyblue")
+# dev.off()
+# 
+# tiff("509_Model_3_examp_site34.tiff", units="in", width=8, height=3, res=300)
+# plot(ci.x.3[2,sitei],type='l',ylim=range(condscores.samp,na.rm=TRUE),
+#      ylab="Forest Condition Score", 
+#      col="green",
+#      xlab="Month",
+#      cex=1)
+# ecoforecastR::ciEnvelope(time,ci.x.3[1,sitei],ci.x.1[3,sitei],col=ecoforecastR::col.alpha("greenyellow",0.60))
+# points(time,condscores.samp[i,],pch=16,cex=0.5,col="navyblue")
+# dev.off()
 
 
 
