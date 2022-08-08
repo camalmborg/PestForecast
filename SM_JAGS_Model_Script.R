@@ -220,6 +220,7 @@ ci.x.2 <- apply(out2[,x.cols.2],2,quantile,c(0.025,0.5,0.975))
 # ci.x.3 <- apply(out3[,x.cols.3],2,quantile,c(0.025,0.5,0.975))
 
 ci.x.names = parse.MatrixNames(colnames(ci.x.1),numeric=TRUE)
+ci.d.names = parse.MatrixNames(colnames(ci.d.1))
 
 d.cols.1 <- grep("^D",colnames(out1))
 ci.d.1 <- apply(out1[,d.cols.1],2,quantile,c(0.25,0.5,0.975))
@@ -234,7 +235,7 @@ ci.d.2 <- apply(out2[,d.cols.2],2,quantile,c(0.25,0.5,0.975))
 #load("modeldata.RData")
 condscores.samp<-data$y
 
-i=48
+i=84
 sitei = which(ci.x.names$row == i)
 time=1:130
 NT=length(time)
@@ -294,5 +295,23 @@ dev.off()
 
 ###plots of individual sites testing:-----
 #plot(1:NT,condscores.samp[100,],type="l")
+
+
+i=2
+sitei = which(ci.d.names$row == paste0("D",i))
+#sitei = sitei[2:NT]
+#plot for disturbance prob all models:
+tiff(paste0("Dist_Prob_allmodels_ESARUN1_", i,".tiff"),
+     units="in", width=10, height=5, res=300)
+#plot:
+plot(time[2:NT],ci.d.1[2,sitei],type='l',ylim=range(ci.d.1,na.rm=TRUE),
+     ylab="Disturbance Probability",
+     col="red",
+     xlab="Month",
+     cex=1)
+lines(time[2:NT],ci.d.2[2,sitei], col="blue")
+ecoforecastR::ciEnvelope(time[2:NT],ci.d.1[1,sitei],ci.d.1[3,sitei],col=ecoforecastR::col.alpha("indianred1",0.30))
+ecoforecastR::ciEnvelope(time[2:NT],ci.d.2[1,sitei],ci.d.2[3,sitei],col=ecoforecastR::col.alpha("lightblue1",0.30))
+dev.off()
 
 
