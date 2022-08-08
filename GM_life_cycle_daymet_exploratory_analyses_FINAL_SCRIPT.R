@@ -151,18 +151,18 @@ vpds<-c(53:78)
 hfss<-cbind(distmagrecov$mags,distmagrecov$colnum,hatchss[,temps],feedss[,temps],hatchss[,precips],feedss[,precips],hatchss[,vpds],feedss[,vpds])
 names(hfss)[names(hfss) == 'distmagrecov$mags'] <- 'mags'
 names(hfss)[names(hfss) == 'distmagrecov$colnum'] <- 'colnum'
-hf16<-hfss[hfss$colnum == 22,]
+hf16.s<-hfss[hfss$colnum == 22,]
 
 # ### RUNNING THE GAMs-----
 library(mgcv)
 # 
 # #variables to include:
-mp<-hf16[,100]
-mp2<-hf16[,101]
+mp<-hf16.s[,100]
+mp2<-hf16.s[,101]
 mp3<-hf16[,74]
 mp4<-hf16[,75]
-mp5<-hf16[,76]
-mp6<-hf16[,102]
+mp5<-hf16.s[,76]
+mp6<-hf16.s[,102]
 mv<-hf16[,152]
 mv2<-hf16[,153]
 mv3<-hf16[,126]
@@ -181,7 +181,7 @@ mv6<-hf16[,154]
 # vardat = feed16
 # vardat = hf16
 
-vardat = hf16
+vardat = hf16.s
 
 #vardat = varwintmags[varwintmags$colnum == 22,] #21=2015 dist, 22=2016 dist, 23=2017 dist
 
@@ -207,7 +207,8 @@ vardat = hf16
 #var.gam <- gam(mags~s(mp)+s(mp2)+s(mp5)+s(mp6)+s(mv4)+s(mv5), data = vardat)
 #var.gam <- gam(mags~s(mp)+s(mp2)+s(mp5)+s(mp6)+s(mv2)+s(mv4)+s(mv5)+s(mv6), data = vardat)
 #var.gam <- gam(mags~s(mp)+s(mp2)+s(mp5)+s(mp6)+s(mv4)+s(mv5)+s(mv6), data = vardat)
-var.gam <- gam(mags~s(mp)+s(mp2)+s(mp5)+s(mp6)+s(mv5)+s(mv6), data = vardat)
+#var.gam <- gam(mags~s(mp)+s(mp2)+s(mp5)+s(mp6)+s(mv5)+s(mv6), data = vardat)
+var.gam <- gam(mags~s(mp)+s(mp2)+s(mp5)+s(mp6), data = vardat)
 
 
 #var.gam <- gam(mags ~  s(jan2016)+ s(mar2016), data=vardat)
