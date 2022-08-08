@@ -174,13 +174,13 @@ parse.MatrixNames <- function(w, pre = "x", numeric = FALSE) {
 #model2<-"Model_2_precip5k_jpout_"
 #model3<-"Model_3_fullenv5k_jpout_"
 model1<-"Model_1_mu0_jpout_esarun1_"
-model2<-"Model_2_pcp_jpout_esarun1_"
+model2<-"Model_2_pcp_jpout_esarun2_"
 i=1
 load(file = paste0(model2,as.character(i),".RData"))
 #make empty matrix with sample mcmc object's # of columns (1 per tracked param)
 out<-matrix(NA,ncol=ncol(jpout[[1]]))
 #grab each mcmc object of that model and convert to matrix:
-for (i in 20:10){
+for (i in 20:19){
   load(file = paste0(model2,as.character(i),".RData"))
   jpmx<-as.matrix(jpout)
   out<-rbind(out,jpmx)
@@ -204,7 +204,7 @@ params1<-out1[,sel.1]
 params2<-out2[,sel.2]
 #params3<-out3[,sel.3]
 
-summ1<-summary(params1)
+summ1<-as.data.frame.matrix(summary(params1))
 summ2<-as.data.frame.matrix(summary(params2))
 #summ3<-as.data.frame.matrix(summary(params3))
 
@@ -221,8 +221,8 @@ ci.x.2 <- apply(out2[,x.cols.2],2,quantile,c(0.025,0.5,0.975))
 
 ci.x.names = parse.MatrixNames(colnames(ci.x.1),numeric=TRUE)
 
-# d.cols.1 <- grep("^D",colnames(out1))
-# ci.d.1 <- apply(out1[,d.cols.1],2,quantile,c(0.25,0.5,0.975))
+d.cols.1 <- grep("^D",colnames(out1))
+ci.d.1 <- apply(out1[,d.cols.1],2,quantile,c(0.25,0.5,0.975))
 # 
 d.cols.2 <- grep("^D",colnames(out2))
 ci.d.2 <- apply(out2[,d.cols.2],2,quantile,c(0.25,0.5,0.975))
@@ -234,11 +234,11 @@ ci.d.2 <- apply(out2[,d.cols.2],2,quantile,c(0.25,0.5,0.975))
 #load("modeldata.RData")
 condscores.samp<-data$y
 
-i=1
+i=48
 sitei = which(ci.x.names$row == i)
 time=1:130
 NT=length(time)
-tiff("ESA_bothmodels_site1.tiff", units="in", width=10, height=5, res=300)
+tiff(paste0("ESA_bothmodels_site2_",as.character(i),".tiff"), units="in", width=10, height=5, res=300)
 plot(ci.x.1[2,sitei],type='l',ylim=c(-12,5),
      ylab="Forest Condition Score", 
      col="red",
@@ -253,7 +253,7 @@ points(time,condscores.samp[i,],pch=16,cex=0.5,col="navyblue")
 dev.off()
 
 
-tiff("ESA_Model_1_site1.tiff", units="in", width=8, height=3, res=300)
+tiff(paste0("ESA_model1_site",as.character(i),".tiff"), units="in", width=8, height=3, res=300)
 plot(ci.x.1[2,sitei],type='l',ylim=range(condscores.samp,na.rm=TRUE),
      ylab="Forest Condition Score",
      col="red",
@@ -263,15 +263,16 @@ ecoforecastR::ciEnvelope(time,ci.x.1[1,sitei],ci.x.1[3,sitei],col=ecoforecastR::
 points(time,condscores.samp[i,],pch=16,cex=0.5,col="navyblue")
 dev.off()
 # 
-# tiff("509_Model_2_examp_site34.tiff", units="in", width=8, height=3, res=300)
-# plot(ci.x.2[2,sitei],type='l',ylim=range(condscores.samp,na.rm=TRUE),
-#      ylab="Forest Condition Score", 
-#      col="blue",
-#      xlab="Month",
-#      cex=1)
-# ecoforecastR::ciEnvelope(time,ci.x.2[1,sitei],ci.x.1[3,sitei],col=ecoforecastR::col.alpha("lightblue1",0.60))
-# points(time,condscores.samp[i,],pch=16,cex=0.5,col="navyblue")
-# dev.off()
+#
+tiff(paste0("ESA_model2_site",as.character(i),".tiff"), units="in", width=8, height=3, res=300)
+plot(ci.x.2[2,sitei],type='l',ylim=range(condscores.samp,na.rm=TRUE),
+     ylab="Forest Condition Score",
+     col="blue",
+     xlab="Month",
+     cex=1)
+ecoforecastR::ciEnvelope(time,ci.x.2[1,sitei],ci.x.1[3,sitei],col=ecoforecastR::col.alpha("lightblue1",0.60))
+points(time,condscores.samp[i,],pch=16,cex=0.5,col="navyblue")
+dev.off()
 # 
 # tiff("509_Model_3_examp_site34.tiff", units="in", width=8, height=3, res=300)
 # plot(ci.x.3[2,sitei],type='l',ylim=range(condscores.samp,na.rm=TRUE),
@@ -292,6 +293,6 @@ dev.off()
 #DIC.mu0model<-dic.samples(j.pests, n.iter=10000)
 
 ###plots of individual sites testing:-----
-plot(1:NT,condscores.samp[81,])
+#plot(1:NT,condscores.samp[100,],type="l")
 
 
