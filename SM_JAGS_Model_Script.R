@@ -78,7 +78,8 @@ for (s in 1:ns){
     muD[s,t] ~ dnorm(mu0[s,t],pa0) ##step 1: process model on mu0
     D[s,t] ~ dbern(p) ##step 2: adding process model here
     mu[s,t] <- D[s,t]*muD[s,t] + (1-D[s,t])*muN[s,t]
-    mu0[s,t] <- beta0 + beta[1]*pcp[s,1] + beta[2]*pcp[s,2] + beta[3]*pcp[s,3] + beta[4]*pcp[s,4]
+    mu0[s,t] <- beta0
+    #mu0[s,t] <- beta0 + beta[1]*pcp[s,1] + beta[2]*pcp[s,2] + beta[3]*pcp[s,3] + beta[4]*pcp[s,4]
     ##beta[1]*vpd[s,1]
     ##beta[2]*vpd[s,2]
     ##beta[1]*pcp[s,1]
@@ -97,10 +98,10 @@ for (s in 1:ns){
   R ~ dnorm(rmean,rprec)  #rho term
   p ~ dunif(0,1)  #disturbance probability
   beta0 ~ dnorm(-5,1) #param for calculating mean of disturbed state
-  beta[1] ~ dnorm(0,0.0001)
-  beta[2] ~ dnorm(0,0.0001)
-  beta[3] ~ dnorm(0,0.0001)
-  beta[4] ~ dnorm(0,0.0001)
+  # beta[1] ~ dnorm(0,0.0001)
+  # beta[2] ~ dnorm(0,0.0001)
+  # beta[3] ~ dnorm(0,0.0001)
+  # beta[4] ~ dnorm(0,0.0001)
   pa0 ~ dgamma(1,1) #precision of disturbed state
   
 }
@@ -112,8 +113,8 @@ data = list(y=condscores.samp, n=NT, ns=nsites,
               x_ic=0, tau_ic=0.1,
               a_obs=0.1,t_obs=0.1,
               a_add=0.1,t_add=0.1,
-              rmean=0,rprec=0.00001,#,
-              pcp=pcpanom)#, vpd=vpdanom)
+              rmean=0,rprec=0.00001)#,#,
+              #pcp=pcpanom)#, vpd=vpdanom)
 
 j.pests <- jags.model (file = textConnection(spongy_disturb),
                        data = data,
@@ -290,14 +291,28 @@ dev.off()
 #DIC calculations:
 #DIC.fullenv<-dic.samples(j.pests, n.iter=10000)
 #DIC.threevar<-dic.samples(j.pests, n.iter=10000)
-#DIC.justprecip<-dic.samples(j.pests, n.iter=10000)
-#DIC.mu0model<-dic.samples(j.pests, n.iter=10000)
+#DIC.justprecip_ESA<-dic.samples(j.pests, n.iter=10000)
+DIC.mu0model_ESA<-dic.samples(j.pests, n.iter=10000)
 
+#short bit of code for putting into table:
+library(dplyr)
+modelcompare<-matrix(ncol = 2, nrow = 1)
+modelcompare[1,]<-c(sum(DIC.mu0model_ESA$deviance,DIC.mu0model_ESA$penalty),
+                    sum(DIC.justprecip_ESA$deviance,DIC.justprecip_ESA$penalty))#,
+                    #sum(DIC.fullenv$deviance,DIC.fullenv$penalty))
+
+colnames(modelcompare)<-c("Model 1","Model 2")#,"Model 3")
+
+kable(modelcompare, digits = 3, caption="Model DIC Scores") %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+
+
+###VISUALIZATIONS------------------------------------------------------
 ###plots of individual sites testing:-----
 #plot(1:NT,condscores.samp[100,],type="l")
 
 
-i=2
+i=89
 sitei = which(ci.d.names$row == paste0("D",i))
 #sitei = sitei[2:NT]
 #plot for disturbance prob all models:
