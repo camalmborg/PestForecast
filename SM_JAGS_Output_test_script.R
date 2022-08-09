@@ -223,15 +223,15 @@ kable(m1t, digits = 3, caption = "Model 1") %>%
 library(dplyr)
 
 rbtest<-as.matrix(bind_rows(as.data.frame(m1t),
-                            as.data.frame(m2t),
-                            as.data.frame(m3t)))
-rownames(rbtest)<-rep(c("Mean","2.5% Q","50% Q","97.5% Q"),times=3)
+                            as.data.frame(m2t)))#,
+                            #as.data.frame(m3t)))
+rownames(rbtest)<-rep(c("Mean","2.5% Q","50% Q","97.5% Q"),times=2)
 
 kable(rbtest, digits = 3, caption="Model Parameter Estimates") %>%
   kable_classic(full_width = F, html_font = "Cambria") %>%
   pack_rows("Model 1: Null Model", 1, 4) %>%
-  pack_rows("Model 2: Precipitation Only Model", 5, 8) %>%
-  pack_rows("Model 3: Precipitation and VPD Model", 9, 12)
+  pack_rows("Model 2: Precipitation Model", 5, 8) #%>%
+  #pack_rows("Model 3: Precipitation and VPD Model", 9, 12)
 
 
 
