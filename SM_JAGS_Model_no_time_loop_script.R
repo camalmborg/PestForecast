@@ -44,7 +44,7 @@ for (s in 1:ns){
   y[s] ~ dnorm(x[s],tau_obs)
   
   #### Process Model
-  muN[s,107]<-R*x[s,t-1]  ##how to I resolve the t-1 without loop? remove this line?
+  muN[s,107]<-R*x[s]
   x[s] ~ dnorm(mu[s],tau_add)
   muD[s] ~ dnorm(mu0[s],pa0) 
   D[s] ~ dbern(p)
