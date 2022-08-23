@@ -28,12 +28,21 @@ cs16<-condscores[hf16$X,]
 condscores.samp<-cs16[smpl,]
 
 #number of sites, timesteps:
-nsites = nrow(condscores.samp)
-NT = ncol(condscores.samp)
+nsites = nrow(condscores)#.samp)
+NT = ncol(condscores)#.samp)
+
+# #initial state of model parameters
+init<-list()
+nchain <- 3
+for(j in 1:nchain){
+  samp<- sample(!is.na(condscores),length(condscores),replace=TRUE)
+  init[[j]]<-list(tau_add=1/var(diff(samp)),tau_obs=1/var(samp))
+}
 
 
 #the model loops only over sites with to parameterize mu0 @ 2016 disturb timestep 
 #timestep 2016 june >>> t = 107
+condscores<-condscores[,107]
 #THE MODEL:
 spongy_disturb <- "model{
 
@@ -44,7 +53,7 @@ for (s in 1:ns){
   y[s] ~ dnorm(x[s],tau_obs)
   
   #### Process Model
-  muN[s,107]<-R*x[s]
+  muN[s]<-R*xic
   x[s] ~ dnorm(mu[s],tau_add)
   muD[s] ~ dnorm(mu0[s],pa0) 
   D[s] ~ dbern(p)
@@ -59,9 +68,11 @@ for (s in 1:ns){
   ##beta[3]*pcp[s,3]
   ##beta[4]*pcp[s,4]
   
-  x[s,1]~dnorm(x_ic,tau_ic)
+ ## x[s]~dnorm(x_ic,tau_ic)
   
 }#end loop over sites
+ 
+  xic~dnorm(x_ic,tau_ic)
   
   #### Priors
   tau_obs ~ dgamma(t_obs,a_obs)
@@ -77,3 +88,25 @@ for (s in 1:ns){
   
 }
 "
+
+#MODEL INPUTS
+#data and parameters for sites model:
+data = list(y=condscores, ns=nsites,
+            x_ic=0, tau_ic=0.1,
+            a_obs=0.1,t_obs=0.1,
+            a_add=0.1,t_add=0.1,
+            rmean=0,rprec=0.00001)#,#,
+#pcp=pcpanom)#, vpd=vpdanom)
+
+j.pests <- jags.model (file = textConnection(spongy_disturb),
+                       data = data,
+                       inits = init,
+                       n.chains = 3)
+
+jpout<-coda.samples(j.pests,
+                    variable.names = c("beta0", "x", "D",
+                                       "tau_add","tau_obs",
+                                       "pa0"),
+                    n.iter = 5000)
+
+out<-as.matrix(jpout)
