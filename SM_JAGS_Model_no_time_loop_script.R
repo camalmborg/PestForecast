@@ -31,12 +31,20 @@ condscores.samp<-cs16[smpl,]
 nsites = nrow(condscores)#.samp)
 NT = ncol(condscores)#.samp)
 
+# # #initial state of model parameters
+# init<-list()
+# nchain <- 3
+# for(j in 1:nchain){
+#   samp<- sample(!is.na(condscores),length(condscores),replace=TRUE)
+#   init[[j]]<-list(tau_add=1/var(diff(samp)),tau_obs=1/var(samp))
+# }
+
 # #initial state of model parameters
 init<-list()
 nchain <- 3
 for(j in 1:nchain){
   samp<- sample(!is.na(condscores),length(condscores),replace=TRUE)
-  init[[j]]<-list(tau_add=1/var(diff(samp)),tau_obs=1/var(samp))
+  init[[j]]<-list(tau_obs=1/var(samp))
 }
 
 
@@ -50,11 +58,11 @@ spongy_disturb <- "model{
 for (s in 1:ns){
 
   #### Data Model
-  y[s] ~ dnorm(x[s],tau_obs)
+  y[s] ~ dnorm(mu[s],tau_obs)
   
   #### Process Model
   muN[s]<-R*xic
-  x[s] ~ dnorm(mu[s],tau_add)
+ # x[s] ~ dnorm(mu[s],tau_add)
   muD[s] ~ dnorm(mu0[s],pa0) 
   D[s] ~ dbern(p)
   mu[s] <- D[s]*muD[s] + (1-D[s])*muN[s]
@@ -76,7 +84,7 @@ for (s in 1:ns){
   
   #### Priors
   tau_obs ~ dgamma(t_obs,a_obs)
-  tau_add ~ dgamma(a_add,t_add)
+#  tau_add ~ dgamma(t_add,a_add)
   R ~ dnorm(rmean,rprec)  #rho term
   p ~ dunif(0,1)  #disturbance probability
   beta0 ~ dnorm(-5,1) #param for calculating mean of disturbed state
@@ -94,9 +102,9 @@ for (s in 1:ns){
 data = list(y=condscores, ns=nsites,
             x_ic=0, tau_ic=0.1,
             a_obs=0.1,t_obs=0.1,
-            a_add=0.1,t_add=0.1,
             rmean=0,rprec=0.00001)#,#,
 #pcp=pcpanom)#, vpd=vpdanom)
+#a_add=0.1,t_add=0.1,
 
 j.pests <- jags.model (file = textConnection(spongy_disturb),
                        data = data,
@@ -104,9 +112,9 @@ j.pests <- jags.model (file = textConnection(spongy_disturb),
                        n.chains = 3)
 
 jpout<-coda.samples(j.pests,
-                    variable.names = c("beta0", "x", "D",
-                                       "tau_add","tau_obs",
+                    variable.names = c("beta0",
+                                       "tau_obs",
                                        "pa0"),
-                    n.iter = 5000)
+                    n.iter = 10000)
 
 out<-as.matrix(jpout)
