@@ -14,18 +14,28 @@ library(coda)
 cond.scores.mo<-read.csv("2020_07_10_sample_score_mean_MONTHLY.csv")
 condscores<-cond.scores.mo[,2:131]
 
+#make initial conditions for the x[s], mean junes 5 yrs prior:
+#june sequence:
+jseq<-seq(2,length(condscores),by=5)
+junes<-condscores[,jseq]
+javgs<-apply(na.omit(junes[,(length(junes)-5):length(junes)]),1,mean)
+
+
+#load st devs for initial conditions x[s]:
+stdevs<-read.csv("2022_08_31_DATAGRAB/2022_08_31_5k_score_stddev - 2022_08_31_5k_score_stddev.csv")
+
 #load hatch-feed temp,vpd,precip dataset:
 #hf16<-read.csv("hf16_dataset_03_2022.csv")
-hf16<-read.csv("hatchfeed16_daymet_tpv_mags_data.csv")
-hf16<-hf16[,-c(3)]
-hfnoX<-as.matrix(hf16[,2:ncol(hf16)])
+# hf16<-read.csv("hatchfeed16_daymet_tpv_mags_data.csv")
+# hf16<-hf16[,-c(3)]
+# hfnoX<-as.matrix(hf16[,2:ncol(hf16)])
 
 ##SELECT SITES:
 #2016 dist mag sites:
-cs16<-condscores[hf16$X,]
-#random selection of sites for testing:
-#smpl<-sample(nrow(cs16),100)
-condscores.samp<-cs16[smpl,]
+# cs16<-condscores[hf16$X,]
+# #random selection of sites for testing:
+# #smpl<-sample(nrow(cs16),100)
+# condscores.samp<-cs16[smpl,]
 
 #number of sites, timesteps:
 nsites = nrow(condscores)#.samp)
@@ -62,7 +72,7 @@ for (s in 1:ns){
   
   #### Process Model
   muN[s]<-R*xic
- # x[s] ~ dnorm(mu[s],tau_add)
+ ##x[s] ~ dnorm(mu[s],tau_add)
   muD[s] ~ dnorm(mu0[s],pa0) 
   D[s] ~ dbern(p)
   mu[s] <- D[s]*muD[s] + (1-D[s])*muN[s]
@@ -76,15 +86,15 @@ for (s in 1:ns){
   ##beta[3]*pcp[s,3]
   ##beta[4]*pcp[s,4]
   
- ## x[s]~dnorm(x_ic,tau_ic)
+ x[s]~dnorm(x_ic,tau_ic)
   
 }#end loop over sites
  
-  xic~dnorm(x_ic,tau_ic)
+  ##xic~dnorm(x_ic,tau_ic)
   
   #### Priors
   tau_obs ~ dgamma(t_obs,a_obs)
-#  tau_add ~ dgamma(t_add,a_add)
+##tau_add ~ dgamma(t_add,a_add)
   R ~ dnorm(rmean,rprec)  #rho term
   p ~ dunif(0,1)  #disturbance probability
   beta0 ~ dnorm(-5,1) #param for calculating mean of disturbed state
