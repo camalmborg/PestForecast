@@ -14,6 +14,7 @@ library(coda)
 cond.scores.mo<-read.csv("2020_07_10_sample_score_mean_MONTHLY.csv")
 condscores<-cond.scores.mo[,2:131]
 
+
 #make initial conditions for the x[s], mean junes 5 yrs prior:
 #june sequence:
 jseq<-seq(2,length(condscores),by=5)
@@ -53,6 +54,7 @@ precs<-as.numeric(prec_convert(sdavgs))
 nsites = nrow(condscores)#.samp)
 NT = ncol(condscores)#.samp)
 
+
 # # #initial state of model parameters
 # init<-list()
 # nchain <- 3
@@ -77,6 +79,20 @@ prec16<-as.numeric(prec_convert(sds[,22]))
 for(i in length(prec16)){
   if(is.na(prec16[i])){prec16[i]==mean(prec16,na.rm=T)}
 }
+
+
+##USE THESE IF YOU WANT 2016 ONLY!!!!
+##SELECT SITES:
+#2016 dist mag sites:
+# condscores<-condscores[hf16$X,]
+# cond16<-condscores[,107]
+# javgs<-javgs[hf16$X]
+# precs<-precs[hf16$X]
+# prec16<-prec16[hf16$X]
+# nsites = nrow(condscores)
+# NT = ncol(condscores)
+
+
 #THE MODEL:
 spongy_disturb <- "model{
 
@@ -92,9 +108,10 @@ for (s in 1:ns){
   muD[s] ~ dnorm(mu0[s],pa0) 
   D[s] ~ dbern(p)
   mu[s] <- D[s]*muD[s] + (1-D[s])*muN[s]
-  mu0[s] <- beta0
+ ##mu0[s] <- beta0
+  mu0[s] <- beta0 + beta[1]*pcp[s,1] + beta[2]*pcp[s,2]
   
-  ##mu0[s,t] <- beta0 + beta[1]*pcp[s,1] + beta[2]*pcp[s,2] + beta[3]*pcp[s,3] + beta[4]*pcp[s,4]
+  ##mu0[s] <- beta0 + beta[1]*pcp[s,1] + beta[2]*pcp[s,2] + beta[3]*pcp[s,3] + beta[4]*pcp[s,4]
   ##beta[1]*vpd[s,1]
   ##beta[2]*vpd[s,2]
   ##beta[1]*pcp[s,1]
@@ -114,8 +131,8 @@ for (s in 1:ns){
   R ~ dnorm(rmean,rprec)  #rho term
   p ~ dunif(0,1)  #disturbance probability
   beta0 ~ dnorm(-5,1) #param for calculating mean of disturbed state
-  # beta[1] ~ dnorm(0,0.0001)
-  # beta[2] ~ dnorm(0,0.0001)
+  beta[1] ~ dnorm(0,0.0001)
+  beta[2] ~ dnorm(0,0.0001)
   # beta[3] ~ dnorm(0,0.0001)
   # beta[4] ~ dnorm(0,0.0001)
   pa0 ~ dgamma(1,1) #precision of disturbed state
@@ -127,9 +144,8 @@ for (s in 1:ns){
 #data and parameters for sites model:
 data = list(y=cond16, ns=nsites,
             x_ic=javgs, tau_ic=precs,
-            a_obs=0.1,t_obs=mean(prec16),
-            rmean=0,rprec=0.00001)#,#,
-#pcp=pcpanom)#, vpd=vpdanom)
+            a_obs=0.1, t_obs=mean(prec16),
+            rmean=0,rprec=0.00001, pcp=pcpanom[,2:3])#, vpd=vpdanom)
 #a_add=0.1,t_add=0.1,
 
 j.pests <- jags.model (file = textConnection(spongy_disturb),
@@ -138,7 +154,7 @@ j.pests <- jags.model (file = textConnection(spongy_disturb),
                        n.chains = 3)
 
 jpout<-coda.samples(j.pests,
-                    variable.names = c("beta0",
+                    variable.names = c("beta0", "beta[1]", "beta[2]",
                                        "tau_obs",
                                        "pa0"),
                     n.iter = 100000)
