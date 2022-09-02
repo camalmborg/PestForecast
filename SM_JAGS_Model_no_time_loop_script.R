@@ -157,7 +157,7 @@ jpout<-coda.samples(j.pests,
                     variable.names = c("beta0", "beta[1]", "beta[2]",
                                        "tau_obs",
                                        "pa0"),
-                    n.iter = 100000)
+                    n.iter = 200000)
 
 out<-as.matrix(jpout)
 
