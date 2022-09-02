@@ -17,12 +17,24 @@ condscores<-cond.scores.mo[,2:131]
 #make initial conditions for the x[s], mean junes 5 yrs prior:
 #june sequence:
 jseq<-seq(2,length(condscores),by=5)
-junes<-condscores[,jseq]
-javgs<-apply(na.omit(junes[,(length(junes)-5):length(junes)]),1,mean)
-
+junes<-condscores[,jseq[1:22]] #just up to the 2016 disturb
+javgs<-as.numeric(apply(junes[,(length(junes)-5):(length(junes)-1)],1,mean,na.rm=T))
 
 #load st devs for initial conditions x[s]:
 stdevs<-read.csv("2022_08_31_DATAGRAB/2022_08_31_5k_score_stddev - 2022_08_31_5k_score_stddev.csv")
+sds<-stdevs[,2:23] #just up to 2016
+sdavgs<-apply(sds[,(length(sds)-5):(length(sds)-1)],1,mean,na.rm=T)
+#convert to precisions:
+prec_convert<-function(x){
+  prec<-matrix(NA,nrow=length(x),ncol=1)
+  for (i in 1:length(x)){
+     prec[i,]<-1/x[i]
+     if(is.na(prec[i,])){prec[i,]<-mean(prec,na.rm=T)}
+  }
+  return(prec)
+}
+precs<-as.numeric(prec_convert(sdavgs))
+
 
 #load hatch-feed temp,vpd,precip dataset:
 #hf16<-read.csv("hf16_dataset_03_2022.csv")
@@ -60,7 +72,11 @@ for(j in 1:nchain){
 
 #the model loops only over sites with to parameterize mu0 @ 2016 disturb timestep 
 #timestep 2016 june >>> t = 107
-condscores<-condscores[,107]
+cond16<-condscores[,107]
+prec16<-as.numeric(prec_convert(sds[,22]))
+for(i in length(prec16)){
+  if(is.na(prec16[i])){prec16[i]==mean(prec16,na.rm=T)}
+}
 #THE MODEL:
 spongy_disturb <- "model{
 
@@ -71,7 +87,7 @@ for (s in 1:ns){
   y[s] ~ dnorm(mu[s],tau_obs)
   
   #### Process Model
-  muN[s]<-R*xic
+  muN[s]<-R*x[s]
  ##x[s] ~ dnorm(mu[s],tau_add)
   muD[s] ~ dnorm(mu0[s],pa0) 
   D[s] ~ dbern(p)
@@ -86,7 +102,7 @@ for (s in 1:ns){
   ##beta[3]*pcp[s,3]
   ##beta[4]*pcp[s,4]
   
- x[s]~dnorm(x_ic,tau_ic)
+ x[s]~dnorm(x_ic[s],tau_ic[s])
   
 }#end loop over sites
  
@@ -109,9 +125,9 @@ for (s in 1:ns){
 
 #MODEL INPUTS
 #data and parameters for sites model:
-data = list(y=condscores, ns=nsites,
-            x_ic=0, tau_ic=0.1,
-            a_obs=0.1,t_obs=0.1,
+data = list(y=cond16, ns=nsites,
+            x_ic=javgs, tau_ic=precs,
+            a_obs=0.1,t_obs=mean(prec16),
             rmean=0,rprec=0.00001)#,#,
 #pcp=pcpanom)#, vpd=vpdanom)
 #a_add=0.1,t_add=0.1,
@@ -125,6 +141,7 @@ jpout<-coda.samples(j.pests,
                     variable.names = c("beta0",
                                        "tau_obs",
                                        "pa0"),
-                    n.iter = 10000)
+                    n.iter = 100000)
 
 out<-as.matrix(jpout)
+
