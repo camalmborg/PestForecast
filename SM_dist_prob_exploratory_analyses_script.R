@@ -114,30 +114,31 @@ vs=c(16:20,42:46,68:72) #pre-dist (2010-2014)
 vars = dmhatch[,vs]
 vardat = as.data.frame(cbind(distprob, vars))
 #pre-d colnames:
-# colnames(vardat)<-c("dist2015","dist2016","dist2017",
-#                     "temp2010","temp2011","temp2012","temp2013","temp2014",
-#                     "pcp2010","pcp2011","pcp2012","pcp2013","pcp2014",
-#                     "vpd2010","vpd2011","vpd2012","vpd2013","vpd2014")
-#dist colnames:
 colnames(vardat)<-c("dist2015","dist2016","dist2017",
-                    "temp2015","temp2016","temp2017",
-                    "pcp2015","pcp2016","pcp2017",
-                    "vpd2015","vpd2016","vpd2017")
+                    "temp2010","temp2011","temp2012","temp2013","temp2014",
+                    "pcp2010","pcp2011","pcp2012","pcp2013","pcp2014",
+                    "vpd2010","vpd2011","vpd2012","vpd2013","vpd2014")
+#dist colnames:
+# colnames(vardat)<-c("dist2015","dist2016","dist2017",
+#                     "temp2015","temp2016","temp2017",
+#                     "pcp2015","pcp2016","pcp2017",
+#                     "vpd2015","vpd2016","vpd2017")
 
 
 ###AUC analyses:
 library(pROC)
 library(mgcv)
 
+##run the gams:
+var.gam<-gam(dist2016~s(pcp2014), data=vardat, family="binomial")
+roc<-roc(vardat$dist2016,var.gam$fitted.values)#, plot=T)
+print(roc$auc)
 
 
+## plotting:
+#plot(vardat$pcp2010,vardat$dist2016)
+#lines(var.gam$fitted.values)
 
-
-
-
-
-# ##run the gams:
-# var.gam<-gam(dist2017~s(vpd2017), data=vardat, family="binomial")
 # #plot.gam(var.gam)
 # summ<-summary(var.gam)
 # r2 <- summ$r.sq
