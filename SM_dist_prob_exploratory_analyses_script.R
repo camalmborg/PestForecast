@@ -130,8 +130,8 @@ library(pROC)
 library(mgcv)
 
 ##run the gams:
-var.gam<-gam(dist2016~s(temp2014), data=vardat, family="binomial")
-roc<-roc(vardat$dist2016,var.gam$fitted.values)#, plot=T)
+var.gam<-gam(dist2017~s(vpd2014), data=vardat, family="binomial")
+roc<-roc(vardat$dist2017,var.gam$fitted.values)#, plot=T)
 print(roc$auc)
 
 
