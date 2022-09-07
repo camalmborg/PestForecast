@@ -97,8 +97,6 @@ for (i in 1:nrow(condscores)){
 
 
 ##### Running analyses -----
-##load library
-library(mgcv)
 
 ##load environmental data
 dmhatch<-read.csv("hatch_daymet_allvar.csv")[,-1]
@@ -109,11 +107,11 @@ dmfeed<-read.csv("feed_daymet_allvar.csv")[,-1]
 
 ##create vardat: 
 #choose the variable you want to test (FROM DAYMET SET):
-#vs=c(16:20,42:46,68:72) #pre-dist (2010-2014)
-vs=c(21:23,47:49,73:75) #dist (2015-2017)
+vs=c(16:20,42:46,68:72) #pre-dist (2010-2014)
+#vs=c(21:23,47:49,73:75) #dist (2015-2017)
 
 #choose hatch or feed:
-vars = dmfeed[,vs]
+vars = dmhatch[,vs]
 vardat = as.data.frame(cbind(distprob, vars))
 #pre-d colnames:
 # colnames(vardat)<-c("dist2015","dist2016","dist2017",
@@ -126,15 +124,24 @@ colnames(vardat)<-c("dist2015","dist2016","dist2017",
                     "pcp2015","pcp2016","pcp2017",
                     "vpd2015","vpd2016","vpd2017")
 
-##load gam lib:
-#library(mgcv)
 
-##run the gams:
-var.gam<-gam(dist2017~s(vpd2017), data=vardat, family="binomial")
-#plot.gam(var.gam)
-summ<-summary(var.gam)
-r2 <- summ$r.sq
-print(r2)
+###AUC analyses:
+library(pROC)
+library(mgcv)
+
+
+
+
+
+
+
+
+# ##run the gams:
+# var.gam<-gam(dist2017~s(vpd2017), data=vardat, family="binomial")
+# #plot.gam(var.gam)
+# summ<-summary(var.gam)
+# r2 <- summ$r.sq
+# print(r2)
 
 # #plot:
 #varr<-
