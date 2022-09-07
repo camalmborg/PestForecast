@@ -33,8 +33,8 @@ nsites = nrow(condscores.samp)
 NT = ncol(condscores.samp)
 
 #vpd and precip  data:
-vpd<-hf16[smpl,126:127] #vpd 2014-2015 hatch
-pcp<-hf16[smpl,c(76,100:102)] #precip 2014-2015 feed and 2016 hatch/feed
+vpd<-hf16[,126:127] #vpd 2014-2015 hatch
+pcp<-hf16[,c(76,100:102)] #precip 2014-2015 feed and 2016 hatch/feed
 #make anomaly datasets:
 anomfx<-function(x){
   means<-apply(x,2,mean, na.rm=T)
