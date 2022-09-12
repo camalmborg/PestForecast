@@ -28,3 +28,5 @@ HF.mort$mort<-1
 HF.plot.data<- merge(HF.plot.data, HF.mort, all = TRUE)
 HF.plot.data$mort[is.na(HF.plot.data$mort)] <- 0
 
+
+###recovery rate slopes for field sites:
