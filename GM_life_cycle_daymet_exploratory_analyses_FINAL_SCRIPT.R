@@ -81,7 +81,7 @@ colnames(varwintmags)<-c("mags", "colnum",
                     "feb2011","feb2012","feb2013","feb2014","feb2015","feb2016","feb2017",
                     "mar2011","mar2012","mar2013","mar2014","mar2015","mar2016","mar2017")
 
-
+#write.csv(varwintmags,file="varwintmages.csv")
 
 
 #grab seasonal months (2 monthly values * 26 years = 52 cols)
@@ -157,18 +157,18 @@ hf16.s<-hfss[hfss$colnum == 22,]
 library(mgcv)
 # 
 # #variables to include:
-mp<-hf16.s[,100]
-mp2<-hf16.s[,101]
-mp3<-hf16[,74]
-mp4<-hf16[,75]
-mp5<-hf16.s[,76]
-mp6<-hf16.s[,102]
-mv<-hf16[,152]
-mv2<-hf16[,153]
-mv3<-hf16[,126]
-mv4<-hf16[,127]
-mv5<-hf16[,128]
-mv6<-hf16[,154]
+# mp<-hf16.s[,100]
+# mp2<-hf16.s[,101]
+# mp3<-hf16[,74]
+# mp4<-hf16[,75]
+# mp5<-hf16.s[,76]
+# mp6<-hf16.s[,102]
+# mv<-hf16[,152]
+# mv2<-hf16[,153]
+# mv3<-hf16[,126]
+# mv4<-hf16[,127]
+# mv5<-hf16[,128]
+# mv6<-hf16[,154]
 # mt<-hf16[,24]
 # mt2<-hf16[,50]
 # mt3<-hf16[,22]
@@ -208,7 +208,7 @@ vardat = hf16.s
 #var.gam <- gam(mags~s(mp)+s(mp2)+s(mp5)+s(mp6)+s(mv2)+s(mv4)+s(mv5)+s(mv6), data = vardat)
 #var.gam <- gam(mags~s(mp)+s(mp2)+s(mp5)+s(mp6)+s(mv4)+s(mv5)+s(mv6), data = vardat)
 #var.gam <- gam(mags~s(mp)+s(mp2)+s(mp5)+s(mp6)+s(mv5)+s(mv6), data = vardat)
-var.gam <- gam(mags~s(mp)+s(mp2)+s(mp5)+s(mp6), data = vardat)
+#var.gam <- gam(mags~s(mp)+s(mp2)+s(mp5)+s(mp6), data = vardat)
 
 
 #var.gam <- gam(mags ~  s(jan2016)+ s(mar2016), data=vardat)
