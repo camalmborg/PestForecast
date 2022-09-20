@@ -153,7 +153,7 @@ names(hfss)[names(hfss) == 'distmagrecov$mags'] <- 'mags'
 names(hfss)[names(hfss) == 'distmagrecov$colnum'] <- 'colnum'
 hf16.s<-hfss[hfss$colnum == 22,]
 
-# ### RUNNING THE GAMs-----
+# ### RUNNING THE GAMs for spring/summer:-----
 library(mgcv)
 # 
 # #variables to include:
@@ -183,8 +183,6 @@ library(mgcv)
 
 vardat = hf16.s
 
-#vardat = varwintmags[varwintmags$colnum == 22,] #21=2015 dist, 22=2016 dist, 23=2017 dist
-
 #var.gam <- gam(mags~s(mp)+s(mp2), data = vardat) #just precip
 #var.gam <- gam(mags~s(mp)+s(mp2)+s(mp3)+s(mp4), data = vardat) #just precip
 #var.gam <- gam(mags~s(mp)+s(mp2)+s(mp3)+s(mp4)+s(mp5)+s(mp6), data = vardat) #just precip
@@ -210,11 +208,36 @@ vardat = hf16.s
 #var.gam <- gam(mags~s(mp)+s(mp2)+s(mp5)+s(mp6)+s(mv5)+s(mv6), data = vardat)
 #var.gam <- gam(mags~s(mp)+s(mp2)+s(mp5)+s(mp6), data = vardat)
 
-
 #var.gam <- gam(mags ~  s(jan2016)+ s(mar2016), data=vardat)
+
 summ<-summary(var.gam)
 r2 <- summ$r.sq
 print(r2)
 
 print(summ)
 
+
+# ### RUNNING THE GAMs for winter temps:------
+
+vardat = varwintmags[varwintmags$colnum == 22,] #21=2015 dist, 22=2016 dist, 23=2017 dist
+
+#variables to include:
+mwt<-vardat[,7]
+mwt2<-vardat[,15]
+mwt3<-vardat[,22]
+mwt4<-vardat[,29]
+
+#var.gam <- gam(mags~s(mwt), data = vardat) #univar winter temps (mintemp mean)
+#var.gam <- gam(mags~s(mwt)+s(mwt2)+s(mwt3)+s(mwt4), data = vardat) 
+#var.gam <- gam(mags~s(mwt2)+s(mwt3)+s(mwt4), data = vardat) 
+#var.gam <- gam(mags~s(mwt)+s(mwt2), data = vardat)  
+#var.gam <- gam(mags~s(mwt2)+s(mwt3), data = vardat) 
+#var.gam <- gam(mags~s(mwt3)+s(mwt4), data = vardat)
+var.gam <- gam(mags~s(mwt)+s(mwt4), data = vardat) 
+
+
+summ<-summary(var.gam)
+r2 <- summ$r.sq
+print(r2)
+
+print(summ)
