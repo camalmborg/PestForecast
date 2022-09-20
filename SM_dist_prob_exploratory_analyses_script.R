@@ -90,7 +90,7 @@ for (i in 1:nrow(condscores)){
   }
   distprob[is.na(distprob)] <- 0
 }
-##-----
+##-----spring/summer temps,pcp,vpd:
 #disturbed<-dmdjs[which(distprob==1),]
 #csdist<-condscores[which(distprob==1),]
 
@@ -124,6 +124,11 @@ colnames(vardat)<-c("dist2015","dist2016","dist2017",
                     "pcp2015","pcp2016","pcp2017",
                     "vpd2015","vpd2016","vpd2017")
 
+
+##### winter temps:-----
+varwint<-read.csv("varwintmages.csv")[,-c(1,2,3)]
+vardat = as.data.frame(cbind(distprob,varwint))
+colnames(vardat)[c(1,2,3)]<-c("dist2015","dist2016","dist2017")
 
 ###AUC analyses:
 library(pROC)
