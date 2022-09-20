@@ -130,12 +130,14 @@ varwint<-read.csv("varwintmages.csv")[,-c(1,2,3)]
 vardat = as.data.frame(cbind(distprob,varwint))
 colnames(vardat)[c(1,2,3)]<-c("dist2015","dist2016","dist2017")
 
+
+
 ###AUC analyses:
 library(pROC)
 library(mgcv)
 
 ##run the gams:
-var.gam<-gam(dist2017~s(vpd2014), data=vardat, family="binomial")
+var.gam<-gam(dist2016~s(mar2016), data=vardat, family="binomial")
 roc<-roc(vardat$dist2017,var.gam$fitted.values)#, plot=T)
 print(roc$auc)
 
