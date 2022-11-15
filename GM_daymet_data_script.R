@@ -4,20 +4,19 @@ library(tidyr)
 library(stringr)
 
 ###load data
-#load annual condition scores:
-file<-"2020_07_10_sample_score_mean_MONTHLY.csv"
-cond.scores.mo<-read.csv(file)
-coordcols<-c("lat","lon")
-coords<-cond.scores.mo[,coordcols]
-nsites<-1:nrow(cond.scores.mo)
-sites<-cbind(nsites,coords)
+#load condition scores:
+# file<-"2020_07_10_sample_score_mean_MONTHLY.csv"
+# cond.scores<-read.csv(file)
+
+# coordcols<-c("lat","lon")
+# coords<-cond.scores.mo[,coordcols]
+# nsites<-1:nrow(cond.scores.mo)
+# sites<-cbind(nsites,coords)
 
 #if you have data with just geo col:
 file<-"2022_08_31_DATAGRAB/2022_08_31_5k_score_mean - 2022_08_31_5k_score_mean.csv"
-cond.scores.an<-read.csv(file)
-geo<-as.data.frame(cond.scores.an[,".geo"])
-#extgeo<-gsub('[typePointcoordinates\\\\"{}::()]',"",geo)
-#newgeo.w<-gsub("([0-9]+)_.*", "\\1", newgeo)
+cond.scores<-read.csv(file)
+geo<-as.data.frame(cond.scores[,".geo"])
 
 #coordinates:
 coords<-matrix(nrow=nrow(geo),ncol=2)
@@ -30,7 +29,11 @@ for (i in 1:nrow(geo)){
   extlon<-sub(lon,"",geo[i,])
   coords[i,2]<-as.numeric(str_extract(extlon, "\\d+\\.*\\d*"))
 }
+colnames(coords)<-c("lon","lat")
 
+#make dataset with condition scores and coordinates:
+# nsites<-1:nrow(cond.scores.mo)
+# sites<-cbind(nsites,coords)
 
 
 #put daymet data into a list
