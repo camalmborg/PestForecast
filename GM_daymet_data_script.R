@@ -76,13 +76,15 @@ spongy_met<-function(var,filenm){
 #(as characters):
 spongy_met("tmax..deg.c.","maxtemp")
 
+#filename can include full path to folder for data
+
 #can do for variables:
 #maxtemp=tmax..deg.c.
 #mintemp=tmin..deg.c.
 #vpd=vp..Pa.
 #precip=prcp..mm.day.
 
-#^^^this code works now
+#^^^this code works now!!!
 
 
 ###ARCHIVED CODE-----
