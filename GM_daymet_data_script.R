@@ -36,11 +36,15 @@ colnames(coords)<-c("lon","lat")
 #make dataset with condition scores and coordinates:
 nsites<-1:nrow(cond.scores)
 sites<-as.data.frame(cbind(nsites,coords))
+#these lines were for testing:
+sites<-sites[1:5,]
+nsites<-1:nrow(sites)
+
 
 ###loop version for putting daymet data into a list:
 #start and end
 startyr <-1995
-endyr<-1996
+endyr<-2000
 
 #loop for downloading daymet data
 dm <- list()
@@ -55,6 +59,11 @@ for(i in nsites){
 
 #use any dm# to get day of year
 doy <- dm[[1]]$data$yday
+#get all years and unique years for later:
+for (i in nsites){
+  metyr=dm[[i]]$data$year
+  metyears=unique(metyr)
+}
 
 #function for grabbing daymet data:
 spongy_met<-function(var,filenm){
@@ -83,6 +92,9 @@ spongy_met("tmax..deg.c.","maxtemp")
 #mintemp=tmin..deg.c.
 #vpd=vp..Pa.
 #precip=prcp..mm.day.
+
+#will load as object called dmvar:
+load("maxtemp.RData")
 
 #^^^this code works now!!!
 

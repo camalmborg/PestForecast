@@ -1,72 +1,203 @@
 #daymet maxtemp exploratory analyses
 
 #load data:
-#load('maxtemp.RData')
+load('maxtemp.RData')
 
-#things I might need for loops if not in environment:
-nsites=5000
-metyears=1:26
-doy <- dm[[1]]$data$yday
-for (i in nsites){
-  metyr= dm[[i]]$data$year
-  metyears=unique(metyr)
-}
+#for test:
+maxtemp<-dmvar
 
 
-###First Maxtemp Run:-----------
-#remove the 366 day:
-maxtempx<-list()
-for (i in 1:nsites){
-  maxtempx[[i]]<-maxtemp[[i]][1:26,1:365]
-}
-#replace old data:
-maxtemp<-maxtempx
-#save(maxtemp, file='maxtemp.RData')
-
-avgyrtemp<-matrix(NA, nrow=nsites, ncol=length(metyears))
-for (i in 1:nsites){
-  for (j in 1:length(metyears)){
-    avgyrtemp[i,j]<-mean(maxtemp[[i]][j,])
+meanvar<-list()
+#function to get monthly averages of each daymet variable value:
+DMmonthly<-function(x){
+  #monthly breaks:
+  jan<-c(doy[1:31])
+  feb<-c(doy[32:59])
+  mar<-c(doy[60:90])
+  apr<-c(doy[91:120])
+  may<-c(doy[121:151])
+  jun<-c(doy[152:181])
+  jul<-c(doy[182:212])
+  aug<-c(doy[213:243])
+  sep<-c(doy[244:273])
+  oct<-c(doy[274:304])
+  nov<-c(doy[305:334])
+  dec<-c(doy[335:365])
+  
+  #loop for getting mean values per month
+  for (i in nsites){
+    meanvar[[i]]<-matrix(NA, nrow=12, ncol=length(metyears))
+    for (j in 1:length(metyears)){
+      for (s in 1:12){
+        if (s==1){
+          meanvar[[i]][s,j]<-mean(var[[i]][j,jan])
+        }
+        if (s==2){
+          meanvar[[i]][s,j]<-mean(var[[i]][j,feb])
+        }
+        if (s==3){
+          meanvar[[i]][s,j]<-mean(var[[i]][j,mar])
+        }
+        if (s==4){
+          meanvar[[i]][s,j]<-mean(var[[i]][j,apr])
+        }
+        if (s==5){
+          meanvar[[i]][s,j]<-mean(var[[i]][j,may])
+        }
+        if (s==6){
+          meanvar[[i]][s,j]<-mean(var[[i]][j,jun])
+        }
+        if (s==7){
+          meanvar[[i]][s,j]<-mean(var[[i]][j,jul])
+        }
+        if (s==8){
+          meanvar[[i]][s,j]<-mean(var[[i]][j,aug])
+        }
+        if (s==9){
+          meanvar[[i]][s,j]<-mean(var[[i]][j,sep])
+        }
+        if (s==10){
+          meanvar[[i]][s,j]<-mean(var[[i]][j,oct])
+        }
+        if (s==11){
+          meanvar[[i]][s,j]<-mean(var[[i]][j,nov])
+        }
+        if (s==12){
+          meanvar[[i]][s,j]<-mean(var[[i]][j,dec])
+        }
+      }
+    }
   }
 }
+  
 
-##caluculating seasons temps:
-#seasonal breaks:
-winter<-c(doy[1:59],doy[336:365])
-spring<-c(doy[60:151])
-summer<-c(doy[152:244])
-fall<-c(doy[245:335])
-#make one object:
-seasons<-c(winter,spring,summer,fall)
+#breaks for monthly data:
+#monthly breaks:
+jan<-c(doy[1:31])
+feb<-c(doy[32:59])
+mar<-c(doy[60:90])
+apr<-c(doy[91:120])
+may<-c(doy[121:151])
+jun<-c(doy[152:181])
+jul<-c(doy[182:212])
+aug<-c(doy[213:243])
+sep<-c(doy[244:273])
+oct<-c(doy[274:304])
+nov<-c(doy[305:334])
+dec<-c(doy[335:365])
 
-avgsmxtemp<-list()
-for (i in 1:nsites){
-  avgsmxtemp[[i]]<-matrix(NA, nrow=4, ncol=length(metyears))
+meanvar<-list()
+for (i in nsites){
+  meanvar[[i]]<-matrix(NA, nrow=12, ncol=length(metyears))
   for (j in 1:length(metyears)){
-    for (s in 1:4){
+    for (s in 1:12){
       if (s==1){
-        avgsmxtemp[[i]][s,j]<-mean(maxtemp[[i]][j,winter])
+        meanvar[[i]][s,j]<-mean(var[[i]][j,jan])
       }
       if (s==2){
-        avgsmxtemp[[i]][s,j]<-mean(maxtemp[[i]][j,spring])
+        meanvar[[i]][s,j]<-mean(var[[i]][j,feb])
       }
       if (s==3){
-        avgsmxtemp[[i]][s,j]<-mean(maxtemp[[i]][j,summer])
+        meanvar[[i]][s,j]<-mean(var[[i]][j,mar])
       }
       if (s==4){
-        avgsmxtemp[[i]][s,j]<-mean(maxtemp[[i]][j,fall])
+        meanvar[[i]][s,j]<-mean(var[[i]][j,apr])
+      }
+      if (s==5){
+        meanvar[[i]][s,j]<-mean(var[[i]][j,may])
+      }
+      if (s==6){
+        meanvar[[i]][s,j]<-mean(var[[i]][j,jun])
+      }
+      if (s==7){
+        meanvar[[i]][s,j]<-mean(var[[i]][j,jul])
+      }
+      if (s==8){
+        meanvar[[i]][s,j]<-mean(var[[i]][j,aug])
+      }
+      if (s==9){
+        meanvar[[i]][s,j]<-mean(var[[i]][j,sep])
+      }
+      if (s==10){
+        meanvar[[i]][s,j]<-mean(var[[i]][j,oct])
+      }
+      if (s==11){
+        meanvar[[i]][s,j]<-mean(var[[i]][j,nov])
+      }
+      if (s==12){
+        meanvar[[i]][s,j]<-mean(var[[i]][j,dec])
       }
     }
   }
 }
 
+#things I might need for loops if not in environment:
+# nsites=5000
+# metyears=1:26
+# doy <- dm[[1]]$data$yday
+# for (i in nsites){
+#   metyr= dm[[i]]$data$year
+#   metyears=unique(metyr)
+# }
+#^should be resolved in dm download script
+
+
+###First Maxtemp Run:-----------
+# #remove the 366 day:
+# maxtempx<-list()
+# for (i in 1:length(nsites)){
+#   maxtempx[[i]]<-maxtemp[[i]][,1:365]
+# }
+# #replace old data:
+# maxtemp<-maxtempx
+# #save(maxtemp, file='maxtemp.RData')
+#^originally needed this, I guess. Doesn't seem to be necessary anymore?
+
+avgyrtemp<-matrix(NA, nrow=length(nsites), ncol=length(metyears))
+for (i in 1:length(nsites)){
+  for (j in 1:length(metyears)){
+    avgyrtemp[i,j]<-mean(maxtemp[[i]][j,])
+  }
+}
+#^made a test loop for avg yearly var value
+
+# ##caluculating seasons temps:
+# #seasonal breaks:
+# winter<-c(doy[1:59],doy[336:365])
+# spring<-c(doy[60:151])
+# summer<-c(doy[152:244])
+# fall<-c(doy[245:335])
+# #make one object:
+# seasons<-c(winter,spring,summer,fall)
+
+# avgsmxtemp<-list()
+# for (i in 1:nsites){
+#   avgsmxtemp[[i]]<-matrix(NA, nrow=4, ncol=length(metyears))
+#   for (j in 1:length(metyears)){
+#     for (s in 1:4){
+#       if (s==1){
+#         avgsmxtemp[[i]][s,j]<-mean(maxtemp[[i]][j,winter])
+#       }
+#       if (s==2){
+#         avgsmxtemp[[i]][s,j]<-mean(maxtemp[[i]][j,spring])
+#       }
+#       if (s==3){
+#         avgsmxtemp[[i]][s,j]<-mean(maxtemp[[i]][j,summer])
+#       }
+#       if (s==4){
+#         avgsmxtemp[[i]][s,j]<-mean(maxtemp[[i]][j,fall])
+#       }
+#     }
+#   }
+# }
+
 
 #plot a sample (maxtemp):
-samp<-sample(nsites,500)
-plot(avgsmxtemp[[1]][1,], tcg.june[1,], pch=20, xlim=c(-3,8),ylim=c(-0.1,0.5))
-for (s in 1:nsites){
-  points(avgsmxtemp[[s]][1,], tcg.june[s,], pch=20)
-}
+# samp<-sample(nsites,500)
+# plot(avgsmxtemp[[1]][1,], tcg.june[1,], pch=20, xlim=c(-3,8),ylim=c(-0.1,0.5))
+# for (s in 1:nsites){
+#   points(avgsmxtemp[[s]][1,], tcg.june[s,], pch=20)
+# }
 
 
 
@@ -80,10 +211,10 @@ for (s in 1:nsites){
 
 ##making seasons:------------
 #seasonal breaks:
-winter<-c(doy[1:59],doy[336:365])
-spring<-c(doy[60:151])
-summer<-c(doy[152:244])
-fall<-c(doy[245:335])
+# winter<-c(doy[1:59],doy[336:365])
+# spring<-c(doy[60:151])
+# summer<-c(doy[152:244])
+# fall<-c(doy[245:335])
 #make one object:
 #seasons<-c(winter,spring,summer,fall)
 
