@@ -146,10 +146,12 @@ spongy_met<-function(scores,startyr,endyr,var,filenm){
 
 #choose your variable from the daymet list, add filename 
 #(as characters):
+#testing, testing, is this thing on?
 spongy_met(cond.scores,1995,1998,c("tmax..deg.c.","tmin..deg.c."),c("maxtemp","mintemp"))
 
 #load"maxtemp_monthly_means.RData")
+#check if it works....
 maxtemp <- miceadds::load.Rdata2("maxtemp_monthly_means.RData")
 mintemp <- miceadds::load.Rdata2("mintemp_monthly_means.RData")
 
-#works!
+# it works! Charlotte is a beautiful genius!
