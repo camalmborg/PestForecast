@@ -9,6 +9,7 @@
 library(daymetr)
 library(tidyr)
 library(stringr)
+library(miceadds)
 
 
 #### Load condition score .csv from GEE extract:
@@ -41,8 +42,8 @@ spongy_met<-function(scores,startyr,endyr,var,filenm){
   nsites<-1:nrow(scores)
   sites<-as.data.frame(cbind(nsites,coords))
   ######these lines were for testing: ###
-  # sites<-sites[1:5,]
-  # nsites<-1:nrow(sites)
+  sites<-sites[1:5,]
+  nsites<-1:nrow(sites)
   
   ##Section for downloading daymet for each site:
   dm <- list()
@@ -63,19 +64,20 @@ spongy_met<-function(scores,startyr,endyr,var,filenm){
     metyears=unique(metyr)
   }
   
-  ##Loop for extracting daymet variable of interest (var):
-  dmvar<-list()
-  for (i in nsites){
-    metyr<-dm[[i]]$data$year
-    metyears<-unique(metyr)
-    dmvar[[i]]<-matrix(NA,length(metyears),365)
-    for(j in 1:nrow(dm[[i]]$data)){
-      dmvar[[i]][as.numeric(as.factor(metyr))[j], 
-                 dm[[i]]$data$yday[j]]=dm[[i]]$data[[var]][j]
+  ##Loop for extracting daymet variables of interest (var):
+  for (k in 1:length(var)){
+    dmvar<-list()
+    for (i in nsites){
+      metyr<-dm[[i]]$data$year
+      metyears<-unique(metyr)
+      dmvar[[i]]<-matrix(NA,length(metyears),365)
+      for(j in 1:nrow(dm[[i]]$data)){
+        dmvar[[i]][as.numeric(as.factor(metyr))[j], 
+                  dm[[i]]$data$yday[j]]=dm[[i]]$data[[var[k]]][j]
+      }
     }
-  }
   #save data:
-  save(dmvar,file=paste0(filenm,".RData"))
+  save(dmvar,file=paste0(filenm[k],".RData"))
   
   ##Section for computing monthly average variable values:
   meanvar<-list()
@@ -92,7 +94,7 @@ spongy_met<-function(scores,startyr,endyr,var,filenm){
   oct<-c(doy[274:304])
   nov<-c(doy[305:334])
   dec<-c(doy[335:365])
-  
+
   ##Loop for getting mean values per month
   for (i in nsites){
     meanvar[[i]]<-matrix(NA, nrow=12, ncol=length(metyears))
@@ -136,13 +138,18 @@ spongy_met<-function(scores,startyr,endyr,var,filenm){
         }
       }
     }
-    #save
-    save(meanvar, file=paste0(filenm,"_monthly_means",".Rdata"))
+  }
+  #save meanvar data
+  save(meanvar, file=paste0(filenm[k],"_monthly_means",".Rdata"))
   }
 }
 
 #choose your variable from the daymet list, add filename 
 #(as characters):
-spongy_met(cond.scores,1995,2000,"tmax..deg.c.","maxtemp")
+spongy_met(cond.scores,1995,1998,c("tmax..deg.c.","tmin..deg.c."),c("maxtemp","mintemp"))
 
-load("maxtemp_monthly_means.RData")
+#load"maxtemp_monthly_means.RData")
+maxtemp <- miceadds::load.Rdata2("maxtemp_monthly_means.RData")
+mintemp <- miceadds::load.Rdata2("mintemp_monthly_means.RData")
+
+#works!
