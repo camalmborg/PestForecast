@@ -4,74 +4,11 @@
 load('maxtemp.RData')
 
 #for test:
-maxtemp<-dmvar
+maxtemps<-dmvar
+#var<-dmvar
 
 
 meanvar<-list()
-#function to get monthly averages of each daymet variable value:
-DMmonthly<-function(x){
-  #monthly breaks:
-  jan<-c(doy[1:31])
-  feb<-c(doy[32:59])
-  mar<-c(doy[60:90])
-  apr<-c(doy[91:120])
-  may<-c(doy[121:151])
-  jun<-c(doy[152:181])
-  jul<-c(doy[182:212])
-  aug<-c(doy[213:243])
-  sep<-c(doy[244:273])
-  oct<-c(doy[274:304])
-  nov<-c(doy[305:334])
-  dec<-c(doy[335:365])
-  
-  #loop for getting mean values per month
-  for (i in nsites){
-    meanvar[[i]]<-matrix(NA, nrow=12, ncol=length(metyears))
-    for (j in 1:length(metyears)){
-      for (s in 1:12){
-        if (s==1){
-          meanvar[[i]][s,j]<-mean(var[[i]][j,jan])
-        }
-        if (s==2){
-          meanvar[[i]][s,j]<-mean(var[[i]][j,feb])
-        }
-        if (s==3){
-          meanvar[[i]][s,j]<-mean(var[[i]][j,mar])
-        }
-        if (s==4){
-          meanvar[[i]][s,j]<-mean(var[[i]][j,apr])
-        }
-        if (s==5){
-          meanvar[[i]][s,j]<-mean(var[[i]][j,may])
-        }
-        if (s==6){
-          meanvar[[i]][s,j]<-mean(var[[i]][j,jun])
-        }
-        if (s==7){
-          meanvar[[i]][s,j]<-mean(var[[i]][j,jul])
-        }
-        if (s==8){
-          meanvar[[i]][s,j]<-mean(var[[i]][j,aug])
-        }
-        if (s==9){
-          meanvar[[i]][s,j]<-mean(var[[i]][j,sep])
-        }
-        if (s==10){
-          meanvar[[i]][s,j]<-mean(var[[i]][j,oct])
-        }
-        if (s==11){
-          meanvar[[i]][s,j]<-mean(var[[i]][j,nov])
-        }
-        if (s==12){
-          meanvar[[i]][s,j]<-mean(var[[i]][j,dec])
-        }
-      }
-    }
-  }
-}
-  
-
-#breaks for monthly data:
 #monthly breaks:
 jan<-c(doy[1:31])
 feb<-c(doy[32:59])
@@ -86,50 +23,177 @@ oct<-c(doy[274:304])
 nov<-c(doy[305:334])
 dec<-c(doy[335:365])
 
-meanvar<-list()
+#loop for getting mean values per month
 for (i in nsites){
   meanvar[[i]]<-matrix(NA, nrow=12, ncol=length(metyears))
   for (j in 1:length(metyears)){
     for (s in 1:12){
       if (s==1){
-        meanvar[[i]][s,j]<-mean(var[[i]][j,jan])
+        meanvar[[i]][s,j]<-mean(dmvar[[i]][j,jan])
       }
       if (s==2){
-        meanvar[[i]][s,j]<-mean(var[[i]][j,feb])
+        meanvar[[i]][s,j]<-mean(dmvar[[i]][j,feb])
       }
       if (s==3){
-        meanvar[[i]][s,j]<-mean(var[[i]][j,mar])
+        meanvar[[i]][s,j]<-mean(dmvar[[i]][j,mar])
       }
       if (s==4){
-        meanvar[[i]][s,j]<-mean(var[[i]][j,apr])
+        meanvar[[i]][s,j]<-mean(dmvar[[i]][j,apr])
       }
       if (s==5){
-        meanvar[[i]][s,j]<-mean(var[[i]][j,may])
+        meanvar[[i]][s,j]<-mean(dmvar[[i]][j,may])
       }
       if (s==6){
-        meanvar[[i]][s,j]<-mean(var[[i]][j,jun])
+        meanvar[[i]][s,j]<-mean(dmvar[[i]][j,jun])
       }
       if (s==7){
-        meanvar[[i]][s,j]<-mean(var[[i]][j,jul])
+        meanvar[[i]][s,j]<-mean(dmvar[[i]][j,jul])
       }
       if (s==8){
-        meanvar[[i]][s,j]<-mean(var[[i]][j,aug])
+        meanvar[[i]][s,j]<-mean(dmvar[[i]][j,aug])
       }
       if (s==9){
-        meanvar[[i]][s,j]<-mean(var[[i]][j,sep])
+        meanvar[[i]][s,j]<-mean(dmvar[[i]][j,sep])
       }
       if (s==10){
-        meanvar[[i]][s,j]<-mean(var[[i]][j,oct])
+        meanvar[[i]][s,j]<-mean(dmvar[[i]][j,oct])
       }
       if (s==11){
-        meanvar[[i]][s,j]<-mean(var[[i]][j,nov])
+        meanvar[[i]][s,j]<-mean(dmvar[[i]][j,nov])
       }
       if (s==12){
-        meanvar[[i]][s,j]<-mean(var[[i]][j,dec])
+        meanvar[[i]][s,j]<-mean(dmvar[[i]][j,dec])
       }
     }
   }
+  #save(meanvar, file=paste0(filenm,"_monthly_means",".Rdata"))
 }
+
+
+# #function to get monthly averages of each daymet variable value:
+# DMmonthly<-function(var,filenm){
+#   #monthly breaks:
+#   jan<-c(doy[1:31])
+#   feb<-c(doy[32:59])
+#   mar<-c(doy[60:90])
+#   apr<-c(doy[91:120])
+#   may<-c(doy[121:151])
+#   jun<-c(doy[152:181])
+#   jul<-c(doy[182:212])
+#   aug<-c(doy[213:243])
+#   sep<-c(doy[244:273])
+#   oct<-c(doy[274:304])
+#   nov<-c(doy[305:334])
+#   dec<-c(doy[335:365])
+#   
+#   #loop for getting mean values per month
+#   for (i in nsites){
+#     meanvar[[i]]<-matrix(NA, nrow=12, ncol=length(metyears))
+#     for (j in 1:length(metyears)){
+#       for (s in 1:12){
+#         if (s==1){
+#           meanvar[[i]][s,j]<-mean(dmvar[[i]][j,jan])
+#         }
+#         if (s==2){
+#           meanvar[[i]][s,j]<-mean(dmvar[[i]][j,feb])
+#         }
+#         if (s==3){
+#           meanvar[[i]][s,j]<-mean(dmvar[[i]][j,mar])
+#         }
+#         if (s==4){
+#           meanvar[[i]][s,j]<-mean(dmvar[[i]][j,apr])
+#         }
+#         if (s==5){
+#           meanvar[[i]][s,j]<-mean(dmvar[[i]][j,may])
+#         }
+#         if (s==6){
+#           meanvar[[i]][s,j]<-mean(dmvar[[i]][j,jun])
+#         }
+#         if (s==7){
+#           meanvar[[i]][s,j]<-mean(dmvar[[i]][j,jul])
+#         }
+#         if (s==8){
+#           meanvar[[i]][s,j]<-mean(dmvar[[i]][j,aug])
+#         }
+#         if (s==9){
+#           meanvar[[i]][s,j]<-mean(dmvar[[i]][j,sep])
+#         }
+#         if (s==10){
+#           meanvar[[i]][s,j]<-mean(dmvar[[i]][j,oct])
+#         }
+#         if (s==11){
+#           meanvar[[i]][s,j]<-mean(dmvar[[i]][j,nov])
+#         }
+#         if (s==12){
+#           meanvar[[i]][s,j]<-mean(dmvar[[i]][j,dec])
+#         }
+#       }
+#     }
+#   }
+#   save(meanvar, file=paste0(filenm,"_monthly_means",".Rdata"))
+# }
+# 
+# DMmonthly("maxtemps","maxtemp")
+# 
+# #breaks for monthly data:
+# #monthly breaks:
+# jan<-c(doy[1:31])
+# feb<-c(doy[32:59])
+# mar<-c(doy[60:90])
+# apr<-c(doy[91:120])
+# may<-c(doy[121:151])
+# jun<-c(doy[152:181])
+# jul<-c(doy[182:212])
+# aug<-c(doy[213:243])
+# sep<-c(doy[244:273])
+# oct<-c(doy[274:304])
+# nov<-c(doy[305:334])
+# dec<-c(doy[335:365])
+# 
+# meanvar<-list()
+# for (i in nsites){
+#   meanvar[[i]]<-matrix(NA, nrow=12, ncol=length(metyears))
+#   for (j in 1:length(metyears)){
+#     for (s in 1:12){
+#       if (s==1){
+#         meanvar[[i]][s,j]<-mean(var[[i]][j,jan])
+#       }
+#       if (s==2){
+#         meanvar[[i]][s,j]<-mean(var[[i]][j,feb])
+#       }
+#       if (s==3){
+#         meanvar[[i]][s,j]<-mean(var[[i]][j,mar])
+#       }
+#       if (s==4){
+#         meanvar[[i]][s,j]<-mean(var[[i]][j,apr])
+#       }
+#       if (s==5){
+#         meanvar[[i]][s,j]<-mean(var[[i]][j,may])
+#       }
+#       if (s==6){
+#         meanvar[[i]][s,j]<-mean(var[[i]][j,jun])
+#       }
+#       if (s==7){
+#         meanvar[[i]][s,j]<-mean(var[[i]][j,jul])
+#       }
+#       if (s==8){
+#         meanvar[[i]][s,j]<-mean(var[[i]][j,aug])
+#       }
+#       if (s==9){
+#         meanvar[[i]][s,j]<-mean(var[[i]][j,sep])
+#       }
+#       if (s==10){
+#         meanvar[[i]][s,j]<-mean(var[[i]][j,oct])
+#       }
+#       if (s==11){
+#         meanvar[[i]][s,j]<-mean(var[[i]][j,nov])
+#       }
+#       if (s==12){
+#         meanvar[[i]][s,j]<-mean(var[[i]][j,dec])
+#       }
+#     }
+#   }
+# }
 
 #things I might need for loops if not in environment:
 # nsites=5000
@@ -153,12 +217,12 @@ for (i in nsites){
 # #save(maxtemp, file='maxtemp.RData')
 #^originally needed this, I guess. Doesn't seem to be necessary anymore?
 
-avgyrtemp<-matrix(NA, nrow=length(nsites), ncol=length(metyears))
-for (i in 1:length(nsites)){
-  for (j in 1:length(metyears)){
-    avgyrtemp[i,j]<-mean(maxtemp[[i]][j,])
-  }
-}
+# avgyrtemp<-matrix(NA, nrow=length(nsites), ncol=length(metyears))
+# for (i in 1:length(nsites)){
+#   for (j in 1:length(metyears)){
+#     avgyrtemp[i,j]<-mean(maxtemp[[i]][j,])
+#   }
+# }
 #^made a test loop for avg yearly var value
 
 # ##caluculating seasons temps:
@@ -251,15 +315,17 @@ load('vpd.RData')
 #var=precip
 var = vpd
 
-#remove the 366 day:
-varx<-list()
-for (i in nsites){
-  varx[[i]]<-var[[i]][1:26,1:365]
-}
-#replace old data:
-var<-varx
-rm(varx)
-#save(var, file='maxtemp.RData')
+# #remove the 366 day:
+# varx<-list()
+# for (i in nsites){
+#   varx[[i]]<-var[[i]][1:26,1:365]
+# }
+# #replace old data:
+# var<-varx
+# rm(varx)
+# #save(var, file='maxtemp.RData')
+###^ the removal of day 366 seems to be some sort of artifact, it doesn't
+###  need to be done in the current code and I am not 100% sure why.
 
 ###FOR AVERAGES, SEASONAL-----
 # avgyrvar<-matrix(NA, nrow=nsites, ncol=length(metyears))
