@@ -36,3 +36,109 @@ colnames(coords)<-c("lon","lat")
 nsites<-1:nrow(cond.scores)
 sites<-as.data.frame(cbind(nsites,coords))
 
+#start and end years of analysis:
+startyr <-1995
+endyr<-2000
+
+#loop for downloading daymet data
+dm <- list()
+for(i in nsites){
+  dm[[i]] <- daymetr::download_daymet(site = sites$nsites[i],
+                                      lat = sites$lat[i],
+                                      lon = sites$lon[i],
+                                      start = startyr,
+                                      end = endyr,
+                                      internal = TRUE)
+}
+
+#use any dm# to get day of year
+doy <- dm[[1]]$data$yday
+#get all years and unique years for later:
+for (i in nsites){
+  metyr=dm[[i]]$data$year
+  metyears=unique(metyr)
+}
+
+#function for grabbing daymet data:
+spongy_met<-function(var,filenm){
+  ##Loop for extracting daymet variable of interest (var):
+  dmvar<-list()
+  for (i in nsites){
+    metyr<-dm[[i]]$data$year
+    metyears<-unique(metyr)
+    dmvar[[i]]<-matrix(NA,length(metyears),365)
+    for(j in 1:nrow(dm[[i]]$data)){
+      dmvar[[i]][as.numeric(as.factor(metyr))[j], 
+                 dm[[i]]$data$yday[j]]=dm[[i]]$data[[var]][j]
+    }
+  }
+  #save data:
+  save(dmvar,file=paste0(filenm,".RData"))
+  
+  ##Section for computing monthly average variable values:
+  meanvar<-list()
+  #monthly breaks:
+  jan<-c(doy[1:31])
+  feb<-c(doy[32:59])
+  mar<-c(doy[60:90])
+  apr<-c(doy[91:120])
+  may<-c(doy[121:151])
+  jun<-c(doy[152:181])
+  jul<-c(doy[182:212])
+  aug<-c(doy[213:243])
+  sep<-c(doy[244:273])
+  oct<-c(doy[274:304])
+  nov<-c(doy[305:334])
+  dec<-c(doy[335:365])
+  
+  ##Loop for getting mean values per month
+  for (i in nsites){
+    meanvar[[i]]<-matrix(NA, nrow=12, ncol=length(metyears))
+    for (j in 1:length(metyears)){
+      for (s in 1:12){
+        if (s==1){
+          meanvar[[i]][s,j]<-mean(dmvar[[i]][j,jan])
+        }
+        if (s==2){
+          meanvar[[i]][s,j]<-mean(dmvar[[i]][j,feb])
+        }
+        if (s==3){
+          meanvar[[i]][s,j]<-mean(dmvar[[i]][j,mar])
+        }
+        if (s==4){
+          meanvar[[i]][s,j]<-mean(dmvar[[i]][j,apr])
+        }
+        if (s==5){
+          meanvar[[i]][s,j]<-mean(dmvar[[i]][j,may])
+        }
+        if (s==6){
+          meanvar[[i]][s,j]<-mean(dmvar[[i]][j,jun])
+        }
+        if (s==7){
+          meanvar[[i]][s,j]<-mean(dmvar[[i]][j,jul])
+        }
+        if (s==8){
+          meanvar[[i]][s,j]<-mean(dmvar[[i]][j,aug])
+        }
+        if (s==9){
+          meanvar[[i]][s,j]<-mean(dmvar[[i]][j,sep])
+        }
+        if (s==10){
+          meanvar[[i]][s,j]<-mean(dmvar[[i]][j,oct])
+        }
+        if (s==11){
+          meanvar[[i]][s,j]<-mean(dmvar[[i]][j,nov])
+        }
+        if (s==12){
+          meanvar[[i]][s,j]<-mean(dmvar[[i]][j,dec])
+        }
+      }
+    }
+    #save
+    save(meanvar, file=paste0(filenm,"_monthly_means",".Rdata"))
+  }
+}
+
+#choose your variable from the daymet list, add filename 
+#(as characters):
+spongy_met("tmax..deg.c.","maxtemp")
