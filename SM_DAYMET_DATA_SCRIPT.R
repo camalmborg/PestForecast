@@ -21,6 +21,7 @@ cond.scores<-read.csv(file)
 geo<-as.data.frame(cond.scores[,".geo"])
 
 #make lat and lon columns from .geo data:
+coords<-matrix(nrow=nrow(geo),ncol=2)
 for (i in 1:nrow(geo)){
   #longitudes:
   lon<-str_extract(geo[i,], "\\d+\\.*\\d*")
@@ -35,32 +36,54 @@ colnames(coords)<-c("lon","lat")
 #make dataset with condition scores and coordinates:
 nsites<-1:nrow(cond.scores)
 sites<-as.data.frame(cbind(nsites,coords))
+######these lines were for testing: ###
+sites<-sites[1:5,]
+nsites<-1:nrow(sites)
 
 #start and end years of analysis:
 startyr <-1995
 endyr<-2000
 
 #loop for downloading daymet data
-dm <- list()
-for(i in nsites){
-  dm[[i]] <- daymetr::download_daymet(site = sites$nsites[i],
-                                      lat = sites$lat[i],
-                                      lon = sites$lon[i],
-                                      start = startyr,
-                                      end = endyr,
-                                      internal = TRUE)
-}
-
-#use any dm# to get day of year
-doy <- dm[[1]]$data$yday
-#get all years and unique years for later:
-for (i in nsites){
-  metyr=dm[[i]]$data$year
-  metyears=unique(metyr)
-}
+# dm <- list()
+# for(i in nsites){
+#   dm[[i]] <- daymetr::download_daymet(site = sites$nsites[i],
+#                                       lat = sites$lat[i],
+#                                       lon = sites$lon[i],
+#                                       start = startyr,
+#                                       end = endyr,
+#                                       internal = TRUE)
+# }
+# 
+# #use any dm# to get day of year
+# doy <- dm[[1]]$data$yday
+# #get all years and unique years for later:
+# for (i in nsites){
+#   metyr=dm[[i]]$data$year
+#   metyears=unique(metyr)
+# }
 
 #function for grabbing daymet data:
 spongy_met<-function(var,filenm){
+  ##Section for downloading daymet for each site:
+  dm <- list()
+  for(i in nsites){
+    dm[[i]] <- daymetr::download_daymet(site = sites$nsites[i],
+                                        lat = sites$lat[i],
+                                        lon = sites$lon[i],
+                                        start = startyr,
+                                        end = endyr,
+                                        internal = TRUE)
+  }
+  
+  #use any dm# to get day of year
+  doy <- dm[[1]]$data$yday
+  #get all years and unique years for later:
+  for (i in nsites){
+    metyr=dm[[i]]$data$year
+    metyears=unique(metyr)
+  }
+  
   ##Loop for extracting daymet variable of interest (var):
   dmvar<-list()
   for (i in nsites){
@@ -142,3 +165,5 @@ spongy_met<-function(var,filenm){
 #choose your variable from the daymet list, add filename 
 #(as characters):
 spongy_met("tmax..deg.c.","maxtemp")
+
+load("maxtemp_monthly_means.RData")
