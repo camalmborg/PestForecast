@@ -17,54 +17,59 @@ file<-"2022_08_31_DATAGRAB/2022_08_31_5k_score_mean - 2022_08_31_5k_score_mean.c
 #condition score object:
 cond.scores<-read.csv(file)
 
-#geographic coordinates from GEE extract:
-geo<-as.data.frame(cond.scores[,".geo"])
-
-#make lat and lon columns from .geo data:
-coords<-matrix(nrow=nrow(geo),ncol=2)
-for (i in 1:nrow(geo)){
-  #longitudes:
-  lon<-str_extract(geo[i,], "\\d+\\.*\\d*")
-  coords[i,1]<-as.numeric(lon)*-1
-  
-  #latitudes:
-  extlon<-sub(lon,"",geo[i,])
-  coords[i,2]<-as.numeric(str_extract(extlon, "\\d+\\.*\\d*"))
-}
-colnames(coords)<-c("lon","lat")
-
-#make dataset with condition scores and coordinates:
-nsites<-1:nrow(cond.scores)
-sites<-as.data.frame(cbind(nsites,coords))
-######these lines were for testing: ###
-sites<-sites[1:5,]
-nsites<-1:nrow(sites)
-
-#start and end years of analysis:
-startyr <-1995
-endyr<-2000
-
-#loop for downloading daymet data
-# dm <- list()
-# for(i in nsites){
-#   dm[[i]] <- daymetr::download_daymet(site = sites$nsites[i],
-#                                       lat = sites$lat[i],
-#                                       lon = sites$lon[i],
-#                                       start = startyr,
-#                                       end = endyr,
-#                                       internal = TRUE)
-# }
+# #geographic coordinates from GEE extract:
+# geo<-as.data.frame(cond.scores[,".geo"])
 # 
-# #use any dm# to get day of year
-# doy <- dm[[1]]$data$yday
-# #get all years and unique years for later:
-# for (i in nsites){
-#   metyr=dm[[i]]$data$year
-#   metyears=unique(metyr)
+# #make lat and lon columns from .geo data:
+# coords<-matrix(nrow=nrow(geo),ncol=2)
+# for (i in 1:nrow(geo)){
+#   #longitudes:
+#   lon<-str_extract(geo[i,], "\\d+\\.*\\d*")
+#   coords[i,1]<-as.numeric(lon)*-1
+#   
+#   #latitudes:
+#   extlon<-sub(lon,"",geo[i,])
+#   coords[i,2]<-as.numeric(str_extract(extlon, "\\d+\\.*\\d*"))
 # }
+# colnames(coords)<-c("lon","lat")
+# 
+# #make dataset with condition scores and coordinates:
+# nsites<-1:nrow(cond.scores)
+# sites<-as.data.frame(cbind(nsites,coords))
+# ######these lines were for testing: ###
+# sites<-sites[1:5,]
+# nsites<-1:nrow(sites)
+
+# #start and end years of analysis:
+# startyr <-1995
+# endyr<-2000
 
 #function for grabbing daymet data:
-spongy_met<-function(var,filenm){
+spongy_met<-function(scores,startyr,endyr,var,filenm){
+  ##Section for getting sites from GEE dataset:
+  #geographic coordinates from GEE extract:
+  geo<-as.data.frame(scores[,".geo"])
+  
+  #make lat and lon columns from .geo data:
+  coords<-matrix(nrow=nrow(geo),ncol=2)
+  for (i in 1:nrow(geo)){
+    #longitudes:
+    lon<-str_extract(geo[i,], "\\d+\\.*\\d*")
+    coords[i,1]<-as.numeric(lon)*-1
+    
+    #latitudes:
+    extlon<-sub(lon,"",geo[i,])
+    coords[i,2]<-as.numeric(str_extract(extlon, "\\d+\\.*\\d*"))
+  }
+  colnames(coords)<-c("lon","lat")
+  
+  #make dataset with condition scores and coordinates:
+  nsites<-1:nrow(scores)
+  sites<-as.data.frame(cbind(nsites,coords))
+  ######these lines were for testing: ###
+  sites<-sites[1:5,]
+  nsites<-1:nrow(sites)
+  
   ##Section for downloading daymet for each site:
   dm <- list()
   for(i in nsites){
@@ -164,6 +169,6 @@ spongy_met<-function(var,filenm){
 
 #choose your variable from the daymet list, add filename 
 #(as characters):
-spongy_met("tmax..deg.c.","maxtemp")
+spongy_met(cond.scores,1995,2000,"tmax..deg.c.","maxtemp")
 
 load("maxtemp_monthly_means.RData")
