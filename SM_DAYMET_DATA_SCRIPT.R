@@ -177,10 +177,17 @@ spongy_met<-function(scores,startyr,endyr,var,filenm){
   return(dm.v)
 }
 
-#choose your variable from the daymet list, add filename 
+#choose your variable from the daymet list, add filename
+#variables:
+#c("tmax..deg.c.","tmin..deg.c.","prcp..mm.day.","vp..Pa.")
+#filenames:
+#c("maxtemp","mintemp","pcp","vpd")
+
 #(as characters):
 #testing, testing, is this thing on?
-dmvars<-spongy_met(cond.scores,2020,2021,c("tmax..deg.c.","tmin..deg.c."),c("maxtemp","mintemp"))
+dmvars<-spongy_met(cond.scores,2020,2021,
+                   c("tmax..deg.c.","tmin..deg.c.","prcp..mm.day.","vp..Pa."),
+                   c("maxtemp","mintemp","pcp","vpd"))
 
 
 #load"maxtemp_monthly_means.RData")
