@@ -1,7 +1,7 @@
 #This code is for downloading Daymet data for forecasts. Process:
 #1) Download Daymet data for each site
 #2) Extract variables
-#3) Get monthly values
+#3) Get monthly values (rows) for each year (column) within list of sites
 #4) 
 
 
@@ -139,8 +139,30 @@ spongy_met<-function(scores,startyr,endyr,var,filenm){
       }
     }
   }
-  #save meanvar data
+  #save meanvar data:
   save(meanvar, file=paste0(filenm[k],"_monthly_means",".Rdata"))
+  
+  ### Getting mean values into 1 matrix:
+  #number of years:
+  alltime=c(1,1:(endyr-startyr)+1)
+  #months:
+  mons=1:12
+  ## Loop for extracting monthly values
+  x.p <- matrix(data=NA, nrow=nrow(sites))
+  for (p in alltime){
+    x <- matrix(data = NA, nrow=length(nsites), ncol=length(mons))
+    for (m in 1:length(mons)){
+      for (s in nsites){
+        #months become columns, rows become sites:
+        x[s,m] <- meanvar[[s]][mons[m],alltime[p]]
+      }
+    }
+    x.p <- cbind(x.p,x)
+    rm(x) #remove last loop
+  }
+  #remove x.p NA column, remove x.p extra variable
+  envar <- x.p[,2:((length(ms)*length(nyears))+1)] #remove NA column
+  rm(x.p)
   }
 }
 
