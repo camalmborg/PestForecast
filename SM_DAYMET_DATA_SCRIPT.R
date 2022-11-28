@@ -169,7 +169,7 @@ spongy_met<-function(scores,startyr,endyr,var,filenm){
   rm(x.p)
   
   #add to daymet variable:
-  dm.v[[k]]<-envar
+  dm.v[[filenm[k]]]<-envar
   rm(envar)
   }
   
