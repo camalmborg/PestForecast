@@ -64,6 +64,9 @@ spongy_met<-function(scores,startyr,endyr,var,filenm){
     metyears=unique(metyr)
   }
   
+  #make empty matrix for all daymet variable data:
+  dm.v<-matrix(data=NA, nrow=nrow(sites))
+  
   ##Loop for extracting daymet variables of interest (var):
   for (k in 1:length(var)){
     dmvar<-list()
@@ -161,15 +164,23 @@ spongy_met<-function(scores,startyr,endyr,var,filenm){
     rm(x) #remove last loop
   }
   #remove x.p NA column, remove x.p extra variable
-  envar <- x.p[,2:((length(ms)*length(nyears))+1)] #remove NA column
+  envar <- x.p[,2:((length(mons)*length(alltime))+1)] #remove NA column
   rm(x.p)
+  
+  #add to daymet variable:
+  dm.v<-cbind(dm.v,envar)
+  rm(envar)
   }
+  
+  #return(envar)
+  return(dm.v[,2:ncol(dm.v)])
 }
 
 #choose your variable from the daymet list, add filename 
 #(as characters):
 #testing, testing, is this thing on?
-spongy_met(cond.scores,1995,1998,c("tmax..deg.c.","tmin..deg.c."),c("maxtemp","mintemp"))
+dmvars<-spongy_met(cond.scores,1995,1998,c("tmax..deg.c.","tmin..deg.c."),c("maxtemp","mintemp"))
+
 
 #load"maxtemp_monthly_means.RData")
 #check if it works....
