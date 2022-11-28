@@ -32,12 +32,42 @@ nsites = 1:5000
 nyears = 1:26
 ms = 1:12
 
-x.p <- matrix(data=NA, nrow=5000)
-for (p in 1:length(alltime)){
-  x <- matrix(data = NA, nrow=5000, ncol=length(ms))
-  for (m in 1:length(ms)){
+
+#### 11/28/22 coding sesh----
+#geographic coordinates from GEE extract:
+geo<-as.data.frame(cond.scores[,".geo"])
+
+#make lat and lon columns from .geo data:
+coords<-matrix(nrow=nrow(geo),ncol=2)
+for (i in 1:nrow(geo)){
+  #longitudes:
+  lon<-str_extract(geo[i,], "\\d+\\.*\\d*")
+  coords[i,1]<-as.numeric(lon)*-1
+  
+  #latitudes:
+  extlon<-sub(lon,"",geo[i,])
+  coords[i,2]<-as.numeric(str_extract(extlon, "\\d+\\.*\\d*"))
+}
+colnames(coords)<-c("lon","lat")
+
+#make dataset with condition scores and coordinates:
+nsites<-1:nrow(cond.scores)
+sites<-as.data.frame(cbind(nsites,coords))
+######these lines were for testing: ###
+sites<-sites[1:5,]
+nsites<-1:nrow(sites)
+
+startyr<-1995
+endyr<-1998
+alltime=c(1,1:(endyr-startyr)+1)
+mons=1:12
+
+x.p <- matrix(data=NA, nrow=nrow(sites))
+for (p in alltime){
+  x <- matrix(data = NA, nrow=length(nsites), ncol=length(mons))
+  for (m in 1:length(mons)){
     for (s in nsites){
-      x[s,m] <- meanvar[[s]][ms[m],alltime[p]]
+      x[s,m] <- meanvar[[s]][mons[m],alltime[p]]
     }
   }
   x.p <- cbind(x.p,x)
