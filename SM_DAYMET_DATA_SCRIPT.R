@@ -65,7 +65,8 @@ spongy_met<-function(scores,startyr,endyr,var,filenm){
   }
   
   #make empty matrix for all daymet variable data:
-  dm.v<-matrix(data=NA, nrow=nrow(sites))
+  #dm.v<-matrix(data=NA, nrow=nrow(sites))
+  dm.v<-list()
   
   ##Loop for extracting daymet variables of interest (var):
   for (k in 1:length(var)){
@@ -80,7 +81,7 @@ spongy_met<-function(scores,startyr,endyr,var,filenm){
       }
     }
   #save data:
-  save(dmvar,file=paste0(filenm[k],".RData"))
+  #save(dmvar,file=paste0(filenm[k],".RData"))
   
   ##Section for computing monthly average variable values:
   meanvar<-list()
@@ -168,23 +169,23 @@ spongy_met<-function(scores,startyr,endyr,var,filenm){
   rm(x.p)
   
   #add to daymet variable:
-  dm.v<-cbind(dm.v,envar)
+  dm.v[[k]]<-envar
   rm(envar)
   }
   
   #return(envar)
-  return(dm.v[,2:ncol(dm.v)])
+  return(dm.v)
 }
 
 #choose your variable from the daymet list, add filename 
 #(as characters):
 #testing, testing, is this thing on?
-dmvars<-spongy_met(cond.scores,1995,1998,c("tmax..deg.c.","tmin..deg.c."),c("maxtemp","mintemp"))
+dmvars<-spongy_met(cond.scores,2020,2021,c("tmax..deg.c.","tmin..deg.c."),c("maxtemp","mintemp"))
 
 
 #load"maxtemp_monthly_means.RData")
 #check if it works....
-maxtemp <- miceadds::load.Rdata2("maxtemp_monthly_means.RData")
-mintemp <- miceadds::load.Rdata2("mintemp_monthly_means.RData")
+#maxtemp <- miceadds::load.Rdata2("maxtemp_monthly_means.RData")
+#mintemp <- miceadds::load.Rdata2("mintemp_monthly_means.RData")
 
 # it works! Charlotte is a beautiful genius!
