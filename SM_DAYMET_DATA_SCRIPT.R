@@ -193,15 +193,26 @@ mons=1:12
 
 #quick function for making sequences to extract 
 #monthly values based on # of years of daymet data downloaded:
-seqfx<-function(x,yrs){
-  seq(x,yrs*12,by=12) #x = month (1=jan, 2=feb, etc.)
+dm_me<-function(x,yrs,month){
+  mcols<-vector()
+  for (i in 1:length(month)){
+    colpyr<-c(seq(month[i],yrs*12,by=12))
+    mcols<-c(mcols,colpyr)
+  }
+  cols<-sort(mcols) #x = month (1=jan, 2=feb, etc.)
+  dmvar<-x[,cols]
+  return(dmvar)
 }
+
+spongyvars<-dm_me(dmvars$maxtemp,2,c(1,6))
 
 test<-dmvars$maxtemp
 winter<-sort(c(seqfx(12,2),seqfx(1,2),seqfx(2,2)))
 wintertest<-test[,winter]
-
+month<-c(1,2)
+yrs<-2
 #### Getting variables for the forecast:
+
 
 ###WHEN RUNNING FOR REAL BE SURE TO REMOVE 5 SITE SUBSET^^^-----
 
