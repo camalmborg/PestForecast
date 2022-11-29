@@ -183,16 +183,8 @@ dmvars<-spongy_met(cond.scores,2020,2021,
                    c("maxtemp","mintemp","pcp","vpd"))
 
 #### Getting seasonal variable values for analyses:
-#objects for extracting necessary variable values:
-#start and end years of analysis:
-startyr<-2019
-endyr<-2020
-#number of years and 12-months:
-alltime=c(1,1:(endyr-startyr)+1)
-mons=1:12
-
-#quick function for making sequences to extract 
-#monthly values based on # of years of daymet data downloaded:
+## Quick function for making sequences to extract 
+## monthly values based on # of years of daymet data downloaded:
 dm_me<-function(x,yrs,month){
   mcols<-vector()
   for (i in 1:length(month)){
@@ -204,13 +196,9 @@ dm_me<-function(x,yrs,month){
   return(dmvar)
 }
 
-spongyvars<-dm_me(dmvars$maxtemp,2,c(1,6))
+spongyvars<-cbind(dm_me(dmvars$maxtemp,2,c(1,6)),
+                  dm_me(dmvars$pcp,2,c(1,6)))
 
-test<-dmvars$maxtemp
-winter<-sort(c(seqfx(12,2),seqfx(1,2),seqfx(2,2)))
-wintertest<-test[,winter]
-month<-c(1,2)
-yrs<-2
 #### Getting variables for the forecast:
 
 
