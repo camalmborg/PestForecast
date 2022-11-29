@@ -2,7 +2,6 @@
 #1) Download Daymet data for each site
 #2) Extract variables
 #3) Get monthly values (rows) for each year (column) within list of sites
-#4) 
 
 
 #### Load Libraries:
@@ -19,7 +18,7 @@ file<-"2022_08_31_DATAGRAB/2022_08_31_5k_score_mean - 2022_08_31_5k_score_mean.c
 cond.scores<-read.csv(file)
 
 
-#### Function for grabbing daymet data:
+#### Function for grabbing daymet data:-----
 spongy_met<-function(scores,startyr,endyr,var,filenm){
   ##Section for getting sites from GEE dataset:
   #geographic coordinates from GEE extract:
@@ -144,7 +143,7 @@ spongy_met<-function(scores,startyr,endyr,var,filenm){
     }
   }
   #save meanvar data:
-  save(meanvar, file=paste0(filenm[k],"_monthly_means",".Rdata"))
+  #save(meanvar, file=paste0(filenm[k],"_monthly_means",".Rdata"))
   
   ### Getting mean values into 1 matrix:
   #number of years:
@@ -172,16 +171,10 @@ spongy_met<-function(scores,startyr,endyr,var,filenm){
   dm.v[[filenm[k]]]<-envar
   rm(envar)
   }
-  
+
   #return(envar)
   return(dm.v)
 }
-
-#choose your variable from the daymet list, add filename
-#variables:
-#c("tmax..deg.c.","tmin..deg.c.","prcp..mm.day.","vp..Pa.")
-#filenames:
-#c("maxtemp","mintemp","pcp","vpd")
 
 #(as characters):
 #testing, testing, is this thing on?
@@ -189,6 +182,34 @@ dmvars<-spongy_met(cond.scores,2020,2021,
                    c("tmax..deg.c.","tmin..deg.c.","prcp..mm.day.","vp..Pa."),
                    c("maxtemp","mintemp","pcp","vpd"))
 
+#### Getting seasonal variable values for analyses:
+#objects for extracting necessary variable values:
+#start and end years of analysis:
+startyr<-2019
+endyr<-2020
+#number of years and 12-months:
+alltime=c(1,1:(endyr-startyr)+1)
+mons=1:12
+
+#quick function for making sequences to extract 
+#monthly values based on # of years of daymet data downloaded:
+seqfx<-function(x,yrs){
+  seq(x,yrs*12,by=12) #x = month (1=jan, 2=feb, etc.)
+}
+
+test<-dmvars$maxtemp
+winter<-sort(c(seqfx(12,2),seqfx(1,2),seqfx(2,2)))
+wintertest<-test[,winter]
+
+#### Getting variables for the forecast:
+
+###WHEN RUNNING FOR REAL BE SURE TO REMOVE 5 SITE SUBSET^^^-----
+
+#choose your variable from the daymet list, add filename
+#variables:
+#c("tmax..deg.c.","tmin..deg.c.","prcp..mm.day.","vp..Pa.")
+#filenames:
+#c("maxtemp","mintemp","pcp","vpd")
 
 #load"maxtemp_monthly_means.RData")
 #check if it works....
