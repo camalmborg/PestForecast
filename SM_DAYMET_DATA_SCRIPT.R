@@ -182,7 +182,7 @@ dmvars<-spongy_met(cond.scores,2020,2021,
                    c("tmax..deg.c.","tmin..deg.c.","prcp..mm.day.","vp..Pa."),
                    c("maxtemp","mintemp","pcp","vpd"))
 
-#### Getting seasonal variable values for analyses:
+#### Getting seasonal variable values for analyses:-----
 ## Quick function for making sequences to extract 
 ## monthly values based on # of years of daymet data downloaded:
 dm_me<-function(x,yrs,month){
