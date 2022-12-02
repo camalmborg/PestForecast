@@ -91,7 +91,6 @@ colnum<-tcg.recov[,'colnum']
 #
 #
 ### Make testing windows for daymet data #####
-
 #quick function for making sequences to extract monthly values:
 seqfx<-function(x){
   seq(x,312,by=12) #x = month (1=jan, 2=feb, etc.)
