@@ -8,7 +8,7 @@
 library(daymetr)
 library(tidyr)
 library(stringr)
-library(miceadds)
+#library(miceadds)
 
 
 #### Load condition score .csv from GEE extract:
@@ -198,6 +198,14 @@ dm_me<-function(x,yrs,month){
 
 spongyvars<-cbind(dm_me(dmvars$maxtemp,2,c(1,6)),
                   dm_me(dmvars$pcp,2,c(1,6)))
+
+# dm_me is used to create a data frame that includes daymet variables
+# of interest - arguments are:
+#1) dmvars$... <- the variable you want to extract
+#2) the number of years in your analysis (typically the previous 2 years)
+#3) c(....) <- the months of the year you want the values (eg. 1=jan, 2=feb)
+# you cbind these and it makes a dataframe with these values where columns
+# are the monthly daymet variables and rows are sites
 
 #### Getting variables for the forecast:
 
