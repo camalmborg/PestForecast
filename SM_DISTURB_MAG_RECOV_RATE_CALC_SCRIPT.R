@@ -21,7 +21,14 @@ spongy_mpr<-function(tcg,distyr){
                      grep(as.character(distyr-1),colnames(tcgjune))]
   steadys<-as.matrix(apply(prevyrs[,1:3],1,mean,na.rm=T))
   
-  #
+  #identify missing data columns:
+  NA16<-which(is.na(tcgjune[,grep(as.character(distyr),colnames(tcgjune))]))
+  NA17<-which(is.na(tcgjune[,grep(as.character(distyr+1),colnames(tcgjune))]))
+  missing<-intersect(NA16,NA17)
+  tcgjune<-tcgjune[-missing,]
+  steadys<-steadys[-missing]
+  
+  
 }
 
 
