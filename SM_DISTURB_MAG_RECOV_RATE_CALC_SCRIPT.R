@@ -98,3 +98,5 @@ spongy_mpr<-function(tcg,distyr){
 }
 
 testfx<-spongy_mpr(tcg.values,2016)
+
+#once again I am a beautiful genius!!!!
