@@ -25,9 +25,9 @@ spongy_mpr<-function(tcg,distyr){
   steadys<-as.matrix(apply(prevyrs[,1:3],1,mean,na.rm=T))
   
   #identify missing data columns:
-  NA16<-which(is.na(tcgjune[,grep(as.character(distyr),colnames(tcgjune))]))
-  NA17<-which(is.na(tcgjune[,grep(as.character(distyr+1),colnames(tcgjune))]))
-  missing<-intersect(NA16,NA17)
+  NAy1<-which(is.na(tcgjune[,grep(as.character(distyr),colnames(tcgjune))]))
+  NAy2<-which(is.na(tcgjune[,grep(as.character(distyr+1),colnames(tcgjune))]))
+  missing<-intersect(NAy1,NAy2)
   tcgjune<-tcgjune[-missing,]
   steadys<-steadys[-missing]
   
@@ -66,10 +66,34 @@ spongy_mpr<-function(tcg,distyr){
   #calculate recovery time:
   recov.time<-mags/recov.rate
   
-  #combine data for regressions:
+  #combine data into dataframe:
   tcg.mx<-cbind(tcg[-missing,1],steadys,colnum,mins,mags,recov.rate,recov.time)
   tcg.m<-as.data.frame(tcg.mx)
   colnames(tcg.m)<-c("id","steady","colnum","mins","mags","recov.rate","recov.time")
+  #return(tcg.m)
+  
+  dmpr<-cbind(tcg.m,tcgjune)
+  #LOOP FOR DISTURBANCE PROBABILITY:
+  distprob<-matrix(NA,nrow=nrow(dmpr),ncol=2)
+  d = quantile(dmpr[,grep(as.character(distyr-5),colnames(dmpr)):
+                       grep(as.character(distyr-1),colnames(dmpr))],
+               c(0.01),na.rm=T) #selecting dist sites 1% quant in prev 3 yr
+  #determine if disturbance (cond score < d threshold) occurs
+  for (i in 1:nrow(dmpr)){
+    if (dmpr[i,]$colnum == min(dmpr$colnum) & dmpr[i,grep(as.character(distyr),colnames(dmpr))] <= d){
+      distprob[i,1]<- 1
+    } else if (dmpr[i,]$colnum == max(dmpr$colnum) & dmpr[i,grep(as.character(distyr+1),colnames(dmpr))] <= d){
+      distprob[i,2]<- 1
+    } else {
+      distprob[i,] <- 0
+    }
+    distprob[is.na(distprob)] <- 0
+  }
+  
+  #add disturbance probabilities to dataframe:
+  tcg.m$dpy1<-distprob[,1]
+  tcg.m$dpy2<-distprob[,2]
+  
   return(tcg.m)
 }
 
