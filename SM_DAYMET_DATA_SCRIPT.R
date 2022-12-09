@@ -41,8 +41,8 @@ spongy_met<-function(scores,startyr,endyr,var,filenm){
   nsites<-1:nrow(scores)
   sites<-as.data.frame(cbind(nsites,coords))
   ######these lines were for testing: ###
-  sites<-sites[1:5,]
-  nsites<-1:nrow(sites)
+  #sites<-sites[1:5,]
+  #nsites<-1:nrow(sites)
   
   ##Section for downloading daymet for each site:
   dm <- list()
@@ -178,7 +178,7 @@ spongy_met<-function(scores,startyr,endyr,var,filenm){
 
 #(as characters):
 #testing, testing, is this thing on?
-dmvars<-spongy_met(cond.scores,2020,2021,
+dmvars<-spongy_met(cond.scores,2011,2017,
                    c("tmax..deg.c.","tmin..deg.c.","prcp..mm.day.","vp..Pa."),
                    c("maxtemp","mintemp","pcp","vpd"))
 
