@@ -14,11 +14,12 @@ tcg.values<-read.csv(file)
 spongy_mpr<-function(tcg,distyr){
   #get just the tcg values from data frame:
   tcgs<-tcg[,c(grep("^X",colnames(tcg)))]
+  sitenum<-as.matrix(1:nrow(tcgs))
   
   #first get just june values:
   junes<-seq(2,130,by=5)
   tcgjune<-as.matrix(tcgs[,junes])
-  
+
   #identify steady state (mean tcg previous 3 years):
   prevyrs<-tcgjune[,grep(as.character(distyr-3),colnames(tcgjune)):
                      grep(as.character(distyr-1),colnames(tcgjune))]
@@ -67,9 +68,9 @@ spongy_mpr<-function(tcg,distyr){
   recov.time<-mags/recov.rate
   
   #combine data into dataframe:
-  tcg.mx<-cbind(tcg[-missing,1],steadys,colnum,mins,mags,recov.rate,recov.time)
+  tcg.mx<-cbind(tcg[-missing,1],sitenum[-missing],steadys,colnum,mins,mags,recov.rate,recov.time)
   tcg.m<-as.data.frame(tcg.mx)
-  colnames(tcg.m)<-c("id","steady","colnum","mins","mags","recov.rate","recov.time")
+  colnames(tcg.m)<-c("id","sitenum","steady","colnum","mins","mags","recov.rate","recov.time")
   #return(tcg.m)
   
   dmpr<-cbind(tcg.m,tcgjune)
