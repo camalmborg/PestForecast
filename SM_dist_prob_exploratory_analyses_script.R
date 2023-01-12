@@ -2,6 +2,9 @@
 
 #load condition scores (finding where prob of dist = 0,1)
 cond.scores.mo<-read.csv("2020_07_10_sample_score_mean_MONTHLY.csv")
+
+file<-"2022_08_31_DATAGRAB/2022_12_7_sample_tcg_mean_5k.csv"
+cond.scores.mo<-read.csv(file)
 condscores<-cond.scores.mo[,2:131]
 jjunes<-c(102,107,112)
 junes<-seq(2,length(condscores[1,]),by=5)
