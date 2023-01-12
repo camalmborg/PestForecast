@@ -76,12 +76,13 @@ spongy_mpr<-function(tcg,cs,distyr){
   
   ### Condition scores for disturbance probabilties
   csj<-cs[,grep("[:.:]06",colnames(cs))]
+  csj<-csj[-missing,]
   dmpr<-cbind(tcg.m,csj)
   #LOOP FOR DISTURBANCE PROBABILITY:
   distprob<-matrix(NA,nrow=nrow(dmpr),ncol=2)
   d = quantile(dmpr[,grep(as.character(distyr-5),colnames(dmpr)):
                        grep(as.character(distyr-1),colnames(dmpr))],
-               c(0.01),na.rm=T) #selecting dist sites 1% quant in prev 3 yr
+               c(0.01),na.rm=T) #selecting dist sites 1% quant in prev 5 yr
   #determine if disturbance (cond score < d threshold) occurs
   for (i in 1:nrow(dmpr)){
     if (dmpr[i,]$colnum == min(dmpr$colnum) & dmpr[i,grep(as.character(distyr),colnames(dmpr))] <= d){
