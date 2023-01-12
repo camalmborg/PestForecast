@@ -4,14 +4,15 @@
 #file<-"2022_08_31_DATAGRAB/2022_08_31_5k_score_mean - 2022_08_31_5k_score_mean.csv"
 #file<-"2022_08_31_DATAGRAB/2022_08_31_5k_tcg_mean - 2022_08_31_5k_tcg_mean.csv"
 file<-"2022_08_31_DATAGRAB/2022_12_7_sample_tcg_mean_5k.csv"
+cfile<-"2022_08_31_DATAGRAB/2022_12_7_sample_score_mean_5k.csv"
 
-#condition score object:
-#cond.scores<-read.csv(file)
+#tcg and condition score objects:
 tcg.values<-read.csv(file)
 #tcgs<-tcg.values[,c(grep("^X",colnames(tcg.values)))] #grab with "X1996 eg) for all tcg value columns
+cond.scores<-read.csv(cfile)
 
 #### Function for computing disturbance magnitudes, probabilities, and recovery rates:
-spongy_mpr<-function(tcg,distyr){
+spongy_mpr<-function(tcg,cs,distyr){
   #get just the tcg values from data frame:
   tcgs<-tcg[,c(grep("^X",colnames(tcg)))]
   sitenum<-as.matrix(1:nrow(tcgs))
@@ -73,7 +74,9 @@ spongy_mpr<-function(tcg,distyr){
   colnames(tcg.m)<-c("id","sitenum","steady","colnum","mins","mags","recov.rate","recov.time")
   #return(tcg.m)
   
-  dmpr<-cbind(tcg.m,tcgjune)
+  ### Condition scores for disturbance probabilties
+  csj<-cs[,grep("[:.:]06",colnames(cs))]
+  dmpr<-cbind(tcg.m,csj)
   #LOOP FOR DISTURBANCE PROBABILITY:
   distprob<-matrix(NA,nrow=nrow(dmpr),ncol=2)
   d = quantile(dmpr[,grep(as.character(distyr-5),colnames(dmpr)):
@@ -98,6 +101,6 @@ spongy_mpr<-function(tcg,distyr){
   return(tcg.m)
 }
 
-testfx<-spongy_mpr(tcg.values,2016)
+testfx<-spongy_mpr(tcg.values,cond.scores,2016)
 
 #once again I am a beautiful genius!!!!
