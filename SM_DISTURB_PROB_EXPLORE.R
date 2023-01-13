@@ -8,7 +8,7 @@ library(mgcv)
 cfile<-"2022_08_31_DATAGRAB/2022_12_7_sample_score_mean_5k.csv"
 condscores<-read.csv(cfile)
 
-spongy_ROC <- function(mpr,dmrdat,yr,coln,){
+spongy_ROC <- function(mpr,dmrdat,yr,coln){
   #make empty matrix:
   rocs <- matrix(NA,nrow=ncol(dmvars[[1]]),ncol=length(dmvars))
   
@@ -27,8 +27,14 @@ spongy_ROC <- function(mpr,dmrdat,yr,coln,){
     vardat <- x[x$cn==coln,]
   }
   
-  
-  
+  #loop for filling in R2 table:  
+  for (j in 1:ncol(dmvariable)){
+    var.gam<-gam(vardat[,1]~s(vardat[,j+1]), data=vardat, family="binomial")
+    var.roc<-roc(vardat[,1],var.gam$fitted.values)
+    rocs[j,i] <-var.roc$auc
+  }
+return(rocs)
+
 }
 
 
