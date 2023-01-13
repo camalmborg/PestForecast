@@ -8,7 +8,28 @@ library(mgcv)
 cfile<-"2022_08_31_DATAGRAB/2022_12_7_sample_score_mean_5k.csv"
 condscores<-read.csv(cfile)
 
+spongy_ROC <- function(mpr,dmrdat,yr,coln,){
+  #make empty matrix:
+  rocs <- matrix(NA,nrow=ncol(dmvars[[1]]),ncol=length(dmvars))
+  
+  #grab just disturbance probability columns:
+  dists<-mpr[,grep("^dp",colnames(mpr))]
 
+  #loop over all members of dmvars list:
+  for (i in 1:length(dmvars)){
+    #first extract the list you want:
+    dmvariable <- as.data.frame(dmvars[[i]][as.numeric(dmrdat$sitenum),])
+    #grab column number:
+    cn <- as.matrix(as.numeric(dmrdat$colnum))
+    #grab exploratory response  of choice:
+    y <- as.matrix(as.numeric(dists[,yr]))
+    x <- as.data.frame(cbind(y,cn,dmvariable))
+    vardat <- x[x$cn==coln,]
+  }
+  
+  
+  
+}
 
 
 ############ ARCHIVE:
@@ -17,4 +38,5 @@ condscores<-read.csv(cfile)
 #   
 # }
 
-junetest<-condscores[,grep("[:.:]06",colnames(condscores))]
+#junetest<-condscores[,grep("[:.:]06",colnames(condscores))]
+#yeartest<-testfx[,grep("^dp",colnames(testfx))]
