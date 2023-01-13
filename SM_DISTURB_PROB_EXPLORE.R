@@ -8,12 +8,12 @@ library(mgcv)
 cfile<-"2022_08_31_DATAGRAB/2022_12_7_sample_score_mean_5k.csv"
 condscores<-read.csv(cfile)
 
-spongy_ROC <- function(mpr,dmrdat,yr,coln){
+spongy_ROC <- function(dmvars,dmrdat,yr,coln){
   #make empty matrix:
   rocs <- matrix(NA,nrow=ncol(dmvars[[1]]),ncol=length(dmvars))
   
   #grab just disturbance probability columns:
-  dists<-mpr[,grep("^dp",colnames(mpr))]
+  dists<-dmrdat[,grep("^dp",colnames(dmrdat))]
 
   #loop over all members of dmvars list:
   for (i in 1:length(dmvars)){
@@ -25,15 +25,16 @@ spongy_ROC <- function(mpr,dmrdat,yr,coln){
     y <- as.matrix(as.numeric(dists[,yr]))
     x <- as.data.frame(cbind(y,cn,dmvariable))
     vardat <- x[x$cn==coln,]
+    
+    #loop for filling in R2 table:  
+    for (j in 1:ncol(dmvariable)){
+      var.gam<-gam(vardat[,1]~s(vardat[,j+2]), data=vardat, family="binomial")
+      var.roc<-roc(vardat[,1],var.gam$fitted.values)
+      rocs[j,i] <-var.roc$auc
+    }
   }
-  
-  #loop for filling in R2 table:  
-  for (j in 1:ncol(dmvariable)){
-    var.gam<-gam(vardat[,1]~s(vardat[,j+1]), data=vardat, family="binomial")
-    var.roc<-roc(vardat[,1],var.gam$fitted.values)
-    rocs[j,i] <-var.roc$auc
-  }
-return(rocs)
+  #return table of AUCs
+  return(rocs)
 
 }
 
