@@ -65,13 +65,16 @@ spongy_mpr<-function(tcg,cs,distyr){
   #calculate disturbance magnitude:
   mags<-steadys-mins
   
+  #calculate disturbance magnitude/original tcg:
+  magsdiv<-mags/steadys
+  
   #calculate recovery time:
   recov.time<-mags/recov.rate
   
   #combine data into dataframe:
-  tcg.mx<-cbind(tcg[-missing,1],sitenum[-missing],steadys,colnum,mins,mags,recov.rate,recov.time)
+  tcg.mx<-cbind(tcg[-missing,1],sitenum[-missing],steadys,colnum,mins,mags,masgdiv,recov.rate,recov.time)
   tcg.m<-as.data.frame(tcg.mx)
-  colnames(tcg.m)<-c("id","sitenum","steady","colnum","mins","mags","recov.rate","recov.time")
+  colnames(tcg.m)<-c("id","sitenum","steady","colnum","mins","mags","magsdiv","recov.rate","recov.time")
   #return(tcg.m)
   
   ### Condition scores for disturbance probabilties
