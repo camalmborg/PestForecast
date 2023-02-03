@@ -3,8 +3,10 @@
 ####load libraries:
 library(tidyr)
 library(stringr)
-library(leafletR) #cannot download on this version of R???
+library(leafletR) #cannot download on this version of R??? but do have "leaflet"...
 library(rgdal)
+library(reticulate)
+library(rgee)
 
 ####load data:
 #Load condition score .csv from GEE extract:
