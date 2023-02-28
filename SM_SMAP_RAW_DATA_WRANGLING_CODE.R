@@ -3,3 +3,7 @@
 #data and so I'm going rogue to get my initial analyses done.
 
 #load libraries
+
+#load data
+file <- "SMAP_Data/SMAP_04_08_2015_2017.txt"
+SMAPdata <- read.table(file, header=T, sep=",")
