@@ -5,7 +5,7 @@
 #load libraries
 
 #load data
-file <- "SMAP_Data/SMAP_04_08_2015_2017.txt"
+file <- "SMAP_Data/SMAP_04_08_2015_2017_try3.txt"
 SMAP.GEE <- read.table(file, header=T, sep=",")
 #load lat long data from sampling points:
 sitesfile <- "2022_03_22_5000sites_lat_long_points_for_GEE_asset.csv"
