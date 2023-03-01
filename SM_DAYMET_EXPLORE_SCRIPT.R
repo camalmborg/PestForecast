@@ -31,4 +31,11 @@ dm_explore<-function(dmvars,dmrdat,dmr,coln){
   return(r2s)
 }
 
-testing <- dm_explore(dmvars,testfx,"magsdiv",22)
+testing <- dm_explore(dmvars,testfx,"mags",22)
+
+
+##---------------------------------------------------------------------####
+###Multivariate Analyses:
+
+
+
