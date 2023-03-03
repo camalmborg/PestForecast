@@ -3,6 +3,7 @@
 #data and so I'm going rogue to get my initial analyses done.
 
 #load libraries
+library(mgcv)
 
 #load data
 file <- "SMAP_Data/SMAP_04_08_2015_2017_try3.txt"
@@ -22,9 +23,34 @@ SMAPdata <- as.data.frame(cbind(SMAP.GEE[,"longitude"],
                                 SMAP.GEE[,"latitude"],
                                 SMAPvalues))
 
+
+#how many sites:
 nsites=5000
+#loop for organizing SMAP data into monthly columns 2015-2017:
 SMAPorg <- matrix(data=NA, nrow=nsites, ncol=15) #15= 3 years X 5 months
 for (i in 1:15){
   rows<-seq(i, nrow(SMAPdata), by=15)
   SMAPorg[,i]<-SMAPdata[rows,3]
 }
+
+
+####matching SMAP lat/lon to mags lat/lon
+#make data frame with coords and mags:
+magsdat <- as.data.frame(cbind(coords[-missing,],mags))
+#magscoords <- magsdat[order(magsdat[,1]),]
+
+sortcoords <- as.data.frame(coords[order(coords[,1]),]) #with full 5000
+
+#remove duplicate values in SMAP lat/lon:
+SMAPlonlat <- as.data.frame(unique(SMAPdata[,1:2]))
+
+#make data frame with SMAP coords and SMAP data:
+SMAPall <- as.data.frame(cbind(SMAPlonlat,SMAPorg))
+SMAPcoords <- SMAPall[order(SMAPall[,1]),]
+SMAPsmap <- cbind(sortcoords$site_id,SMAPcoords)
+sortSMAP <- SMAPsmap[order(SMAPsmap[,1]),]
+#removing correct missing values:
+sortSMAP <- sortSMAP[-missing,]
+
+#make new data frame:
+SMAPmags <- cbind(magsdat, sortSMAP[,4:ncol(sortSMAP)])
