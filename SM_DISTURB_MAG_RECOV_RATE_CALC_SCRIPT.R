@@ -3,9 +3,9 @@
 #### Load condition score .csv from GEE extract:
 #file<-"2022_08_31_DATAGRAB/2022_08_31_5k_score_mean - 2022_08_31_5k_score_mean.csv"
 #file<-"2022_08_31_DATAGRAB/2022_08_31_5k_tcg_mean - 2022_08_31_5k_tcg_mean.csv"
-#file<-"2022_08_31_DATAGRAB/2022_12_7_sample_tcg_mean_5k.csv"
-file <- "2023_03_08_DATAGRAB/2023_03_08_5000_sites_sample_tcg_mean.csv"
-cfile <- "2023_03_08_DATAGRAB/2023_03_08_5000_sites_sample_score_mean.csv"
+file<-"2022_08_31_DATAGRAB/2022_12_7_sample_tcg_mean_5k.csv"
+#file <- "2023_03_08_DATAGRAB/2023_03_08_5000_sites_sample_tcg_mean.csv"
+#cfile <- "2023_03_08_DATAGRAB/2023_03_08_5000_sites_sample_score_mean.csv"
 #cfile<-"2022_08_31_DATAGRAB/2022_12_7_sample_score_mean_5k.csv"
 
 
@@ -83,7 +83,7 @@ spongy_mpr<-function(tcg,cs,distyr){
   if (length(missing) == 0){
     tcg.mx<-cbind(tcg[,1],sitenum,steadys,colnum,mins,mags,magsdiv,recov.rate,recov.time)
   } else{
-  tcg.mx<-cbind(tcg[-missing,1],sitenum[-missing],steadys,colnum,mins,mags,masgdiv,recov.rate,recov.time)
+  tcg.mx<-cbind(tcg[-missing,1],sitenum[-missing],steadys,colnum,mins,mags,magsdiv,recov.rate,recov.time)
   }
   
   tcg.m<-as.data.frame(tcg.mx)
@@ -122,7 +122,7 @@ spongy_mpr<-function(tcg,cs,distyr){
   return(tcg.m)
 }
 
-testfx<-spongy_mpr(tcg.values,cond.scores,2016)
+testfx_2<-spongy_mpr(tcg.values,cond.scores,2016)
 
 #once again I am a beautiful genius!!!!
 
@@ -197,7 +197,7 @@ spongy_mpr<-function(tcg,cs,distyr){
   if (length(missing) == 0){
     tcg.mx<-cbind(tcg[,1],sitenum,steadys,colnum,mins,mags,magsdiv,recov.rate,recov.time)
   } else{
-    tcg.mx<-cbind(tcg[-missing,1],sitenum[-missing],steadys,colnum,mins,mags,masgdiv,recov.rate,recov.time)
+    tcg.mx<-cbind(tcg[-missing,1],sitenum[-missing],steadys,colnum,mins,mags,magsdiv,recov.rate,recov.time)
   }
   
   tcg.m<-as.data.frame(tcg.mx)
@@ -221,8 +221,8 @@ spongy_mpr<-function(tcg,cs,distyr){
   for (i in 1:nrow(dmpr)){
     if (dmpr[i,]$colnum == min(dmpr$colnum) & dmpr[i,grep(as.character(distyr),colnames(dmpr))] <= d){
       distprob[i,1]<- 1
-    } else if (dmpr[i,]$colnum == max(dmpr$colnum) & dmpr[i,grep(as.character(distyr+1),colnames(dmpr))] <= d){
-      distprob[i,2]<- 1
+    # } else if (dmpr[i,]$colnum == max(dmpr$colnum) & dmpr[i,grep(as.character(distyr+1),colnames(dmpr))] <= d){
+    #   distprob[i,2]<- 1
     } else {
       distprob[i,] <- 0
     }
