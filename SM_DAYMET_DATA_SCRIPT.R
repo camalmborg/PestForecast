@@ -17,6 +17,7 @@ file <- "2023_03_08_DATAGRAB/2023_03_08_5000_sites_sample_score_mean.csv"
 
 #condition score object:
 cond.scores<-read.csv(file)
+cond.samp<-cond.scores[1:3,]
 
 
 #### Function for grabbing daymet data:-----
@@ -389,7 +390,7 @@ spongy_met_15s<-function(scores,startyr,endyr,var,filenm){
 
 #(as characters):
 #testing, testing, is this thing on?
-dmvars<-spongy_met_15s(cond.scores,2011,2017,
+dmvars<-spongy_met_15s(cond.scores,2012,2017,
                    c("tmax..deg.c.","tmin..deg.c.","prcp..mm.day.","vp..Pa."),
                    c("maxtemp","mintemp","pcp","vpd"))
 
