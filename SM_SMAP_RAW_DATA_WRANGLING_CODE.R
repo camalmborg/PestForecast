@@ -80,3 +80,34 @@ sortSMAP <- SMAPsmap[order(SMAPsmap[,1]),]
 SMAPmags <- cbind(magsdat, sortSMAP[,4:ncol(sortSMAP)])
 
 
+#####-------------------ANALYSES------------------#####################
+
+#function for univariate analyses:
+smap_explore<-function(smap,dmrdat,dmr,coln){
+  #make empty matrix:
+  r2s <- matrix(NA,nrow=nrow(smap),ncol=ncol(smap)-4)
+  
+  #loop over all members of dmvars list:
+  for (i in 1:nrow(smap)){
+    #first get just SMAP data:
+    smapvar <- as.data.frame(smap[5:ncol(smap)])
+    #grab column number:
+    cn <- as.matrix(as.numeric(dmrdat$colnum))
+    #grab exploratory response  of choice:
+    y <- as.matrix(as.numeric(dmrdat[,dmr]))
+    x <- as.data.frame(cbind(y,cn,smapvar))
+    vardat <- x[x$cn==coln,]
+    
+    #loop for filling in R2 table:  
+    for (j in 1:ncol(smapvar)){
+      var.gam <- gam(vardat[,1]~s(vardat[,j+2]),data=vardat)
+      
+      #extract r2:
+      summ <- summary(var.gam)
+      r2s[j,i] <-summ$r.sq
+    }
+  }
+  return(r2s)
+}
+
+testing_smap <- smap_explore(SMAPmags,testfx,"mags",22)
