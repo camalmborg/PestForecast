@@ -1,12 +1,12 @@
 #### This is the script for processing GEE data from the forest condition tool
 
 #### Load condition score .csv from GEE extract:
-#file<-"2022_08_31_DATAGRAB/2022_08_31_5k_score_mean - 2022_08_31_5k_score_mean.csv"
+#cfile<-"2022_08_31_DATAGRAB/2022_08_31_5k_score_mean - 2022_08_31_5k_score_mean.csv"
 #file<-"2022_08_31_DATAGRAB/2022_08_31_5k_tcg_mean - 2022_08_31_5k_tcg_mean.csv"
 file<-"2022_08_31_DATAGRAB/2022_12_7_sample_tcg_mean_5k.csv"
 #file <- "2023_03_08_DATAGRAB/2023_03_08_5000_sites_sample_tcg_mean.csv"
 #cfile <- "2023_03_08_DATAGRAB/2023_03_08_5000_sites_sample_score_mean.csv"
-#cfile<-"2022_08_31_DATAGRAB/2022_12_7_sample_score_mean_5k.csv"
+cfile<-"2022_08_31_DATAGRAB/2022_12_7_sample_score_mean_5k.csv"
 
 
 #tcg and condition score objects:
@@ -122,21 +122,23 @@ spongy_mpr<-function(tcg,cs,distyr){
   return(tcg.m)
 }
 
-testfx_2<-spongy_mpr(tcg.values,cond.scores,2016)
+testfx<-spongy_mpr(tcg.values,cond.scores,2016)
 
 #once again I am a beautiful genius!!!!
 
 
+
+
 ###------------15s/15s version--------------------------------------------#
 #### Function for computing disturbance magnitudes, probabilities, and recovery rates:
-spongy_mpr<-function(tcg,cs,distyr){
+spongy_mpr_15s<-function(tcg,cs,distyr){
   #get just the tcg values from data frame:
   tcgs<-tcg[,c(grep("^X",colnames(tcg)))]
   sitenum<-as.matrix(1:nrow(tcgs))
   
   #first get just june values:
-  junes<-seq(2,ncol(tcgs),by=5) #15/15s = seq starts w 3, 1/1s = seq starts w 2
-  tcgjune<-as.matrix(tcgs[,junes])
+  junejul<-seq(4,ncol(tcgs),by=5) #15/15s = seq starts w 3, 1/1s = seq starts w 2
+  tcgjune<-as.matrix(tcgs[,junejul])
   
   #identify steady state (mean tcg previous 3 years):
   prevyrs<-tcgjune[,grep(as.character(distyr-3),colnames(tcgjune)):
@@ -166,21 +168,23 @@ spongy_mpr<-function(tcg,cs,distyr){
   for (i in 1:nsite){
     mins[i]<-min(tcgjune[i,grep(as.character(distyr),colnames(tcgjune)):
                            grep(as.character(distyr+1),colnames(tcgjune))],na.rm=T)        #grabs min forest condition score for each site
-    colnum[i]<-which(tcgjune[i,]==mins[i])           #grabs time step at which min score appears in disturbance window
-    if(is.na(colnum[i] + which(tcgjune[i,colnum[i]:end]>=steadys[i])[1])){
-      recovcol[i]<-colnum[i] + 2
-    } else {
-      recovcol[i]<-colnum[i] + which(tcgjune[i,colnum[i]:end]>=steadys[i])[1]
-    }
-    if(recovcol[i]>end){
-      recov<-tcgjune[i,colnum[i]:end]
-    } else {
-      recov<-tcgjune[i,colnum[i]:recovcol[i]]
-    }
-    # #recov <- tcg[i,colnum[i]:recovcol[i]]
-    ind<-1:length(recov)                      #grabs length of recov rate
-    slope[[i]]<-lm(recov~ind)                      #runs the lm to find slope of recov rate, saves output
-    recov.rate[i]<-slope[[i]]$coefficients["ind"] #stores recovery rate
+    #disturb cols:
+    colnum[i]<-which(tcgjune[i,grep(as.character(distyr),colnames(tcgjune)):
+                               grep(as.character(distyr+1),colnames(tcgjune))]==mins[i])           #grabs time step at which min score appears in disturbance window
+  #   if(is.na(colnum[i] + which(tcgjune[i,colnum[i]:end]>=steadys[i])[1])){
+  #     recovcol[i]<-colnum[i] + 2
+  #   } else {
+  #     recovcol[i]<-colnum[i] + which(tcgjune[i,colnum[i]:end]>=steadys[i])[1]
+  #   }
+  #   if(recovcol[i]>end){
+  #     recov<-tcgjune[i,colnum[i]:end]
+  #   } else {
+  #     recov<-tcgjune[i,colnum[i]:recovcol[i]]
+  #   }
+  #   # #recov <- tcg[i,colnum[i]:recovcol[i]]
+  #   ind<-1:length(recov)                      #grabs length of recov rate
+  #   slope[[i]]<-lm(recov~ind)                      #runs the lm to find slope of recov rate, saves output
+  #   recov.rate[i]<-slope[[i]]$coefficients["ind"] #stores recovery rate
   }
   rm(slope)
   
@@ -236,6 +240,6 @@ spongy_mpr<-function(tcg,cs,distyr){
   return(tcg.m)
 }
 
-testfx<-spongy_mpr(tcg.values,cond.scores,2016)
+testfx<-spongy_mpr_15s(tcg.values,cond.scores,2016)
 
 #this is still not working^^
