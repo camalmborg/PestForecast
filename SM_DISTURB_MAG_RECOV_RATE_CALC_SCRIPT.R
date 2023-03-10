@@ -129,7 +129,7 @@ testfx<-spongy_mpr(tcg.values,cond.scores,2016)
 
 
 
-###------------15s/15s version--------------------------------------------#
+####------------15s/15s version--------------------------------------------####
 #### Function for computing disturbance magnitudes, probabilities, and recovery rates:
 spongy_mpr_15s<-function(tcg,cs,distyr){
   #get just the tcg values from data frame:
