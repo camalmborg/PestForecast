@@ -78,6 +78,7 @@ sortSMAP <- SMAPsmap[order(SMAPsmap[,1]),]
 
 #make new data frame:
 SMAPmags <- cbind(magsdat, sortSMAP[,4:ncol(sortSMAP)])
+#smap<-SMAPmags[,5:ncol(SMAPmags)]
 
 
 #####-------------------ANALYSES------------------#####################
@@ -85,10 +86,10 @@ SMAPmags <- cbind(magsdat, sortSMAP[,4:ncol(sortSMAP)])
 #function for univariate analyses:
 smap_explore<-function(smap,dmrdat,dmr,coln){
   #make empty matrix:
-  r2s <- matrix(NA,nrow=nrow(smap),ncol=ncol(smap)-4)
+  r2s <- matrix(NA,nrow=length(smap)-4,ncol=1)  #hard coded rn
   
   #loop over all members of dmvars list:
-  for (i in 1:nrow(smap)){
+  for (i in 1:15){  #this is hard coded until further notice
     #first get just SMAP data:
     smapvar <- as.data.frame(smap[5:ncol(smap)])
     #grab column number:
@@ -99,13 +100,11 @@ smap_explore<-function(smap,dmrdat,dmr,coln){
     vardat <- x[x$cn==coln,]
     
     #loop for filling in R2 table:  
-    for (j in 1:ncol(smapvar)){
-      var.gam <- gam(vardat[,1]~s(vardat[,j+2]),data=vardat)
-      
-      #extract r2:
-      summ <- summary(var.gam)
-      r2s[j,i] <-summ$r.sq
-    }
+    var.gam <- gam(vardat[,1]~s(vardat[,i+2]),data=vardat)
+
+    #extract r2:
+    summ <- summary(var.gam)
+    r2s[i,] <-summ$r.sq
   }
   return(r2s)
 }
