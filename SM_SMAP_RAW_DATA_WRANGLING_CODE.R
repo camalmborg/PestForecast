@@ -109,4 +109,4 @@ smap_explore<-function(smap,dmrdat,dmr,coln){
   return(r2s)
 }
 
-testing_smap <- smap_explore(SMAPmags,testfx,"mags",22)
+testing_smap_2 <- smap_explore(SMAPmags,testfx,"mags",23)
