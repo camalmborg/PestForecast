@@ -110,3 +110,37 @@ smap_explore<-function(smap,dmrdat,dmr,coln){
 }
 
 testing_smap_2 <- smap_explore(SMAPmags,testfx,"mags",22)
+
+
+#####-----Let's make some plots---------------########
+library(lattice)
+library(latticeExtra)
+library(tactile)
+
+mo<-SMAPmags[,"7"]  #what month column here
+smap.gam <- gam(mags~s(mo), data = SMAPmags)
+
+smapplot<-xyplot(mags ~ mo, data = SMAPmags,
+                panel = function(x, y) {
+                  ci<-predict(smap.gam, se=T)
+                  ci$lower<-ci$fit-qt(0.975,smap.gam$df.null)*ci$se.fit
+                  ci$upper<-ci$fit+qt(0.975,smap.gam$df.null)*ci$se.fit
+                  l.ci<-cbind(smap.gam$model$mo,ci$fit,ci$lower,ci$upper)
+                  l<-l.ci[order(l.ci[,1]),]
+                  panel.ci(l[,1],l[,2],l[,4],l[,3],
+                           fill="seagreen3",alpha = 0.3)
+                  panel.xyplot(x, y, pch=20,col="seagreen")
+                  panel.lines(l[,1], l[,2],lty=1, col='black', lwd=1.5)
+                  summ<-summary(smap.gam)
+                  r2 <- summ$r.sq
+                  #f <- summ$fstatistic
+                  # p <- pf(f[1],f[2],f[3],lower.tail=F)
+                  panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
+                             x=2150,y=-0.12,cex=0.75)
+                  # panel.text(labels = bquote(italic(p)==.(format(p,digits = 3))),
+                  #            x=1.2,y=-0.15,cex=0.75)
+                },
+                ylab="Disturbance Magnitude (TCG)",
+                xlab="Mean Soil Moisture (SMAP)",
+)
+print(smapplot)
