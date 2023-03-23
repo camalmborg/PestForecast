@@ -118,7 +118,7 @@ library(lattice)
 library(latticeExtra)
 library(tactile)
 
-mo<-SMAPmags[,"2"]  #what month column here
+mo<-SMAPmags[,"1"]  #what month column here
 smap.gam <- gam(mags~s(mo), data = SMAPmags)
 
 smapplot<-xyplot(mags ~ mo, data = SMAPmags,
