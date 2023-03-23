@@ -113,11 +113,12 @@ testing_smap_2 <- smap_explore(SMAPmags,testfx,"mags",22)
 
 
 #####-----Let's make some plots---------------########
+library(mgcv)
 library(lattice)
 library(latticeExtra)
 library(tactile)
 
-mo<-SMAPmags[,"7"]  #what month column here
+mo<-SMAPmags[,"2"]  #what month column here
 smap.gam <- gam(mags~s(mo), data = SMAPmags)
 
 smapplot<-xyplot(mags ~ mo, data = SMAPmags,
@@ -144,3 +145,4 @@ smapplot<-xyplot(mags ~ mo, data = SMAPmags,
                 xlab="Mean Soil Moisture (SMAP)",
 )
 print(smapplot)
+
