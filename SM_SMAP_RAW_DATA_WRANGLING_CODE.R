@@ -2,6 +2,8 @@
 #univariate analyses. The R SMAP download code is not set up for 5000 sites of
 #data and so I'm going rogue to get my initial analyses done.
 
+##EVERYTHING here is hard coded and not super useful if you don't have my environments loaded, sorry everyone
+
 #load libraries
 library(mgcv)
 library(tidyr)
@@ -88,17 +90,17 @@ smap_explore<-function(smap,dmrdat,dmr,coln){
   #make empty matrix:
   r2s <- matrix(NA,nrow=length(smap)-4,ncol=1)  #hard coded rn
   
-  #loop over all members of dmvars list:
+  #first get just SMAP data:
+  smapvar <- as.data.frame(smap[5:ncol(smap)])
+  #grab column number:
+  cn <- as.matrix(as.numeric(dmrdat$colnum))
+  #grab exploratory response  of choice:
+  y <- as.matrix(as.numeric(dmrdat[,dmr]))
+  x <- as.data.frame(cbind(y,cn,smapvar))
+  vardat <- x[x$cn==coln,]
+  
+  #loop over all members of dmvars:
   for (i in 1:15){  #this is hard coded until further notice
-    #first get just SMAP data:
-    smapvar <- as.data.frame(smap[5:ncol(smap)])
-    #grab column number:
-    cn <- as.matrix(as.numeric(dmrdat$colnum))
-    #grab exploratory response  of choice:
-    y <- as.matrix(as.numeric(dmrdat[,dmr]))
-    x <- as.data.frame(cbind(y,cn,smapvar))
-    vardat <- x[x$cn==coln,]
-    
     #loop for filling in R2 table:  
     var.gam <- gam(vardat[,1]~s(vardat[,i+2]),data=vardat)
 
@@ -148,5 +150,39 @@ print(smapplot)
 
 
 
-###-----Disturbance Probabilities Analyses------------------###
+#####-----Disturbance Probabilities Analyses----------#####
+library(mgcv)
+library(pROC)
 
+smap_ROC <- function(dmvars,dmrdat,yr,coln){
+  #make empty matrix:
+  rocs <- matrix(NA,nrow=length(smap),ncol=1)  #hard coded rn
+  
+  #grab just disturbance probability columns:
+  dists<-dmrdat[,grep("^dp",colnames(dmrdat))]
+  
+  #first get just SMAP data:
+  smapvar <- as.data.frame(smap)
+  #grab column number:
+  cn <- as.matrix(as.numeric(dmrdat$colnum))
+  #grab exploratory response  of choice:
+  y <- as.matrix(as.numeric(dists[,yr]))
+  x <- as.data.frame(cbind(y,cn,smapvar))
+  vardat <- x[x$cn==coln,]
+  
+  #remove missing values:
+  miss <- which(is.na(vardat[,3]))
+  vardat <- vardat[-miss,]
+  
+  #loop over all members of dmvars:
+  for (i in 1:15){  #this is hard coded until further notice
+    #loop for filling in R2 table:  
+    var.gam<-gam(vardat[,1]~s(vardat[,i+2]), data=vardat, family="binomial")
+    var.roc<-roc(vardat[,1],var.gam$fitted.values)
+    rocs[i,] <-var.roc$auc
+  }
+  #return table of AUCs
+  return(rocs)
+}
+
+SMAProcs <- smap_ROC(dmvars,dmrdat,1,22)
