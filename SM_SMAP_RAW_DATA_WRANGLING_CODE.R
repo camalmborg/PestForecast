@@ -146,3 +146,7 @@ smapplot<-xyplot(mags ~ mo, data = SMAPmags,
 )
 print(smapplot)
 
+
+
+###-----Disturbance Probabilities Analyses------------------###
+
