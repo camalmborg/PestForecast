@@ -61,7 +61,7 @@ spongy_mpr<-function(tcg,cs,distyr){
      } else {
        recov<-tcgjune[i,colnum[i]:recovcol[i]]
      }
-    # #recov <- tcg[i,colnum[i]:recovcol[i]]
+    # ##recov <- tcg[i,colnum[i]:recovcol[i]]
      ind<-1:length(recov)                      #grabs length of recov rate
      slope[[i]]<-lm(recov~ind)                      #runs the lm to find slope of recov rate, saves output
      recov.rate[i]<-slope[[i]]$coefficients["ind"] #stores recovery rate
@@ -169,6 +169,7 @@ spongy_mpr_15s<-function(tcg,cs,distyr){
   recov.rate<-vector()
   slope<-list()
   mins<-vector()
+  colpick<-vector()
   colnum<-vector()
   recovcol<-vector()
   end<-length(tcgjune[1,])
@@ -177,19 +178,26 @@ spongy_mpr_15s<-function(tcg,cs,distyr){
     mins[i]<-min(tcgjune[i,grep(as.character(distyr),colnames(tcgjune)):
                            grep(as.character(distyr+1),colnames(tcgjune))],na.rm=T)        #grabs min forest condition score for each site
     #disturb cols:
-    colnum[i]<-which(tcgjune[i,grep(as.character(distyr),colnames(tcgjune)):
-                               grep(as.character(distyr+1),colnames(tcgjune))]==mins[i])           #grabs time step at which min score appears in disturbance window
-  #   if(is.na(colnum[i] + which(tcgjune[i,colnum[i]:end]>=steadys[i])[1])){
-  #     recovcol[i]<-colnum[i] + 2
-  #   } else {
-  #     recovcol[i]<-colnum[i] + which(tcgjune[i,colnum[i]:end]>=steadys[i])[1]
-  #   }
-  #   if(recovcol[i]>end){
-  #     recov<-tcgjune[i,colnum[i]:end]
-  #   } else {
-  #     recov<-tcgjune[i,colnum[i]:recovcol[i]]
-  #   }
-  #   # #recov <- tcg[i,colnum[i]:recovcol[i]]
+    colpick[i]<-which(tcgjune[i,grep(as.character(distyr),colnames(tcgjune)):
+                               grep(as.character(distyr+1),colnames(tcgjune))]==mins[i])
+    if(colpick[i]==1){
+      colnum[i]<-grep(as.character(distyr),colnames(tcgjune))
+    } else {
+      colnum[i]<-grep(as.character(distyr+1),colnames(tcgjune))
+    }
+    
+    # #grabs time step at which min score appears in disturbance window
+    # if(is.na(colnum[i] + which(tcgjune[i,colnum[i]:end]>=steadys[i])[1])){
+    #   recovcol[i]<-colnum[i] + 2
+    # } else {
+    #   recovcol[i]<-colnum[i] + which(tcgjune[i,colnum[i]:end]>=steadys[i])[1]
+    # }
+    # if(recovcol[i]>end){
+    #   recov<-tcgjune[i,colnum[i]:end]
+    # } else {
+    #   recov<-tcgjune[i,colnum[i]:recovcol[i]]
+    # }
+    
   #   ind<-1:length(recov)                      #grabs length of recov rate
   #   slope[[i]]<-lm(recov~ind)                      #runs the lm to find slope of recov rate, saves output
   #   recov.rate[i]<-slope[[i]]$coefficients["ind"] #stores recovery rate
