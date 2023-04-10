@@ -3,10 +3,8 @@
 #### Load condition score .csv from GEE extract:
 #cfile<-"2022_08_31_DATAGRAB/2022_08_31_5k_score_mean - 2022_08_31_5k_score_mean.csv"
 #file<-"2022_08_31_DATAGRAB/2022_08_31_5k_tcg_mean - 2022_08_31_5k_tcg_mean.csv"
-file<-"2022_08_31_DATAGRAB/2022_12_7_sample_tcg_mean_5k.csv"
-#file <- "2023_03_08_DATAGRAB/2023_03_08_5000_sites_sample_tcg_mean.csv"
-#cfile <- "2023_03_08_DATAGRAB/2023_03_08_5000_sites_sample_score_mean.csv"
-cfile<-"2022_08_31_DATAGRAB/2022_12_7_sample_score_mean_5k.csv"
+#file<-"2022_08_31_DATAGRAB/2022_12_7_sample_tcg_mean_5k.csv"
+#cfile<-"2022_08_31_DATAGRAB/2022_12_7_sample_score_mean_5k.csv"
 
 
 #tcg and condition score objects:
@@ -130,6 +128,16 @@ testfx<-spongy_mpr(tcg.values,cond.scores,2016)
 
 
 ####------------15s/15s version--------------------------------------------####
+
+#day 15-day 15 monthly data:
+file <- "2023_03_08_DATAGRAB/2023_03_08_5000_sites_sample_tcg_mean.csv"
+cfile <- "2023_03_08_DATAGRAB/2023_03_08_5000_sites_sample_score_mean.csv"
+
+#tcg and condition score objects:
+tcg.values<-read.csv(file)
+#tcgs<-tcg.values[,c(grep("^X",colnames(tcg.values)))] #grab with "X1996 eg) for all tcg value columns
+cond.scores<-read.csv(cfile)
+
 #### Function for computing disturbance magnitudes, probabilities, and recovery rates:
 spongy_mpr_15s<-function(tcg,cs,distyr){
   #get just the tcg values from data frame:
