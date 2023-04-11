@@ -186,21 +186,21 @@ spongy_mpr_15s<-function(tcg,cs,distyr){
       colnum[i]<-grep(as.character(distyr+1),colnames(tcgjune))
     }
     
-    # #grabs time step at which min score appears in disturbance window
-    # if(is.na(colnum[i] + which(tcgjune[i,colnum[i]:end]>=steadys[i])[1])){
-    #   recovcol[i]<-colnum[i] + 2
-    # } else {
-    #   recovcol[i]<-colnum[i] + which(tcgjune[i,colnum[i]:end]>=steadys[i])[1]
-    # }
-    # if(recovcol[i]>end){
-    #   recov<-tcgjune[i,colnum[i]:end]
-    # } else {
-    #   recov<-tcgjune[i,colnum[i]:recovcol[i]]
-    # }
-    
-  #   ind<-1:length(recov)                      #grabs length of recov rate
-  #   slope[[i]]<-lm(recov~ind)                      #runs the lm to find slope of recov rate, saves output
-  #   recov.rate[i]<-slope[[i]]$coefficients["ind"] #stores recovery rate
+    #grabs time step at which min score appears in disturbance window
+    if(is.na(colnum[i] + which(tcgjune[i,colnum[i]:end]>=steadys[i])[1])){
+      recovcol[i]<-colnum[i] + 2
+    } else {
+      recovcol[i]<-colnum[i] + which(tcgjune[i,colnum[i]:end]>=steadys[i])[1]
+    }
+    if(recovcol[i]>end){
+      recov<-tcgjune[i,colnum[i]:end]
+    } else {
+      recov<-tcgjune[i,colnum[i]:recovcol[i]]
+    }
+
+    ind<-1:length(recov)                      #grabs length of recov rate
+    slope[[i]]<-lm(recov~ind)                      #runs the lm to find slope of recov rate, saves output
+    recov.rate[i]<-slope[[i]]$coefficients["ind"] #stores recovery rate
   }
   rm(slope)
   
@@ -241,8 +241,8 @@ spongy_mpr_15s<-function(tcg,cs,distyr){
   for (i in 1:nrow(dmpr)){
     if (dmpr[i,]$colnum == min(dmpr$colnum) & dmpr[i,grep(as.character(distyr),colnames(dmpr))] <= d){
       distprob[i,1]<- 1
-    # } else if (dmpr[i,]$colnum == max(dmpr$colnum) & dmpr[i,grep(as.character(distyr+1),colnames(dmpr))] <= d){
-    #   distprob[i,2]<- 1
+    } else if (dmpr[i,]$colnum == max(dmpr$colnum) & dmpr[i,grep(as.character(distyr+1),colnames(dmpr))] <= d){
+      distprob[i,2]<- 1
     } else {
       distprob[i,] <- 0
     }
