@@ -202,7 +202,34 @@ spongyvars<-cbind(dm_me(dmvars$maxtemp,2,c(1,6)),
                   dm_me(dmvars$pcp,2,c(1,6)))
 
 ### Expanding DM_ME to make seasonal daymet averages for spring, summer, fall, winter months
-#spring = april/may (4,5), summer = june/july (6/7)
+#spring = march/april/may (3,4,5), summer = june/july/august (6/7/8)
+
+dm_me_seasonal<-function(x,yrs,month,){
+  mcols<-vector()
+  for (i in 1:length(month)){
+    colpyr<-c(seq(month[i],yrs*12,by=12))
+    mcols<-c(mcols,colpyr)
+  }
+  cols<-sort(mcols) #x = month (1=jan, 2=feb, etc.)
+  dmvar<-x[,cols]
+  #return(dmvar)
+  
+}
+
+spongyvars<-cbind(dm_me(dmvars$pcp,7,c(3,4,5)))
+
+library(tidyverse)
+
+pcp <- dmvars$pcp
+
+pcp_long <- pcp %>% as.data.frame() %>% 
+  rownames_to_column(var = "site_no") %>% 
+  pivot_longer(cols = 2:85, names_to = "month")
+
+pcp_long$month =
+  gsub("V", "", pcp_long$month)
+
+
 
 # dm_me is used to create a data frame that includes daymet variables
 # of interest - arguments are:
