@@ -4,8 +4,8 @@
 #### Load condition score .csv from GEE extract:
 #cfile<-"2022_08_31_DATAGRAB/2022_08_31_5k_score_mean - 2022_08_31_5k_score_mean.csv"
 #file<-"2022_08_31_DATAGRAB/2022_08_31_5k_tcg_mean - 2022_08_31_5k_tcg_mean.csv"
-#file<-"2022_08_31_DATAGRAB/2022_12_7_sample_tcg_mean_5k.csv"
-#cfile<-"2022_08_31_DATAGRAB/2022_12_7_sample_score_mean_5k.csv"
+file<-"2022_08_31_DATAGRAB/2022_12_7_sample_tcg_mean_5k.csv"
+cfile<-"2022_08_31_DATAGRAB/2022_12_7_sample_score_mean_5k.csv"
 
 
 #tcg and condition score objects:
@@ -14,7 +14,7 @@ tcg.values<-read.csv(file)
 cond.scores<-read.csv(cfile)
 
 #### Function for computing disturbance magnitudes, probabilities, and recovery rates:
-spongy_mpr<-function(tcg,cs,distyr){
+spongy_season_mpr<-function(tcg,cs,distyr){
   #get just the tcg values from data frame:
   tcgs<-tcg[,c(grep("^X",colnames(tcg)))]
   sitenum<-as.matrix(1:nrow(tcgs))
