@@ -201,6 +201,9 @@ dm_me<-function(x,yrs,month){
 spongyvars<-cbind(dm_me(dmvars$maxtemp,2,c(1,6)),
                   dm_me(dmvars$pcp,2,c(1,6)))
 
+### Expanding DM_ME to make seasonal daymet averages for spring, summer, fall, winter months
+#spring = april/may (4,5), summer = june/july (6/7)
+
 # dm_me is used to create a data frame that includes daymet variables
 # of interest - arguments are:
 #1) dmvars$... <- the variable you want to extract
@@ -229,7 +232,7 @@ spongyvars<-cbind(dm_me(dmvars$maxtemp,2,c(1,6)),
 
 
 
-#--------##### THIS VERSION IS FOR 15-to-15 MONTHLY DATA: #####------------#
+#----------##### THIS VERSION IS FOR 15-to-15 MONTHLY DATA: #-----------######
 #### Function for grabbing daymet data:-----
 spongy_met_15s<-function(scores,startyr,endyr,var,filenm){
   ##Section for getting sites from GEE dataset:
