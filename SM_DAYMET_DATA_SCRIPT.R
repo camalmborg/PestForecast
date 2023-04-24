@@ -8,6 +8,7 @@
 library(daymetr)
 library(tidyr)
 library(stringr)
+library(tidyverse)
 #library(miceadds)
 
 
@@ -204,10 +205,15 @@ spongyvars<-cbind(dm_me(dmvars$maxtemp,2,c(1,6)),
 ### Expanding DM_ME to make seasonal daymet averages for spring, summer, fall, winter months
 #spring = march/april/may (3,4,5), summer = june/july/august (6/7/8)
 
+#if necessary:
+library(tidyverse)
+library(dplyr)
+
 dm_me_seasonal <- function(x,yrs,month){
   mcols <- vector()
   m_id <- vector()
   y_id <- vector()
+  n_id <- c(1:(length(month)*yrs))
   for (i in 1:length(month)){
     colpyr <- c(seq(month[i],yrs*12,by=12))
     mcols <- c(mcols,colpyr)
@@ -215,13 +221,23 @@ dm_me_seasonal <- function(x,yrs,month){
     y_id <- c(y_id, rep(1:yrs))
   }
   
-  cols <- sort(mcols) #x = month (1=jan, 2=feb, etc.)
-  dmvar <- x[,cols]
+  #makes an id daata frame with which to attach months and years to 
+  #the resulting dmvar data frame in long form:
+  dm_mycols <- cbind(mcols, n_id, m_id, y_id)
+  
+  #grab the dmvar data:
+  cols <- sort(dm_mycols[,"mcols"]) #x = month (1=jan, 2=feb, etc.)
+  dmvarbs <- as.matrix(x[,cols])
+  
+  #make final thing
+  dmcols <- t(dm_mycols)
+  dmcols <- dmcols[,order(dmcols["mcols",])]
+  dmvar <- as.data.frame(rbind(dmcols,dmvarbs))
   
   return(dmvar)
 }
 
-spongyvars<-cbind(dm_me_seasonal(dmvars$pcp,7,c(3,4,5)))
+spongyvars<-cbind(dm_me_seasonal(dmvars$pcp,7,c(3,4)))
 
 
 #zoey doing things:
