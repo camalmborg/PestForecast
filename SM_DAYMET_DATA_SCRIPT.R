@@ -187,14 +187,14 @@ dmvars<-spongy_met(cond.scores,2011,2017,
 #### Getting seasonal variable values for analyses:-----
 ## Quick function for making sequences to extract 
 ## monthly values based on # of years of daymet data downloaded:
-dm_me<-function(x,yrs,month){
-  mcols<-vector()
+dm_me <- function(x,yrs,month){
+  mcols <- vector()
   for (i in 1:length(month)){
-    colpyr<-c(seq(month[i],yrs*12,by=12))
-    mcols<-c(mcols,colpyr)
+    colpyr <- c(seq(month[i],yrs*12,by=12))
+    mcols <- c(mcols,colpyr)
   }
-  cols<-sort(mcols) #x = month (1=jan, 2=feb, etc.)
-  dmvar<-x[,cols]
+  cols <- sort(mcols) #x = month (1=jan, 2=feb, etc.)
+  dmvar <- x[,cols]
   return(dmvar)
 }
 
@@ -204,20 +204,24 @@ spongyvars<-cbind(dm_me(dmvars$maxtemp,2,c(1,6)),
 ### Expanding DM_ME to make seasonal daymet averages for spring, summer, fall, winter months
 #spring = march/april/may (3,4,5), summer = june/july/august (6/7/8)
 
-dm_me_seasonal<-function(x,yrs,month,){
-  mcols<-vector()
+dm_me_seasonal <- function(x,yrs,month){
+  mcols <- vector()
+  monthid <- vector()
   for (i in 1:length(month)){
-    colpyr<-c(seq(month[i],yrs*12,by=12))
-    mcols<-c(mcols,colpyr)
+    colpyr <- c(seq(month[i],yrs*12,by=12))
+    monthid <- c(monthid, rep.int(month[i], times = yrs))
+    mcols <- c(mcols,colpyr)
   }
-  cols<-sort(mcols) #x = month (1=jan, 2=feb, etc.)
-  dmvar<-x[,cols]
-  #return(dmvar)
+  cols <- sort(mcols) #x = month (1=jan, 2=feb, etc.)
+  dmvar <- x[,cols]
   
+  return(dmvar)
 }
 
-spongyvars<-cbind(dm_me(dmvars$pcp,7,c(3,4,5)))
+spongyvars<-cbind(dm_me_seasonal(dmvars$pcp,7,c(3,4,5)))
 
+
+#zoey doing things:
 library(tidyverse)
 
 pcp <- dmvars$pcp
