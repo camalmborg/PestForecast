@@ -236,7 +236,7 @@ dm_me_seasonal <- function(x,yrs,month){
   
   #average the colums:
   for (i in 1:yrs){
-    
+    avg <- apply(dmv[5:nrow(dmv),y_id==i]) ###need to finish apply command
   }
   
   return(dmvar)
