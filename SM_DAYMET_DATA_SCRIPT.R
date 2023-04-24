@@ -232,7 +232,12 @@ dm_me_seasonal <- function(x,yrs,month){
   #make final thing
   dmcols <- t(dm_mycols)
   dmcols <- dmcols[,order(dmcols["mcols",])]
-  dmvar <- as.data.frame(rbind(dmcols,dmvarbs))
+  dmv <- as.data.frame(rbind(dmcols,dmvarbs))
+  
+  #average the colums:
+  for (i in 1:yrs){
+    
+  }
   
   return(dmvar)
 }
