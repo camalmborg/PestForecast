@@ -236,13 +236,16 @@ dm_me_seasonal <- function(x,yrs,month){
   
   #average the colums:
   for (i in 1:yrs){
-    avg <- apply(dmv[5:nrow(dmv),y_id==i]) ###need to finish apply command
+    avg <- apply(dmv[5:nrow(dmv),dmv["y_id",]==i], mean, 2) ###need to finish apply command
   }
   
   return(dmvar)
 }
 
 spongyvars<-cbind(dm_me_seasonal(dmvars$pcp,7,c(3,4)))
+
+head()
+
 
 
 #zoey doing things:
