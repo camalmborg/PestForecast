@@ -243,7 +243,7 @@ dm_me_seasonal <- function(x,yrs,month){
   return(dmvar)
 }
 
-spongyvars<-cbind(dm_me_seasonal(dmvars$pcp,7,c(3,4)))
+spongyvars<-dm_me_seasonal(dmvars$pcp,7,c(3,4,5))
 
 
 # dm_me is used to create a data frame that includes daymet variables
