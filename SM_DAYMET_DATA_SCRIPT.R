@@ -5,7 +5,7 @@
 
 
 #### Load Libraries:
-library(daymetr)
+#library(daymetr)
 library(tidyr)
 library(stringr)
 library(tidyverse)
@@ -206,7 +206,7 @@ spongyvars<-cbind(dm_me(dmvars$maxtemp,2,c(1,6)),
 #spring = march/april/may (3,4,5), summer = june/july/august (6/7/8)
 
 #if necessary:
-library(tidyverse)
+#library(tidyverse)
 library(dplyr)
 
 dm_me_seasonal <- function(x,yrs,month){
@@ -232,34 +232,18 @@ dm_me_seasonal <- function(x,yrs,month){
   #make final thing
   dmcols <- t(dm_mycols)
   dmcols <- dmcols[,order(dmcols["mcols",])]
-  dmv <- as.data.frame(rbind(dmcols,dmvarbs))
+  dmv <- rbind(dmcols,dmvarbs)
   
   #average the colums:
+  dmvar <- matrix(NA, nrow=nrow(dmv)-4, ncol=7)
   for (i in 1:yrs){
-    avg <- apply(dmv[5:nrow(dmv),dmv["y_id",]==i], mean, 2) ###need to finish apply command
+    dmvar[,i] <- apply(dmv[5:nrow(dmv),dmv["y_id",]==i], 1, mean, na.rm=T) 
   }
   
   return(dmvar)
 }
 
 spongyvars<-cbind(dm_me_seasonal(dmvars$pcp,7,c(3,4)))
-
-head()
-
-
-
-#zoey doing things:
-# library(tidyverse)
-# 
-# pcp <- dmvars$pcp
-# 
-# pcp_long <- pcp %>% as.data.frame() %>% 
-#   rownames_to_column(var = "site_no") %>% 
-#   pivot_longer(cols = 2:85, names_to = "month")
-# 
-# pcp_long$month =
-#   gsub("V", "", pcp_long$month)
-
 
 
 # dm_me is used to create a data frame that includes daymet variables
