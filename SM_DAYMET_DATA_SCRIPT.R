@@ -18,7 +18,7 @@ file <- "2023_03_08_DATAGRAB/2023_03_08_5000_sites_sample_score_mean.csv"
 
 #condition score object:
 cond.scores<-read.csv(file)
-cond.samp<-cond.scores[1:3,]
+#cond.samp<-cond.scores[1:3,]
 
 
 #### Function for grabbing daymet data:-----
@@ -199,8 +199,8 @@ dm_me <- function(x,yrs,month){
   return(dmvar)
 }
 
-spongyvars<-cbind(dm_me(dmvars$maxtemp,2,c(1,6)),
-                  dm_me(dmvars$pcp,2,c(1,6)))
+# spongyvars<-cbind(dm_me(dmvars$maxtemp,2,c(1,6)),
+#                   dm_me(dmvars$pcp,2,c(1,6)))
 
 ### Expanding DM_ME to make seasonal daymet averages for spring, summer, fall, winter months
 #spring = march/april/may (3,4,5), summer = june/july/august (6/7/8)
@@ -243,7 +243,16 @@ dm_me_seasonal <- function(x,yrs,month){
   return(dmvar)
 }
 
-spongyvars<-dm_me_seasonal(dmvars$pcp,7,c(3,4,5))
+#seasons:
+spring <- c(3,4,5)
+summer <- c(6,7,8)
+fall <- c(9,10,11)
+winter <- c(12,1,2)
+
+spongyvars <- list(dm_me_seasonal(dmvars$maxtemp, 7, spring),
+                   dm_me_seasonal(dmvars$mintemp, 7, spring),
+                   dm_me_seasonal(dmvars$pcp, 7, spring),
+                   dm_me_seasonal(dmvars$vpd, 7, spring))
 
 
 # dm_me is used to create a data frame that includes daymet variables
@@ -255,8 +264,12 @@ spongyvars<-dm_me_seasonal(dmvars$pcp,7,c(3,4,5))
 # are the monthly daymet variables and rows are sites
 
 #dm_me_seasonal is used to create a matrix (or data frame) that includes
-#daymet variables of interest - arguments are:
-#1) x <- enter dmvars from 
+#daymet variables of interest SEASONALLY from mean monthly values
+#arguments are:
+#1) x <- enter dmvars from spongymet function
+#2) yrs <- number of years of the analyses (2011-2017 = 7)
+#3) months <- months you want to use in analyses: 3,4,5 = Mar, Apr, May
+#spring = 3,4,5 #summer = 6,7,8 eg (calendar months)
 
 #### Getting variables for the forecast:
 
@@ -279,7 +292,7 @@ spongyvars<-dm_me_seasonal(dmvars$pcp,7,c(3,4,5))
 
 
 #----------##### THIS VERSION IS FOR 15-to-15 MONTHLY DATA: #-----------######
-#### Function for grabbing daymet data:-----
+### Function for grabbing daymet data:---
 spongy_met_15s<-function(scores,startyr,endyr,var,filenm){
   ##Section for getting sites from GEE dataset:
   #geographic coordinates from GEE extract:
