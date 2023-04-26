@@ -207,7 +207,7 @@ spongyvars<-cbind(dm_me(dmvars$maxtemp,2,c(1,6)),
 
 #if necessary:
 #library(tidyverse)
-library(dplyr)
+#library(dplyr)
 
 dm_me_seasonal <- function(x,yrs,month){
   mcols <- vector()
@@ -253,6 +253,10 @@ spongyvars<-dm_me_seasonal(dmvars$pcp,7,c(3,4,5))
 #3) c(....) <- the months of the year you want the values (eg. 1=jan, 2=feb)
 # you cbind these and it makes a dataframe with these values where columns
 # are the monthly daymet variables and rows are sites
+
+#dm_me_seasonal is used to create a matrix (or data frame) that includes
+#daymet variables of interest - arguments are:
+#1) x <- enter dmvars from 
 
 #### Getting variables for the forecast:
 
