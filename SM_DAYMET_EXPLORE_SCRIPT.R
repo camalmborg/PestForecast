@@ -31,8 +31,15 @@ dm_explore<-function(dmvars,dmrdat,dmr,coln){
   return(r2s)
 }
 
-testing <- dm_explore(dmvars,testfx,"mags",22)
+testing <- dm_explore(spongyvars,testfx,"mags",22)
 
+#season <- c("SPRING", "SUMMER", "FALL", "WINTER")
+#sprmonths <- c("MarApr", "AprMay")
+#summonths <- c("MayJun", "JunJul", "JulAug")
+#winmonths <- c("NovDec","DecJan", "JanFeb")
+
+filename <- paste0("Analyses_Daymet_seasonal/2023_04_27_daymet_seasonal_analyses_", season[1], ".csv")
+write.csv(testing, file=filename)
 
 ##---------------------------------------------------------------------####
 ###Multivariate Analyses:
