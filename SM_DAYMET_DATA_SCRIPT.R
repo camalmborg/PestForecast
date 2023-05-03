@@ -249,10 +249,10 @@ summer <- c(6,7,8)
 fall <- c(9,10,11)
 winter <- c(12,1,2)
 
-spongyvars <- list(dm_me_seasonal(dmvars$maxtemp, 7, winter),
-                   dm_me_seasonal(dmvars$mintemp, 7, winter),
-                   dm_me_seasonal(dmvars$pcp, 7, winter),
-                   dm_me_seasonal(dmvars$vpd, 7, winter))
+spongyvars <- list(dm_me_seasonal(dmvars$maxtemp, 7, spring),
+                   dm_me_seasonal(dmvars$mintemp, 7, spring),
+                   dm_me_seasonal(dmvars$pcp, 7, spring),
+                   dm_me_seasonal(dmvars$vpd, 7, spring))
 
 
 # dm_me is used to create a data frame that includes daymet variables
@@ -455,4 +455,5 @@ spongy_met_15s<-function(scores,startyr,endyr,var,filenm){
 dmvars<-spongy_met_15s(cond.scores,2012,2017,
                    c("tmax..deg.c.","tmin..deg.c.","prcp..mm.day.","vp..Pa."),
                    c("maxtemp","mintemp","pcp","vpd"))
+
 

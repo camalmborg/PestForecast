@@ -27,7 +27,8 @@ dm_explore<-function(dmvars,dmrdat,dmr,coln){
         summ <- summary(var.gam)
         r2s[j,i] <-summ$r.sq
       }
-   }
+  }
+  return(vardat)
   return(r2s)
 }
 
@@ -40,6 +41,45 @@ testing <- dm_explore(spongyvars,testfx,"mags",22)
 
 filename <- paste0("Analyses_Daymet_seasonal/2023_04_27_daymet_seasonal_analyses_", season[1], ".csv")
 write.csv(testing, file=filename)
+
+
+#----------#### MAKING FIGURES: ####------------------------
+library(lattice)
+library(latticeExtra)
+
+vardat <- vardat
+mo <- vardat[,]
+var.gam <- 
+
+dmplot<-xyplot(y ~ mo, data = vardat,
+                panel = function(x, y) {
+                  ci<-predict(var.gam, se=T)
+                  ci$lower<-ci$fit-qt(0.975,var.gam$df.null)*ci$se.fit
+                  ci$upper<-ci$fit+qt(0.975,var.gam$df.null)*ci$se.fit
+                  l.ci<-cbind(vpd.gam$model$mo,ci$fit,ci$lower,ci$upper)
+                  l<-l.ci[order(l.ci[,1]),]
+                  panel.ci(l[,1],l[,2],l[,4],l[,3],
+                           fill="seagreen3",alpha = 0.3)
+                  panel.xyplot(x, y, pch=20,col="seagreen")
+                  panel.lines(l[,1], l[,2],lty=1, col='black', lwd=1.5)
+                  summ<-summary(vpd.gam)
+                  r2 <- summ$r.sq
+                  #f <- summ$fstatistic
+                  # p <- pf(f[1],f[2],f[3],lower.tail=F)
+                  panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
+                             x=2150,y=-0.12,cex=0.75)
+                  # panel.text(labels = bquote(italic(p)==.(format(p,digits = 3))),
+                  #            x=1.2,y=-0.15,cex=0.75)
+                },
+                ylab="Disturbance Magnitude (TCG)",
+                xlab="Mean VPD",
+)
+print(vpdplot)
+
+#saving plots:
+tiff("Plots_509/vpdplot_jul2015.tiff", units="in", width=8, height=5, res=300)
+print(vpdplot)
+dev.off()
 
 ##---------------------------------------------------------------------####
 ###Multivariate Analyses:
