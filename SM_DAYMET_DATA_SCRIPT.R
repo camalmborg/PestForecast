@@ -249,10 +249,10 @@ summer <- c(6,7,8)
 fall <- c(9,10,11)
 winter <- c(12,1,2)
 
-spongyvars <- list(dm_me_seasonal(dmvars$maxtemp, 7, spring),
-                   dm_me_seasonal(dmvars$mintemp, 7, spring),
-                   dm_me_seasonal(dmvars$pcp, 7, spring),
-                   dm_me_seasonal(dmvars$vpd, 7, spring))
+spongyvars <- list(dm_me_seasonal(dmvars$maxtemp, 7, winter),
+                   dm_me_seasonal(dmvars$mintemp, 7, winter),
+                   dm_me_seasonal(dmvars$pcp, 7, winter),
+                   dm_me_seasonal(dmvars$vpd, 7, winter))
 
 
 # dm_me is used to create a data frame that includes daymet variables

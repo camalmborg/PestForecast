@@ -39,6 +39,12 @@ spongy_ROC <- function(dmvars,dmrdat,yr,coln){
 }
 
 
+testing_roc <- spongy_ROC(spongyvars,testfx,1,22)
+
+filename <- paste0("Analyses_Daymet_seasonal/2023_05_03_daymet_seasonal_distprob_analyses_", season[4], ".csv")
+write.csv(testing_roc, file=filename)
+
+
 ############ ARCHIVE:
 # spongy_dp<-function(cs,){
 #   junes<-cs[,grep("[:.:]06",colnames(cs))]
