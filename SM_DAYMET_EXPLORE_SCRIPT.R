@@ -28,41 +28,44 @@ dm_explore<-function(dmvars,dmrdat,dmr,coln){
         r2s[j,i] <-summ$r.sq
       }
   }
-  return(vardat)
+ # return(vardat)
   return(r2s)
 }
 
 testing <- dm_explore(spongyvars,testfx,"mags",22)
 
-#season <- c("SPRING", "SUMMER", "FALL", "WINTER")
-#sprmonths <- c("MarApr", "AprMay")
+season <- c("SPRING", "SUMMER", "FALL", "WINTER")
+sprmonths <- c("MarApr", "AprMay", "MayJunJul")
 #summonths <- c("MayJun", "JunJul", "JulAug")
 #winmonths <- c("NovDec","DecJan", "JanFeb")
 
-filename <- paste0("Analyses_Daymet_seasonal/2023_04_27_daymet_seasonal_analyses_", season[1], ".csv")
-write.csv(testing, file=filename)
+#filename <- "2023_05_10_Daymet_monthly_analysis_2011_2017_r2s.csv"
+filename <- paste0("Analyses_Daymet_seasonal/2023_04_27_daymet_seasonal_analyses_", sprmonths[3], ".csv")
+write.csv(testing_mo, file=filename)
 
 
 #----------#### MAKING FIGURES: ####------------------------
 library(lattice)
 library(latticeExtra)
+library(tactile)
+library(mgcv)
 
 vardat <- vardat
-mo <- vardat[,]
-var.gam <- 
+mo <- vardat[,7]
+var.gam <- var.gam <- gam(vardat[,1]~s(mo),data=vardat)
 
 dmplot<-xyplot(y ~ mo, data = vardat,
                 panel = function(x, y) {
                   ci<-predict(var.gam, se=T)
                   ci$lower<-ci$fit-qt(0.975,var.gam$df.null)*ci$se.fit
                   ci$upper<-ci$fit+qt(0.975,var.gam$df.null)*ci$se.fit
-                  l.ci<-cbind(vpd.gam$model$mo,ci$fit,ci$lower,ci$upper)
+                  l.ci<-cbind(var.gam$model$mo,ci$fit,ci$lower,ci$upper)
                   l<-l.ci[order(l.ci[,1]),]
                   panel.ci(l[,1],l[,2],l[,4],l[,3],
                            fill="seagreen3",alpha = 0.3)
                   panel.xyplot(x, y, pch=20,col="seagreen")
                   panel.lines(l[,1], l[,2],lty=1, col='black', lwd=1.5)
-                  summ<-summary(vpd.gam)
+                  summ<-summary(var.gam)
                   r2 <- summ$r.sq
                   #f <- summ$fstatistic
                   # p <- pf(f[1],f[2],f[3],lower.tail=F)
@@ -72,15 +75,14 @@ dmplot<-xyplot(y ~ mo, data = vardat,
                   #            x=1.2,y=-0.15,cex=0.75)
                 },
                 ylab="Disturbance Magnitude (TCG)",
-                xlab="Mean VPD",
+                xlab="mintemp spring 2016",
 )
-print(vpdplot)
+print(dmplot)
 
 #saving plots:
-tiff("Plots_509/vpdplot_jul2015.tiff", units="in", width=8, height=5, res=300)
-print(vpdplot)
-dev.off()
+# tiff("Plots_509/vpdplot_jul2015.tiff", units="in", width=8, height=5, res=300)
+# print(vpdplot)
+# dev.off()
 
 ##---------------------------------------------------------------------####
-###Multivariate Analyses:
 
