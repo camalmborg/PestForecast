@@ -75,7 +75,7 @@ dmplot<-xyplot(y ~ mo, data = vardat,
                   #            x=1.2,y=-0.15,cex=0.75)
                 },
                 ylab="Disturbance Magnitude (TCG)",
-                xlab="mintemp spring 2016",
+                xlab="precip may/jun/jul 2015",
 )
 print(dmplot)
 
