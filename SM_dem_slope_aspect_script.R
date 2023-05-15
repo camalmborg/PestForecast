@@ -20,22 +20,22 @@ rastertest <- raster('USA1_msk_alt.gri')
 
 #crop to bounding box:
 bounds <- read.csv("2022_03_29_latlonboundingbox.csv")
-extents <- c(round(min(bounds$x)),
-             round(max(bounds$x)),
-             round(min(bounds$y)),
-             round(max(bounds$y)))
+extents <- c(min(bounds$y),
+             max(bounds$y),
+             min(bounds$x),
+             max(bounds$x))
 box <- as(extent(extents), 'SpatialPolygons')
 crs(box) <- "+proj=longlat +datum=WGS84 +no_defs"
+#study area:
+rastbox <- crop(rastertest, box)
 
-#project raster:
-rastertestproj2 <- projectRaster(rastertest, crs= "+proj=longlat +datum=WGS84 +no_defs",
+#re-project raster and convert to gtiff:
+rastboxproj <- projectRaster(rastbox, crs= "+proj=longlat +datum=WGS84 +no_defs",
                                 format='GTiff')
 
-#crop to study area bounds:
-rastbox <- crop(rastertestproj2, box)
 
-#plot(rastertestproj)
-plot(rastbox)
+#plot(rastertest)
+plot(rastboxproj)
 
 
 
