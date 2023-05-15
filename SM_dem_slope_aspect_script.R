@@ -26,10 +26,16 @@ extents <- c(round(min(bounds$x)),
              round(max(bounds$y)))
 box <- as(extent(extents), 'SpatialPolygons')
 crs(box) <- "+proj=longlat +datum=WGS84 +no_defs"
-#rastbox <- crop(rastertest, box)
 
-rastertestproj <- projectRaster(rastertest, "+proj=longlat +datum=WGS84 +no_defs")
-#plot(rastertest)
+#project raster:
+rastertestproj2 <- projectRaster(rastertest, crs= "+proj=longlat +datum=WGS84 +no_defs",
+                                format='GTiff')
+
+#crop to study area bounds:
+rastbox <- crop(rastertestproj2, box)
+
+#plot(rastertestproj)
+plot(rastbox)
 
 
 
