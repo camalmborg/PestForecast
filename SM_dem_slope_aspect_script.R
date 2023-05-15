@@ -15,6 +15,9 @@ library(rasterVis)
 #url for DEM data:
 #url <- "http://doi.org/10.5067/MEaSUREs/SRTM/SRTMGL1N.003"
 
+
+### Get DEM data --------------------------------------------------------------
+
 #this will get the DEM for the whole USA:
 rastertest <- raster('USA1_msk_alt.gri')
 
@@ -30,15 +33,34 @@ crs(box) <- "+proj=longlat +datum=WGS84 +no_defs"
 rastbox <- crop(rastertest, box)
 
 #re-project raster and convert to gtiff:
-rastboxproj <- projectRaster(rastbox, crs= "+proj=longlat +datum=WGS84 +no_defs",
-                                format='GTiff')
+rastboxproj <- projectRaster(rastbox, 
+                             crs= "+proj=longlat +datum=WGS84 +no_defs",
+                             format='GTiff')
 
 
 #plot(rastertest)
-plot(rastboxproj)
+#plot(rastboxproj)
+
+### Make spatial dataset from csv of lat/lon points for sites------------------
+
+#load csv with lat/lon coords:
+sites <- read.csv("2022_03_22_5000sites_lat_long_points_for_GEE_asset.csv")
+#convert to spatial:
+coordinates(sites) <- ~y+x
+crs(sites) <- crs(rastbox)
+
+#plot(sites)
 
 
+### Get slope and aspect data--------------------------------------------------
 
+#slope:
+slopes <- terrain(rastbox, opt="slope", unit="degrees")
+#aspect:
+aspects <- terrain(rastbox, opt="aspect", unit="degrees")
 
+#make stack:
+datastack <- stack(rastbox, slopes, aspects)
 
-
+#extract site values:
+DEMdata <- extract(datastack, sites)
