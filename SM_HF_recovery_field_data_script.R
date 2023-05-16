@@ -1,6 +1,6 @@
 #HF Field Data Script
 
-###load GEE data:
+###ARCHIVE ###load GEE data:---------
 #tcg data:
 hfplotstcg<-read.csv("HF_2022_Field_Data/HFplots_tcg_mean.csv")
 #condition scores:
@@ -30,3 +30,25 @@ HF.plot.data$mort[is.na(HF.plot.data$mort)] <- 0
 
 
 ###recovery rate slopes for field sites:
+
+### HARVARD FOREST SUMMER FIELD DATA 2022 --------------------------
+
+#load libraries:
+library(dplyr)
+library(tidyverse)
+
+#load and fix data:
+field_plots <- read.csv("HF_2022_Field_Data/Plot_data  - Sheet1.csv")
+field_plots <- field_plots %>%
+  mutate(latitude = str_replace(latitude, " N", "")) %>%
+  mutate(longitude = str_replace(longitude, " W", "")) %>%
+  mutate_at(c('latitude', 'longitude'), as.numeric)
+
+hf_trees <- read.csv("HF_2022_Field_data/Tree_data - Sheet1.csv")
+#hf_trees <- hf_trees %>% group_by(plot_2, Cond) %>% summarize(count=n())
+#hf_mort<-HF.condition[HF.condition$Cond=="D",]
+#hf_mort$mort<-1
+
+#merge with plot data:
+#HF.plot.data<- merge(HF.plot.data, HF.mort, all = TRUE)
+#HF.plot.data$mort[is.na(HF.plot.data$mort)] <- 0
