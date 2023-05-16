@@ -40,8 +40,8 @@ sprmonths <- c("MarApr", "AprMay", "MayJunJul")
 #winmonths <- c("NovDec","DecJan", "JanFeb")
 
 #filename <- "2023_05_10_Daymet_monthly_analysis_2011_2017_r2s.csv"
-filename <- paste0("Analyses_Daymet_seasonal/2023_04_27_daymet_seasonal_analyses_", sprmonths[3], ".csv")
-write.csv(testing_mo, file=filename)
+filename <- paste0("Analyses_Daymet_seasonal/2023_05_15_daymet_seasonal_analyses_", "ANNUAL", ".csv")
+write.csv(testing, file=filename)
 
 
 #----------#### MAKING FIGURES: ####------------------------
@@ -51,7 +51,7 @@ library(tactile)
 library(mgcv)
 
 vardat <- vardat
-mo <- vardat[,7]
+mo <- vardat[,8]
 var.gam <- var.gam <- gam(vardat[,1]~s(mo),data=vardat)
 
 dmplot<-xyplot(y ~ mo, data = vardat,
@@ -75,7 +75,7 @@ dmplot<-xyplot(y ~ mo, data = vardat,
                   #            x=1.2,y=-0.15,cex=0.75)
                 },
                 ylab="Disturbance Magnitude (TCG)",
-                xlab="precip may/jun/jul 2015",
+                xlab="maxtemp feb/mar 2016",
 )
 print(dmplot)
 
