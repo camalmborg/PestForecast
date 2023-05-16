@@ -10,23 +10,23 @@ hfplotscond<-read.csv("HF_2022_Field_Data/HFplots_score_mean.csv")
 hftcg<-hfplotstcg[,2:131]
 hfcond<-hfplotscond[,2:131]
 
-
-###load field data:
-HF.latlon<-read.csv("HF_2022_Field_Data/2022_HF_plots_latlon.csv")
-HF.plot.data<-read.csv("HF_2022_Field_Data/HF_Plot_data.csv")
-HF.seedlings<-read.csv("HF_2022_Field_Data/HF_Seedlings_long.csv")
-HF.trees<-read.csv("HF_2022_Field_Data/HF_Tree_data.csv")
-HF.understory<-read.csv("HF_2022_Field_Data/HF_Und_ground_survey.csv")
-
-#separating mortality sites:
-library("dplyr")
-HF.condition<-HF.trees %>% group_by(plot_2, Cond) %>% summarize(count=n())
-HF.mort<-HF.condition[HF.condition$Cond=="D",]
-HF.mort$mort<-1
-
-#merge with plot data:
-HF.plot.data<- merge(HF.plot.data, HF.mort, all = TRUE)
-HF.plot.data$mort[is.na(HF.plot.data$mort)] <- 0
+# 
+# ###load field data:
+# HF.latlon<-read.csv("HF_2022_Field_Data/2022_HF_plots_latlon.csv")
+# HF.plot.data<-read.csv("HF_2022_Field_Data/HF_Plot_data.csv")
+# HF.seedlings<-read.csv("HF_2022_Field_Data/HF_Seedlings_long.csv")
+# HF.trees<-read.csv("HF_2022_Field_Data/HF_Tree_data.csv")
+# HF.understory<-read.csv("HF_2022_Field_Data/HF_Und_ground_survey.csv")
+# 
+# #separating mortality sites:
+# library("dplyr")
+# HF.condition<-HF.trees %>% group_by(plot_2, Cond) %>% summarize(count=n())
+# HF.mort<-HF.condition[HF.condition$Cond=="D",]
+# HF.mort$mort<-1
+# 
+# #merge with plot data:
+# HF.plot.data<- merge(HF.plot.data, HF.mort, all = TRUE)
+# HF.plot.data$mort[is.na(HF.plot.data$mort)] <- 0
 
 
 ###recovery rate slopes for field sites:
@@ -45,7 +45,10 @@ field_plots <- field_plots %>%
   mutate(latitude = str_replace(latitude, " N", "")) %>%
   mutate(longitude = str_replace(longitude, " W", "")) %>%
   mutate_at(c('latitude','longitude'), as.numeric) %>%
-  mutate(invasives = str_replace(invasives, "yes", "1"))
+  mutate(invasives = ifelse(invasives == "no",0,1)) %>%
+  mutate(recent_timber_harvest = ifelse(recent_timber_harvest == "no",0,1))
+field_plots$longitude <- field_plots$longitude*-1
+  #mutate(invasives = str_replace(invasives, "yes", "1")) ###need to do the 0/1 replace this this and timber harvest
 
 #individual tree data (to get plots with mortality observed):
 hf_trees <- read.csv("HF_2022_Field_data/Tree_data - Sheet1.csv")
@@ -60,3 +63,6 @@ hf_mort$mort<-1
 #merge with plot data:
 field_plots <- merge(field_plots,hf_mort, all = TRUE)
 field_plots$mort[is.na(field_plots$mort)] <- 0
+
+#making a new lat/lon 
+hf_lat_lon <-
