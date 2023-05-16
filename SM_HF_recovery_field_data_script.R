@@ -37,18 +37,26 @@ HF.plot.data$mort[is.na(HF.plot.data$mort)] <- 0
 library(dplyr)
 library(tidyverse)
 
-#load and fix data:
+###load and fix data-----
+#field plot data:
 field_plots <- read.csv("HF_2022_Field_Data/Plot_data  - Sheet1.csv")
 field_plots <- field_plots %>%
+  mutate(plot = str_replace(plot, " ", "-")) %>%
   mutate(latitude = str_replace(latitude, " N", "")) %>%
   mutate(longitude = str_replace(longitude, " W", "")) %>%
-  mutate_at(c('latitude', 'longitude'), as.numeric)
+  mutate_at(c('latitude','longitude'), as.numeric) %>%
+  mutate(invasives = str_replace(invasives, "yes", "1"))
 
+#individual tree data (to get plots with mortality observed):
 hf_trees <- read.csv("HF_2022_Field_data/Tree_data - Sheet1.csv")
-#hf_trees <- hf_trees %>% group_by(plot_2, Cond) %>% summarize(count=n())
-#hf_mort<-HF.condition[HF.condition$Cond=="D",]
-#hf_mort$mort<-1
+hf_trees <- hf_trees %>% 
+  mutate(plot = str_replace(plot, " ", "-"))
+hf_condition <- hf_trees %>% 
+  group_by(plot, Cond) %>% 
+  summarize(count=n())
+hf_mort <- hf_condition[hf_condition$Cond=="D",]
+hf_mort$mort<-1
 
 #merge with plot data:
-#HF.plot.data<- merge(HF.plot.data, HF.mort, all = TRUE)
-#HF.plot.data$mort[is.na(HF.plot.data$mort)] <- 0
+field_plots <- merge(field_plots,hf_mort, all = TRUE)
+field_plots$mort[is.na(field_plots$mort)] <- 0
