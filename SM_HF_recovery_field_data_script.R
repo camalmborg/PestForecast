@@ -65,4 +65,6 @@ field_plots <- merge(field_plots,hf_mort, all = TRUE)
 field_plots$mort[is.na(field_plots$mort)] <- 0
 
 #making a new lat/lon 
-hf_lat_lon <-
+hf_lat_lon <- cbind(field_plots$plot, field_plots$longitude, field_plots$latitude)
+colnames(hf_lat_lon) <- c('plot','longitude','latitude')
+write.csv(hf_lat_lon, file="hf_lat_lon.csv", row.names=TRUE)
