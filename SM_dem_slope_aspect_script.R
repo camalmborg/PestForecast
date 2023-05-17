@@ -64,3 +64,4 @@ datastack <- stack(rastbox, slopes, aspects)
 
 #extract site values:
 DEMdata <- extract(datastack, sites)
+
