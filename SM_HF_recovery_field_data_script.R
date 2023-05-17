@@ -50,6 +50,12 @@ field_plots <- field_plots %>%
 field_plots$longitude <- field_plots$longitude*-1
   #mutate(invasives = str_replace(invasives, "yes", "1")) ###need to do the 0/1 replace this this and timber harvest
 
+#making a new lat/lon file:
+# hf_lat_lon <- cbind(field_plots$longitude, field_plots$latitude)
+# colnames(hf_lat_lon) <- c('longitude','latitude')
+# write.csv(hf_lat_lon, file="hf_lat_lon.csv", row.names=TRUE)
+
+
 #individual tree data (to get plots with mortality observed):
 hf_trees <- read.csv("HF_2022_Field_data/Tree_data - Sheet1.csv")
 hf_trees <- hf_trees %>% 
@@ -64,7 +70,3 @@ hf_mort$mort<-1
 field_plots <- merge(field_plots,hf_mort, all = TRUE)
 field_plots$mort[is.na(field_plots$mort)] <- 0
 
-#making a new lat/lon 
-hf_lat_lon <- cbind(field_plots$plot, field_plots$longitude, field_plots$latitude)
-colnames(hf_lat_lon) <- c('plot','longitude','latitude')
-write.csv(hf_lat_lon, file="hf_lat_lon.csv", row.names=TRUE)
