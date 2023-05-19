@@ -19,6 +19,7 @@ library(rasterVis)
 ### Get DEM data --------------------------------------------------------------
 
 #this will get the DEM for the whole USA:
+#raster package becoming unavailable, replaced by terra
 rastertest <- raster('USA1_msk_alt.gri')
 
 #crop to bounding box:
@@ -64,4 +65,5 @@ datastack <- stack(rastbox, slopes, aspects)
 
 #extract site values:
 DEMdata <- extract(datastack, sites)
+#save a csv and GEOTIFF of this -- 5/19
 
