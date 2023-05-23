@@ -244,7 +244,7 @@ dm_me_seasonal <- function(x,yrs,month){
 }
 
 #seasons:
-spring <- c(2,3)
+spring <- c(9,10,11)
 summer <- c(6,7,8)
 fall <- c(9,10,11)
 winter <- c(12,1,2) #but, of course, december is the wrong year

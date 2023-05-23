@@ -19,3 +19,4 @@ load("MJJ_precip.RData") #cols 4,5 for 2014, 2015
 load("MJ_precip.RData") #cols 4,5 for 2014, 2015
 load("SON_precip.RData") # col 4 for 2014
 
+
