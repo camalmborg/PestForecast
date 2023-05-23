@@ -75,32 +75,67 @@ DEMdata <- extract(datastack, sites)
 library(mgcv)
 
 #function for univariate analyses:
-DSA_explore<-function(dem,x,y,z){
+DSA_explore<-function(dem,dmrdat,dmr,coln){
   #make empty matrix:
-  r2s <- matrix(NA,nrow=ncol(dem[[1]]),ncol=length(dmvars))
+  r2s <- matrix(NA,nrow=1,ncol=ncol(dem))
   
   #loop over all members of dmvars list:
-  for (i in 1:length(dmvars)){
+  for (i in 1:ncol(dem)){
     #first extract the list you want:
-    dmvariable <- as.data.frame(dmvars[[i]][as.numeric(dmrdat$sitenum),])
+    demvariables <- as.data.frame(dem[as.numeric(dmrdat$sitenum),])
     #grab column number:
     cn <- as.matrix(as.numeric(dmrdat$colnum))
     #grab exploratory response  of choice:
     y <- as.matrix(as.numeric(dmrdat[,dmr]))
-    x <- as.data.frame(cbind(y,cn,dmvariable))
+    x <- as.data.frame(cbind(y,cn,demvariables))
     vardat <- x[x$cn==coln,]
     
-    #loop for filling in R2 table:  
-    for (j in 1:ncol(dmvariable)){
-      var.gam <- gam(vardat[,1]~s(vardat[,j+2]),data=vardat)
+    #run the GAM:
+    var.gam <- gam(vardat[,1]~s(vardat[,i+2]),data=vardat)
       
-      #extract r2:
-      summ <- summary(var.gam)
-      r2s[j,i] <-summ$r.sq
-    }
+    #extract r2:
+    summ <- summary(var.gam)
+    r2s[,i] <-summ$r.sq
   }
   # return(vardat)
   return(r2s)
 }
 
-testing <- dm_explore(spongyvars,testfx,"mags",22)
+testing_dem <- DSA_explore(DEMdata,testfx,"mags",22)
+
+
+### Plots -------------------------------------------------------
+#----------#### MAKING FIGURES: ####------------------------
+library(lattice)
+library(latticeExtra)
+library(tactile)
+library(mgcv)
+
+vardat <- vardat
+mo <- vardat[,3]
+var.gam <- var.gam <- gam(vardat[,1]~s(mo),data=vardat)
+
+dmplot<-xyplot(y ~ mo, data = vardat,
+               panel = function(x, y) {
+                 ci<-predict(var.gam, se=T)
+                 ci$lower<-ci$fit-qt(0.975,var.gam$df.null)*ci$se.fit
+                 ci$upper<-ci$fit+qt(0.975,var.gam$df.null)*ci$se.fit
+                 l.ci<-cbind(var.gam$model$mo,ci$fit,ci$lower,ci$upper)
+                 l<-l.ci[order(l.ci[,1]),]
+                 panel.ci(l[,1],l[,2],l[,4],l[,3],
+                          fill="seagreen3",alpha = 0.3)
+                 panel.xyplot(x, y, pch=20,col="seagreen")
+                 panel.lines(l[,1], l[,2],lty=1, col='black', lwd=1.5)
+                 summ<-summary(var.gam)
+                 r2 <- summ$r.sq
+                 #f <- summ$fstatistic
+                 # p <- pf(f[1],f[2],f[3],lower.tail=F)
+                 panel.text(labels = bquote(italic(R)^2 ==.(format(r2,digits = 3))),
+                            x=2150,y=-0.12,cex=0.75)
+                 # panel.text(labels = bquote(italic(p)==.(format(p,digits = 3))),
+                 #            x=1.2,y=-0.15,cex=0.75)
+               },
+               ylab="Disturbance Magnitude (TCG)",
+               xlab="DEM Elevation",
+)
+print(dmplot)
