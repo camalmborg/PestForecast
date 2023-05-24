@@ -33,15 +33,13 @@ spongy_mpr<-function(tcg,cs,distyr){
   #identify missing data columns:
   NAy1<-which(is.na(tcgjune[,grep(as.character(distyr),colnames(tcgjune))]))
   NAy2<-which(is.na(tcgjune[,grep(as.character(distyr+1),colnames(tcgjune))]))
-  # if (length(NAy1) == 0 & length(NAy2 =/ 0){
-  #   missing <- NAy2
-  # }
-  #missing<-intersect(NAy1,NAy2) #this line didn't work when NAy1 or NAy2 == 0, was going to troubleshoot above, doing c() instead
-  missing <- c(NAy1, NAy2)
-  # if (length(missing) == 0){
-  #   tcgjune<-tcgjune
-  #   steadys<-steadys
-  # } else {
+
+  missing<-intersect(NAy1,NAy2) 
+  
+  if (length(missing) == 0){
+    tcgjune<-tcgjune
+    steadys<-steadys
+  } else {
   tcgjune<-tcgjune[-missing,]
   steadys<-steadys[-missing]
   }
@@ -54,15 +52,21 @@ spongy_mpr<-function(tcg,cs,distyr){
   recovcol<-vector()
   end<-length(tcgjune[1,])
   nsite<-length(tcgjune[,1])
+  #recov<-list()
   for (i in 1:nsite){
     mins[i]<-min(tcgjune[i,grep(as.character(distyr),colnames(tcgjune)):
                            grep(as.character(distyr+1),colnames(tcgjune))],na.rm=T)        #grabs min forest condition score for each site
-    colnum[i]<-which(tcgjune[i,]==mins[i])           #grabs time step at which min score appears in disturbance window
+    colnum[i]<-which(tcgjune[i,grep(as.character(distyr),colnames(tcgjune)):
+                               grep(as.character(distyr+1),colnames(tcgjune))]==mins[i])           #grabs time step at which min score appears in disturbance window
+    colnum[i] <- ifelse(colnum[i]==1, (grep(as.character(distyr),colnames(tcgjune))),
+                  (grep(as.character(distyr),colnames(tcgjune))+1))
+
     if(is.na(colnum[i] + which(tcgjune[i,colnum[i]:end]>=steadys[i])[1])){
-       recovcol[i]<-colnum[i] + 2
+       recovcol[i]<-colnum[i] + 2 #why?
      } else {
        recovcol[i]<-colnum[i] + which(tcgjune[i,colnum[i]:end]>=steadys[i])[1]
      }
+
      if(recovcol[i]>end){
        recov<-tcgjune[i,colnum[i]:end]
      } else {
@@ -74,27 +78,27 @@ spongy_mpr<-function(tcg,cs,distyr){
      recov.rate[i]<-slope[[i]]$coefficients["ind"] #stores recovery rate
   }
   rm(slope)
-  
+
   #calculate disturbance magnitude:
   mags<-steadys-mins
-  
+
   #calculate disturbance magnitude/original tcg:
   magsdiv<-mags/steadys
-  
+
   #calculate recovery time:
   recov.time<-mags/recov.rate
-  
+
   #combine data into dataframe:
   if (length(missing) == 0){
     tcg.mx<-cbind(tcg[,1],sitenum,steadys,colnum,mins,mags,magsdiv,recov.rate,recov.time)
   } else{
   tcg.mx<-cbind(tcg[-missing,1],sitenum[-missing],steadys,colnum,mins,mags,magsdiv,recov.rate,recov.time)
   }
-  
+
   tcg.m<-as.data.frame(tcg.mx)
   colnames(tcg.m)<-c("id","sitenum","steady","colnum","mins","mags","magsdiv","recov.rate","recov.time")
   #return(tcg.m)
-  
+
   ### Condition scores for disturbance probabilties
   csj<-cs[,grep("[:.:]06",colnames(cs))]
   if (length(missing)==0){
@@ -107,7 +111,7 @@ spongy_mpr<-function(tcg,cs,distyr){
   distprob<-matrix(NA,nrow=nrow(dmpr),ncol=2)
   d = quantile(dmpr[,grep(as.character(distyr-5),colnames(dmpr)):
                        grep(as.character(distyr-1),colnames(dmpr))],
-               c(0.01),na.rm=T) #selecting dist sites 1% quant in prev 5 yr
+               c(0.1),na.rm=T) #selecting dist sites 1% quant in prev 5 yr. For other data: originally 0.01 
   #determine if disturbance (cond score < d threshold) occurs
   for (i in 1:nrow(dmpr)){
     if (dmpr[i,]$colnum == min(dmpr$colnum) & dmpr[i,grep(as.character(distyr),colnames(dmpr))] <= d){
@@ -119,11 +123,11 @@ spongy_mpr<-function(tcg,cs,distyr){
     }
     distprob[is.na(distprob)] <- 0
   }
-  
+
   #add disturbance probabilities to dataframe:
   tcg.m$dpy1<-distprob[,1]
   tcg.m$dpy2<-distprob[,2]
-  
+
   return(tcg.m)
 }
 
