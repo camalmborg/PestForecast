@@ -6,6 +6,9 @@
 #file<-"2022_08_31_DATAGRAB/2022_12_7_sample_tcg_mean_5k.csv"
 #cfile<-"2022_08_31_DATAGRAB/2022_12_7_sample_score_mean_5k.csv"
 
+#### HARVARD FOREST DATA:
+file <- "HF_2022_Field_Data/GEE_Data/2023_05_17_hfplots_sample_tcg_mean.csv"
+cfile <- "HF_2022_Field_Data/GEE_Data/2023_05_17_hfplots_sample_score_mean.csv"
 
 #tcg and condition score objects:
 tcg.values<-read.csv(file)
@@ -19,7 +22,7 @@ spongy_mpr<-function(tcg,cs,distyr){
   sitenum<-as.matrix(1:nrow(tcgs))
   
   #first get just june values:
-  junes<-seq(2,ncol(tcgs),by=5) #15/15s = seq starts w 3, 1/1s = seq starts w 2
+  junes<-seq(3,ncol(tcgs),by=5)  #3 is if tcg/condscores data have april in them, 2 if data starts w/May
   tcgjune<-as.matrix(tcgs[,junes])
 
   #identify steady state (mean tcg previous 3 years):
@@ -30,11 +33,15 @@ spongy_mpr<-function(tcg,cs,distyr){
   #identify missing data columns:
   NAy1<-which(is.na(tcgjune[,grep(as.character(distyr),colnames(tcgjune))]))
   NAy2<-which(is.na(tcgjune[,grep(as.character(distyr+1),colnames(tcgjune))]))
-  missing<-intersect(NAy1,NAy2)
-  if (length(missing) == 0){
-    tcgjune<-tcgjune
-    steadys<-steadys
-  } else {
+  # if (length(NAy1) == 0 & length(NAy2 =/ 0){
+  #   missing <- NAy2
+  # }
+  #missing<-intersect(NAy1,NAy2) #this line didn't work when NAy1 or NAy2 == 0, was going to troubleshoot above, doing c() instead
+  missing <- c(NAy1, NAy2)
+  # if (length(missing) == 0){
+  #   tcgjune<-tcgjune
+  #   steadys<-steadys
+  # } else {
   tcgjune<-tcgjune[-missing,]
   steadys<-steadys[-missing]
   }
@@ -132,6 +139,7 @@ testfx<-spongy_mpr(tcg.values,cond.scores,2016)
 #day 15-day 15 monthly data:
 file <- "2023_03_08_DATAGRAB/2023_03_08_5000_sites_sample_tcg_mean.csv"
 cfile <- "2023_03_08_DATAGRAB/2023_03_08_5000_sites_sample_score_mean.csv"
+
 
 #tcg and condition score objects:
 tcg.values<-read.csv(file)
