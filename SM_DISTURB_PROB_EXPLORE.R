@@ -39,7 +39,7 @@ spongy_ROC <- function(dmvars,dmrdat,yr,coln){
 }
 
 
-testing_roc_2 <- spongy_ROC(dmvars_mo,testfx,2,23) #recall if yr=2, coln=23
+testing_roc_s <- spongy_ROC(spongyvars,testfx,1,22) #recall if yr=2, coln=23
 
 #filename <- paste0("Analyses_Daymet_seasonal/2023_05_03_daymet_seasonal_distprob_analyses_", season[4], ".csv")
 #write.csv(testing_roc, file=filename)
