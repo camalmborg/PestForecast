@@ -21,7 +21,9 @@ library(terra)
 
 #this will get the DEM for the whole USA:
 #raster package becoming unavailable, replaced by terra
-rastertest <- raster('USA1_msk_alt.tif')
+#getData("ISO3")
+#getData('alt', country='USA', mask=TRUE)
+rastertest <- raster('USA1_msk_alt.grd')
 
 #crop to bounding box:
 bounds <- read.csv("2022_03_29_latlonboundingbox.csv")
@@ -112,7 +114,7 @@ library(tactile)
 library(mgcv)
 
 vardat <- vardat
-mo <- vardat[,3]
+mo <- vardat[,4]
 var.gam <- var.gam <- gam(vardat[,1]~s(mo),data=vardat)
 
 dmplot<-xyplot(y ~ mo, data = vardat,
@@ -136,6 +138,6 @@ dmplot<-xyplot(y ~ mo, data = vardat,
                  #            x=1.2,y=-0.15,cex=0.75)
                },
                ylab="Disturbance Magnitude (TCG)",
-               xlab="DEM Elevation",
+               xlab="DEM Slope",
 )
 print(dmplot)
