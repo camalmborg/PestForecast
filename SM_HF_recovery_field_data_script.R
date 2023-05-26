@@ -88,8 +88,25 @@ hf_roc<-roc(hf_data$mags,hf_gam$fitted.values)
 #summ <- 
 
 ### Making some plots:
-library(lattice)
-library(latticeExtra)
-library(tactile)
+# library(lattice)
+# library(latticeExtra)
+# library(tactile)
 
-#
+plot.roc(hf_data$mort,hf_data$mags,
+         percent=T)
+
+
+plot(hf_data$mags, hf_data$mort)
+
+#bin means:
+bins=seq(min(hf_data$mags)-1,max(hf_data$mags)+1,length=10)
+bin = findInterval(hf_data$mags,bins)
+mu = tapply(hf_data$mort,bin,mean,na.rm=TRUE)
+n  = tapply(hf_data$mort,bin,length)
+sigma = sqrt(mu*(1-mu)/n)
+x = min(hf_data$mags)-1 + cumsum(diff(bins))
+points(x,mu,col=2)
+points(x,mu+2*sigma,col=3,pch="-")
+points(x,mu-2*sigma,col=3,pch="-")
+
+#next stop: plot the gam
