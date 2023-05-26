@@ -66,7 +66,30 @@ hf_condition <- hf_trees %>%
 hf_mort <- hf_condition[hf_condition$Cond=="D",]
 hf_mort$mort<-1
 
-#merge with plot data:
+###merge with plot data:
 field_plots <- merge(field_plots,hf_mort, all = TRUE)
 field_plots$mort[is.na(field_plots$mort)] <- 0
 
+#merge with remote-sensing data:
+#load:
+hf_mags <- read.csv("HF_2022_Field_Data/HF_mags_recov_from_GEE_data.csv")
+#join:
+hf_data <- cbind(field_plots,hf_mags)
+
+### GAM time:
+library(mgcv)
+library(pROC)
+
+hf_gam <- gam(hf_data$mort ~ s(hf_data$mags), 
+              data=hf_data,
+              family = "binomial")
+hf_roc<-roc(hf_data$mags,hf_gam$fitted.values)
+
+#summ <- 
+
+### Making some plots:
+library(lattice)
+library(latticeExtra)
+library(tactile)
+
+#
