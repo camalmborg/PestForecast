@@ -52,8 +52,18 @@ SM_multi_var <- function(data, nvars, dmrdat) {
     #make gam variables data frame:
     vardat[[i]] <- as.data.frame(cbind(dmrdat$mags, data[,c(combi[i,])]))
     
+    #make gam explantory variables list
+    ex_vars <- c()
+    for (j in 1:nvars){
+      ex_vars[j] <- paste0('+s(vardat[,', j+1, '])')
+      ex_vars[1] <- gsub('\\+','', ex_vars[1])
+    }
+    
+    #make a single string:
+    ex_var <- paste(ex_vars, collapse='')
+    
     #run gam with those data:
-    mv_gam <- gam(vardat[,1]~s(vardat[,2])+s(vardat[,3]),data=vardat)
+    mv_gam <- gam(vardat[,1]~as.factor(ex_var),data=vardat)
   }
 }
 
