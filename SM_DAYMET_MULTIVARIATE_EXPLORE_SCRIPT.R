@@ -36,6 +36,5 @@ MV_DATA <- cbind(dm_maxtemps[,c(46,47,48,49,50,51,58,59,60,61,62,63)],
 
 #making a combinations loop:
 combi <- combn(nrow(MV_DATA),2)
-combi                                         
-
+com
 
