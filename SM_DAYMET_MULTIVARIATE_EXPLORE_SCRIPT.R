@@ -72,3 +72,4 @@ SM_multi_var <- function(data, nvars, dmrdat) {
 }
 
 test <- SM_multi_var(MV_DATA, 2, dmr)
+test3v <- SM_multi_var(MV_DATA, 3, dmr)
