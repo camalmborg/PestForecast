@@ -68,8 +68,12 @@ SM_multi_var <- function(data, nvars, dmrdat) {
     summ <- summary(mv_gam)
     r2s[i,2] <-summ$r.sq
   }
-  return(r2s)
+  models <- cbind(r2s, combi)
+  return(models)
 }
 
 test <- SM_multi_var(MV_DATA, 2, dmr)
 test3v <- SM_multi_var(MV_DATA, 3, dmr)
+
+checkmodels <- c(which(test3v[,2]>=0.3))
+checking <- text3v[checkmodels,]
