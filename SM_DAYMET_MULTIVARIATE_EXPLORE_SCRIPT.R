@@ -35,6 +35,9 @@ MV_DATA <- cbind(dm_maxtemps[,c(46,47,48,49,50,51,58,59,60,61,62,63)],
                  SON_precip[,4])
 
 #making a combinations loop:
-combi <- combn(nrow(MV_DATA),2)
-com
+combi <- t(combn(ncol(MV_DATA),2))
+
+#SM_multi_var <- function(data, nvars, ) {
+  #combi <- t(combn(ncol(data),nvars))
+#}
 
