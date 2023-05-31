@@ -41,7 +41,8 @@ mv_gam <- gam(dmr$mags~s(vardat[,1])+s(vardat[,2]),data=vardat)
 
 SM_multi_var <- function(data, nvars, dmrdat) {
   #make empty matrix:
-  r2s <- matrix(nrow=1, ncol=1) #need to know dims
+  r2s <- matrix(nrow=nrow(combi), ncol=2) #need to know dims
+  r2s[i,1] <- i
   
   #make combinations of nvars variables:
   combi <- t(combn(ncol(data),nvars))
@@ -50,7 +51,7 @@ SM_multi_var <- function(data, nvars, dmrdat) {
   #vardat loop:
   for (i in 1:nrow(combi)){
     #make gam variables data frame:
-    vardat[[i]] <- as.data.frame(cbind(dmrdat$mags, data[,c(combi[i,])]))
+    vardat <- as.data.frame(cbind(dmrdat$mags, data[,c(combi[i,])]))
     
     #make gam explantory variables list
     ex_vars <- c()
@@ -64,7 +65,10 @@ SM_multi_var <- function(data, nvars, dmrdat) {
     
     #run gam with those data:
     mv_gam <- gam(gam_formula)
+    summ <- summary(mv_gam)
+    r2s[i,2] <-summ$r.sq
   }
-  #return(r2s)
+  return(r2s)
 }
 
+test <- SM_multi_var(MV_DATA, 2, dmr)
