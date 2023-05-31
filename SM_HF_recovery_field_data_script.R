@@ -110,3 +110,5 @@ points(x,mu+2*sigma,col=3,pch="-")
 points(x,mu-2*sigma,col=3,pch="-")
 
 #next stop: plot the gam
+fit <- hf_gam$fitted.values
+points(hf_data$mags, fit, col=4, pch="*")
