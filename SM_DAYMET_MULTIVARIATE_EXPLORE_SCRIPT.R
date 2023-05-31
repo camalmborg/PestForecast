@@ -35,17 +35,17 @@ MV_DATA <- cbind(dm_maxtemps[,c(46,47,48,49,50,51,58,59,60,61,62,63)],
                  SON_precip[,4])
 
 #making a combinations loop:
-combi <- t(combn(ncol(MV_DATA),2))
-vardat <- as.data.frame(cbind(dmr$mags, MV_DATA[,c(combi[1,])]))
-mv_gam <- gam(dmr$mags~s(vardat[,1])+s(vardat[,2]),data=vardat)
+#combi <- t(combn(ncol(MV_DATA),2))
+#vardat <- as.data.frame(cbind(dmr$mags, MV_DATA[,c(combi[1,])]))
+#mv_gam <- gam(dmr$mags~s(vardat[,1])+s(vardat[,2]),data=vardat)
 
 SM_multi_var <- function(data, nvars, dmrdat) {
+  #make combinations of nvars variables:
+  combi <- t(combn(ncol(data),nvars))
+  
   #make empty matrix:
   r2s <- matrix(nrow=nrow(combi), ncol=2) #need to know dims
   r2s[,1] <- 1:nrow(combi)
-  
-  #make combinations of nvars variables:
-  combi <- t(combn(ncol(data),nvars))
   
   #vardattest <- list()
   #vardat loop:
