@@ -36,8 +36,24 @@ MV_DATA <- cbind(dm_maxtemps[,c(46,47,48,49,50,51,58,59,60,61,62,63)],
 
 #making a combinations loop:
 combi <- t(combn(ncol(MV_DATA),2))
+vardat <- as.data.frame(cbind(dmr$mags, MV_DATA[,c(combi[1,])]))
+mv_gam <- gam(dmr$mags~s(vardat[,1])+s(vardat[,2]),data=vardat)
 
-#SM_multi_var <- function(data, nvars, ) {
-  #combi <- t(combn(ncol(data),nvars))
-#}
+SM_multi_var <- function(data, nvars, dmrdat) {
+  #make empty matrix:
+  r2s <- matrix(nrow=1, ncol=1) #need to know dims
+  
+  #make combinations of nvars variables:
+  combi <- t(combn(ncol(data),nvars))
+  
+  #vardattest <- list()
+  #vardat loop:
+  for (i in 1:nrow(combi)){
+    #make gam variables data frame:
+    vardat[[i]] <- as.data.frame(cbind(dmrdat$mags, data[,c(combi[i,])]))
+    
+    #run gam with those data:
+    mv_gam <- gam(vardat[,1]~s(vardat[,2])+s(vardat[,3]),data=vardat)
+  }
+}
 
