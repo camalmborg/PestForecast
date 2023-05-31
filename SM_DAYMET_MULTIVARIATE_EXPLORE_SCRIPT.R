@@ -42,7 +42,7 @@ mv_gam <- gam(dmr$mags~s(vardat[,1])+s(vardat[,2]),data=vardat)
 SM_multi_var <- function(data, nvars, dmrdat) {
   #make empty matrix:
   r2s <- matrix(nrow=nrow(combi), ncol=2) #need to know dims
-  r2s[i,1] <- i
+  r2s[,1] <- 1:nrow(combi)
   
   #make combinations of nvars variables:
   combi <- t(combn(ncol(data),nvars))
