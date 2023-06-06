@@ -1,14 +1,14 @@
 #### This is the script for processing GEE data from the forest condition tool
 
 #### Load condition score .csv from GEE extract:
-#cfile<-"2022_08_31_DATAGRAB/2022_08_31_5k_score_mean - 2022_08_31_5k_score_mean.csv"
-#file<-"2022_08_31_DATAGRAB/2022_08_31_5k_tcg_mean - 2022_08_31_5k_tcg_mean.csv"
-#file<-"2022_08_31_DATAGRAB/2022_12_7_sample_tcg_mean_5k.csv"
-#cfile<-"2022_08_31_DATAGRAB/2022_12_7_sample_score_mean_5k.csv"
+#DONT USE:#cfile<-"2022_08_31_DATAGRAB/2022_08_31_5k_score_mean - 2022_08_31_5k_score_mean.csv"
+#DONT USE:#file<-"2022_08_31_DATAGRAB/2022_08_31_5k_tcg_mean - 2022_08_31_5k_tcg_mean.csv"
+file<-"2022_08_31_DATAGRAB/2022_12_7_sample_tcg_mean_5k.csv"
+cfile<-"2022_08_31_DATAGRAB/2022_12_7_sample_score_mean_5k.csv"
 
 #### HARVARD FOREST DATA:
-file <- "HF_2022_Field_Data/GEE_Data/2023_05_17_hfplots_sample_tcg_mean.csv"
-cfile <- "HF_2022_Field_Data/GEE_Data/2023_05_17_hfplots_sample_score_mean.csv"
+#file <- "HF_2022_Field_Data/GEE_Data/2023_05_17_hfplots_sample_tcg_mean.csv"
+#cfile <- "HF_2022_Field_Data/GEE_Data/2023_05_17_hfplots_sample_score_mean.csv"
 
 #tcg and condition score objects:
 tcg.values<-read.csv(file)
@@ -22,7 +22,7 @@ spongy_mpr<-function(tcg,cs,distyr){
   sitenum<-as.matrix(1:nrow(tcgs))
   
   #first get just june values:
-  junes<-seq(3,ncol(tcgs),by=5)  #3 is if tcg/condscores data have april in them, 2 if data starts w/May
+  junes<-seq(2,ncol(tcgs),by=5)  #3 is if tcg/condscores data have april in them, 2 if data starts w/May
   tcgjune<-as.matrix(tcgs[,junes])
 
   #identify steady state (mean tcg previous 3 years):
@@ -132,6 +132,7 @@ spongy_mpr<-function(tcg,cs,distyr){
 }
 
 testfx<-spongy_mpr(tcg.values,cond.scores,2016)
+testfx2 <- spongy_mpr(cond.scores, cond.scores, 2016)
 
 #once again I am a beautiful genius!!!!
 
