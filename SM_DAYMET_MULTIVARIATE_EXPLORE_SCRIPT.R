@@ -34,6 +34,10 @@ MV_DATA <- cbind(dm_maxtemps[,c(46,47,48,49,50,51,58,59,60,61,62,63)],
                  MJ_precip[,4:5],
                  SON_precip[,4])
 
+test_data <- cbind(dm_maxtemps[,c(60,61,62,63)],
+                   MAM_spring_precip[,6],
+                   SON_precip[,4])
+
 #making a combinations loop:
 #combi <- t(combn(ncol(MV_DATA),2))
 #vardat <- as.data.frame(cbind(dmr$mags, MV_DATA[,c(combi[1,])]))
@@ -46,6 +50,8 @@ SM_multi_var <- function(data, nvars, dmrdat) {
   #make empty matrix:
   r2s <- matrix(nrow=nrow(combi), ncol=2) #need to know dims
   r2s[,1] <- 1:nrow(combi)
+  
+  aics <- vector()
   
   #vardattest <- list()
   #vardat loop:
@@ -66,14 +72,20 @@ SM_multi_var <- function(data, nvars, dmrdat) {
     #run gam with those data:
     mv_gam <- gam(gam_formula)
     summ <- summary(mv_gam)
-    r2s[i,2] <-summ$r.sq
+    r2s[i,2] <- summ$r.sq
+    aics[i] <- mv_gam$aic
   }
-  models <- cbind(r2s, combi)
+  
+  delta <- min(aics)
+  delAIC <- aics-delta
+  models <- cbind(r2s, combi, delAIC)
   return(models)
 }
 
 test <- SM_multi_var(MV_DATA, 2, dmr)
 test3v <- SM_multi_var(MV_DATA, 3, dmr)
+
+test2 <- SM_multi_var(test_data, 2, dmr)
 
 checkmodels <- c(which(test3v[,2]>=0.3))
 checking <- text3v[checkmodels,]
