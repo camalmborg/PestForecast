@@ -100,7 +100,7 @@ spongy_mpr_cs<-function(tcg,cs,distyr){
   }
   
   cs.m<-as.data.frame(cs.mx)
-  colnames(cs.m)<-c("id","sitenum","steady","colnum","mins","mags","magsdiv","recov.rate","recov.time")
+  colnames(cs.m)<-c("id","sitenum","steady","colnum","mins","mags","magsdiv")#,"recov.rate","recov.time")
   #return(tcg.m)
   
   ### Condition scores for disturbance probabilties
@@ -110,7 +110,7 @@ spongy_mpr_cs<-function(tcg,cs,distyr){
   } else {
     csj<-csj[-missing,]
   }
-  dmpr<-cbind(tcg.m,csj)
+  dmpr<-cbind(cs.m,csj)
   #LOOP FOR DISTURBANCE PROBABILITY:
   distprob<-matrix(NA,nrow=nrow(dmpr),ncol=2)
   d = quantile(dmpr[,grep(as.character(distyr-5),colnames(dmpr)):
@@ -135,5 +135,5 @@ spongy_mpr_cs<-function(tcg,cs,distyr){
   return(cs.m)
 }
 
-testfx<-spongy_mpr_cs(tcg.values,cond.scores,2016)
+testfx_t<-spongy_mpr_cs(tcg.values,cond.scores,2016)
 
