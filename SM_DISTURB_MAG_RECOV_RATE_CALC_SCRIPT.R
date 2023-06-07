@@ -90,12 +90,12 @@ spongy_mpr<-function(tcg,cs,distyr){
 
   #combine data into dataframe:
   if (length(missing) == 0){
-    tcg.mx<-cbind(tcg[,1],sitenum,steadys,colnum,mins,mags,magsdiv,recov.rate,recov.time)
+    tcg.m<-data.frame(tcg[,1],sitenum,steadys,colnum,mins,mags,magsdiv,recov.rate,recov.time)
   } else{
-  tcg.mx<-cbind(tcg[-missing,1],sitenum[-missing],steadys,colnum,mins,mags,magsdiv,recov.rate,recov.time)
+  tcg.m<-data.frame(tcg[-missing,1],sitenum[-missing],steadys,colnum,mins,mags,magsdiv,recov.rate,recov.time)
   }
 
-  tcg.m<-as.data.frame(tcg.mx)
+  #tcg.m<-as.data.frame(tcg.mx)
   colnames(tcg.m)<-c("id","sitenum","steady","colnum","mins","mags","magsdiv","recov.rate","recov.time")
   #return(tcg.m)
 
