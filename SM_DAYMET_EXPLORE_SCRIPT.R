@@ -1,5 +1,8 @@
 # This code is for the daymet exploratory analyses
 
+#load data if not in environment:
+load("DMVARS_MO.RData")
+
 # necessary libraries:
 library(mgcv)
 
@@ -32,7 +35,7 @@ dm_explore<-function(dmvars,dmrdat,dmr,coln){
   return(r2s)
 }
 
-testing <- dm_explore(spongyvars,testfx,"mags",22)
+testing <- dm_explore(spongyvars,testfx2,"mags",22)
 
 season <- c("SPRING", "SUMMER", "FALL", "WINTER")
 sprmonths <- c("MarApr", "AprMay", "MayJunJul")
