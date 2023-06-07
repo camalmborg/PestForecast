@@ -7,7 +7,7 @@
 #load libraries:
 library(lattice)
 library(geodata)
-library(rgdal)
+library(rgdal)  ##deprecating?
 library(rgeos)
 library(terra)
 #library(raster)  ##deprecated
@@ -16,59 +16,61 @@ library(terra)
 #url for DEM data:
 #url <- "http://doi.org/10.5067/MEaSUREs/SRTM/SRTMGL1N.003"
 
+### GET DEM DATA AND SLOPE/ASPECT CALCULATIONS USING TERRA PACKAGE:------------
 
-### Get DEM data --------------------------------------------------------------
+
+### Get DEM data ARCHIVED: USED RASTER PACKAGE-------------------------------
 
 #this will get the DEM for the whole USA:
 #raster package becoming unavailable, replaced by terra
 #getData("ISO3")
 #getData('alt', country='USA', mask=TRUE)
-rastertest <- raster('USA1_msk_alt.grd')
+#rastertest <- raster('USA1_msk_alt.grd')
 
-#crop to bounding box:
-bounds <- read.csv("2022_03_29_latlonboundingbox.csv")
-extents <- c(min(bounds$y),
-             max(bounds$y),
-             min(bounds$x),
-             max(bounds$x))
-box <- as(extent(extents), 'SpatialPolygons')
-crs(box) <- "+proj=longlat +datum=WGS84 +no_defs"
-#study area:
-rastbox <- crop(rastertest, box)
+# #crop to bounding box:
+# bounds <- read.csv("2022_03_29_latlonboundingbox.csv")
+# extents <- c(min(bounds$y),
+#              max(bounds$y),
+#              min(bounds$x),
+#              max(bounds$x))
+# box <- as(extent(extents), 'SpatialPolygons')
+# crs(box) <- "+proj=longlat +datum=WGS84 +no_defs"
+# #study area:
+# rastbox <- crop(rastertest, box)
 
-#re-project raster and convert to gtiff:
-rastboxproj <- projectRaster(rastbox, 
-                             crs= "+proj=longlat +datum=WGS84 +no_defs",
-                             format='GTiff')
+# #re-project raster and convert to gtiff:
+# rastboxproj <- projectRaster(rastbox, 
+#                              crs= "+proj=longlat +datum=WGS84 +no_defs",
+#                              format='GTiff')
+# 
+# 
+# #plot(rastertest)
+# #plot(rastboxproj)
+
+### Make spatial dataset from csv of lat/lon points for sites--
+
+# #load csv with lat/lon coords:
+# sites <- read.csv("2022_03_22_5000sites_lat_long_points_for_GEE_asset.csv")
+# #convert to spatial:
+# coordinates(sites) <- ~y+x
+# crs(sites) <- crs(rastbox)
+# 
+# #plot(sites)
 
 
-#plot(rastertest)
-#plot(rastboxproj)
+### Get slope and aspect data--
 
-### Make spatial dataset from csv of lat/lon points for sites------------------
-
-#load csv with lat/lon coords:
-sites <- read.csv("2022_03_22_5000sites_lat_long_points_for_GEE_asset.csv")
-#convert to spatial:
-coordinates(sites) <- ~y+x
-crs(sites) <- crs(rastbox)
-
-#plot(sites)
-
-
-### Get slope and aspect data--------------------------------------------------
-
-#slope:
-slopes <- terrain(rastbox, opt="slope", unit="degrees")
-#aspect:
-aspects <- terrain(rastbox, opt="aspect", unit="degrees")
-
-#make stack:
-datastack <- stack(rastbox, slopes, aspects)
-
-#extract site values:
-DEMdata <- extract(datastack, sites)
-#save a csv and GEOTIFF of this -- 5/19
+# #slope:
+# slopes <- terrain(rastbox, opt="slope", unit="degrees")
+# #aspect:
+# aspects <- terrain(rastbox, opt="aspect", unit="degrees")
+# 
+# #make stack:
+# datastack <- stack(rastbox, slopes, aspects)
+# 
+# #extract site values:
+# DEMdata <- extract(datastack, sites)
+# #save a csv and GEOTIFF of this -- 5/19
 
 
 ### Univariate Analyses ------------------------------------------
