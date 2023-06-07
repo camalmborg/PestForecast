@@ -18,6 +18,9 @@ library(terra)
 
 ### GET DEM DATA AND SLOPE/ASPECT CALCULATIONS USING TERRA PACKAGE:------------
 
+#load tif file:
+tif_file <- "DEM_Data/2023_06_07_NE_MERGE_DEM.tif"
+NE_rast <- rast(tif_file)
 
 ### Get DEM data ARCHIVED: USED RASTER PACKAGE-------------------------------
 
