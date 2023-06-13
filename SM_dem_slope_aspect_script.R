@@ -22,6 +22,17 @@ library(terra)
 tif_file <- "DEM_Data/2023_06_07_NE_MERGE_DEM.tif"
 NE_rast <- rast(tif_file)
 
+#load sites:
+sites <- read.csv("2022_03_22_5000sites_lat_long_points_for_GEE_asset.csv")
+
+#convert to spatial:
+coordinates(sites) <- ~y+x
+#crs(sites) <- crs(NE_rast)
+
+plot(sites)
+
+#calculating 
+
 ### Get DEM data ARCHIVED: USED RASTER PACKAGE-------------------------------
 
 #this will get the DEM for the whole USA:
