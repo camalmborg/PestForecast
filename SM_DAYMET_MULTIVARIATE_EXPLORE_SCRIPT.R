@@ -5,8 +5,10 @@
 #multivariate gams
 
 # necessary libraries:
-library(mgcv)
+library(mgcv) #for GAM analyses
 library(combinat)
+library(pROC) #for AUC analyses
+
 
 #load data:
 load("DMVARS_MO.RData")
