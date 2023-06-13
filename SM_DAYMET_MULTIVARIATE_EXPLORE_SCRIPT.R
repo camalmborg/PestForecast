@@ -91,3 +91,51 @@ test2 <- SM_multi_var(test_data, 2, dmr)
 
 checkmodels <- c(which(test3v[,2]>=0.3))
 checking <- text3v[checkmodels,]
+
+
+### DISTURBANCE PROBABILITY MULTIVARIATE LOOP: ------
+
+SM_multi_ROC <- function(data,dmrdat,yr){
+  #make combinations of nvars variables:
+  combi <- t(combn(ncol(data),nvars))
+  
+  #make empty matrix:
+  rocs <- matrix(nrow=nrow(combi), ncol=2) #need to know dims
+  rocs[,1] <- 1:nrow(combi)
+  
+  aics <- vector()
+  
+  #grab just disturbance probability columns:
+  dists<-dmrdat[,grep("^dp",colnames(dmrdat))]
+  
+  #vardat loop:
+  for (i in 1:nrow(combi)){
+    #make gam variables data frame:
+    vardat <- as.data.frame(cbind(dists[,yr], data[,c(combi[i,])]))
+    
+    #make gam explantory variables list
+    ex_vars <- c()
+    for (j in 1:nvars){
+      ex_vars[j] <- paste0('s(vardat[,', j+1, '])')
+    }
+    
+    #make a single string:
+    gam_formula <- as.formula(paste("vardat[,1] ~ ",
+                                    paste(ex_vars, collapse='+')))
+    
+    #run gam with those data:
+    mv_gam <- gam(gam_formula, data=vardat, family="binomial")
+    mv_roc <- roc(vardat[,1], mv_gam$fitted.values)
+    rocs[i,2] <- mv_roc$auc
+    aics[i] <- mv_gam$aic
+  }
+  
+  delta <- min(aics)
+  delAIC <- aics-delta
+  models <- cbind(rocs, combi, delAIC)
+  return(models)
+  
+}
+
+
+testing_roc_s <- SM_multi_ROC(data, testfx, 1) #recall if yr=1, coln=22 (2016)
