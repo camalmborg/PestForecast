@@ -95,7 +95,7 @@ checking <- text3v[checkmodels,]
 
 ### DISTURBANCE PROBABILITY MULTIVARIATE LOOP: ------
 
-SM_multi_ROC <- function(data,dmrdat,yr){
+SM_multi_ROC <- function(data,nvars,dmrdat,yr){
   #make combinations of nvars variables:
   combi <- t(combn(ncol(data),nvars))
   
@@ -138,4 +138,4 @@ SM_multi_ROC <- function(data,dmrdat,yr){
 }
 
 
-testing_roc_s <- SM_multi_ROC(data, testfx, 1) #recall if yr=1, coln=22 (2016)
+testing_roc_s <- SM_multi_ROC(data,2,testfx,1) #recall if yr=1, coln=22 (2016)
