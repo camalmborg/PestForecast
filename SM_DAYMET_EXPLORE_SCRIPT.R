@@ -35,7 +35,7 @@ dm_explore<-function(dmvars,dmrdat,dmr,coln){
   return(r2s)
 }
 
-testing <- dm_explore(spongyvars,testfx2,"mags",22)
+testing <- dm_explore(dmvars_mo,testfx,"mags",22)
 
 season <- c("SPRING", "SUMMER", "FALL", "WINTER")
 sprmonths <- c("MarApr", "AprMay", "MayJunJul")
