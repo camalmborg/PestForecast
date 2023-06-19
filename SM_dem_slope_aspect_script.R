@@ -115,6 +115,9 @@ site_data <- extract(NE_dem_data, coords)
 #load libraries:
 library(mgcv)
 
+#load testfx object if not in environment:
+testfx <- read.csv("SM_distmagrecov_data.csv")
+
 #function for univariate analyses:
 DSA_explore<-function(dem,dmrdat,dmr,coln){
   #make empty matrix:
@@ -142,7 +145,7 @@ DSA_explore<-function(dem,dmrdat,dmr,coln){
   return(r2s)
 }
 
-testing_dem <- DSA_explore(DEMdata,testfx,"mags",22)
+#testing_dem <- DSA_explore(site_data[,2:5],testfx,"mags",22)
 
 
 ### Plots -------------------------------------------------------
