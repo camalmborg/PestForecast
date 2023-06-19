@@ -7,7 +7,7 @@
 #load libraries:
 library(lattice)
 library(geodata)
-library(rgdal)  ##deprecating?
+#library(rgdal)  ##deprecating?
 library(rgeos)
 library(terra)
 #library(raster)  ##deprecated
@@ -19,19 +19,31 @@ library(terra)
 ### GET DEM DATA AND SLOPE/ASPECT CALCULATIONS USING TERRA PACKAGE:------------
 
 #load tif file:
-tif_file <- "DEM_Data/2023_06_07_NE_MERGE_DEM.tif"
-NE_rast <- rast(tif_file)
+dem_file <- "DEM_Data/2023_06_07_NE_MERGE_DEM.tif"
+NE_rast <- rast(dem_file)
+
+#load TWI tif:
+twi_file <- "DEM_Data/2023_06_19_TWI_DZ.tif"
+NE_twi <- rast(twi_file)
 
 #load sites:
 sites <- read.csv("2022_03_22_5000sites_lat_long_points_for_GEE_asset.csv")
 
-#convert to spatial:
+#convert sites to spatial:
 coordinates(sites) <- ~y+x
-#crs(sites) <- crs(NE_rast)
+#plot(sites)
 
-plot(sites)
+#calculating slope and aspect from DEM:
+aspect_r <- terrain(NE_rast, "aspect", unit = "radians")
+slope_r <- terrain (NE_rast, "slope", unit = "radians")
 
-#calculating 
+aspect_d <- terrain(NE_rast, "aspect", unit="degrees")
+slope_d <- terrain(NE_rast, "slope", unit="degrees")
+
+#stack 'em:
+NE_dem_data <- c(NE_rast, slope_d, slope_r, aspect_d, aspect_r, NE_twi)
+
+#extracting TWI values: 
 
 ### Get DEM data ARCHIVED: USED RASTER PACKAGE-------------------------------
 
