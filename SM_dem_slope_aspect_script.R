@@ -10,6 +10,8 @@ library(geodata)
 #library(rgdal)  ##deprecating?
 library(rgeos)
 library(terra)
+library(sp)
+library(sf)
 #library(raster)  ##deprecated
 #library(rasterVis)
 
@@ -27,10 +29,16 @@ twi_file <- "DEM_Data/2023_06_19_TWI_DZ.tif"
 NE_twi <- rast(twi_file)
 
 #load sites:
-sites <- read.csv("2022_03_22_5000sites_lat_long_points_for_GEE_asset.csv")
-
+site_lat_lon <- read.csv("2022_03_22_5000sites_lat_long_points_for_GEE_asset.csv")
+coords <- site_lat_lon[,c(2,1)] #correcting order for conversion to spatialpointsdataframe obj
+#set site crs:
+site_crs <- crs(NE_rast)
 #convert sites to spatial:
-coordinates(sites) <- ~y+x
+#coordinates(sites) <- ~y+x  ##makes a SpatialPoints object
+sites <- SpatialPointsDataFrame(coords = coords, 
+                                data = site_lat_lon,
+                                proj4string = CRS(site_crs))
+
 #plot(sites)
 
 #calculating slope and aspect from DEM:
@@ -43,7 +51,8 @@ slope_d <- terrain(NE_rast, "slope", unit="degrees")
 #stack 'em:
 NE_dem_data <- c(NE_rast, slope_d, slope_r, aspect_d, aspect_r, NE_twi)
 
-#extracting TWI values: 
+#extracting site values: 
+#site_data <- extract(NE_dem_data, )
 
 ### Get DEM data ARCHIVED: USED RASTER PACKAGE-------------------------------
 
