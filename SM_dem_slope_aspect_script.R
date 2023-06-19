@@ -41,6 +41,8 @@ sites <- SpatialPointsDataFrame(coords = coords,
 
 #plot(sites)
 
+#convert sites to vector
+
 #calculating slope and aspect from DEM:
 aspect_r <- terrain(NE_rast, "aspect", unit = "radians")
 slope_r <- terrain (NE_rast, "slope", unit = "radians")
@@ -49,10 +51,10 @@ aspect_d <- terrain(NE_rast, "aspect", unit="degrees")
 slope_d <- terrain(NE_rast, "slope", unit="degrees")
 
 #stack 'em:
-NE_dem_data <- c(NE_rast, slope_d, slope_r, aspect_d, aspect_r, NE_twi)
+NE_dem_data <- c(NE_rast, slope_d, aspect_d, NE_twi)
 
 #extracting site values: 
-#site_data <- extract(NE_dem_data, )
+site_data <- extract(NE_dem_data, coords)
 
 ### Get DEM data ARCHIVED: USED RASTER PACKAGE-------------------------------
 
