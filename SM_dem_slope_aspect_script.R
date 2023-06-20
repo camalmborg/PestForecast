@@ -12,6 +12,9 @@ library(rgeos)
 library(terra)
 library(sp)
 library(sf)
+library(tidyr)
+library(stringr)
+library(tidyverse)
 #library(raster)  ##deprecated
 #library(rasterVis)
 
@@ -29,8 +32,32 @@ twi_file <- "DEM_Data/2023_06_19_TWI_DZ.tif"
 NE_twi <- rast(twi_file)
 
 #load sites:
+file<-"2022_08_31_DATAGRAB/2022_12_7_sample_tcg_mean_5k.csv"
+cfile<-"2022_08_31_DATAGRAB/2022_12_7_sample_score_mean_5k.csv"
+
+#tcg and condition score objects:
+tcg.values<-read.csv(file)
+#tcgs<-tcg.values[,c(grep("^X",colnames(tcg.values)))] #grab with "X1996 eg) for all tcg value columns
+cond.scores<-read.csv(cfile)
+
+#geographic coordinates from GEE extract:
+geo<-as.data.frame(cond.scores[,".geo"])
+
+#make lat and lon columns from .geo data:
+coords<-matrix(nrow=nrow(geo),ncol=2)
+for (i in 1:nrow(geo)){
+  #longitudes:
+  lon<-str_extract(geo[i,], "\\d+\\.*\\d*")
+  coords[i,1]<-as.numeric(lon)*-1
+  
+  #latitudes:
+  extlon<-sub(lon,"",geo[i,])
+  coords[i,2]<-as.numeric(str_extract(extlon, "\\d+\\.*\\d*"))
+}
+colnames(coords)<-c("x","y")
+
 site_lat_lon <- read.csv("2022_03_22_5000sites_lat_long_points_for_GEE_asset.csv")
-coords <- site_lat_lon[,c(2,1)] #correcting order for conversion to spatialpointsdataframe obj
+#coords <- site_lat_lon[,c(2,1)] #correcting order for conversion to spatialpointsdataframe obj
 #set site crs:
 site_crs <- crs(NE_rast)
 #convert sites to spatial:
@@ -38,6 +65,8 @@ site_crs <- crs(NE_rast)
 sites <- SpatialPointsDataFrame(coords = coords, 
                                 data = site_lat_lon,
                                 proj4string = CRS(site_crs))
+
+
 
 #plot(sites)
 
@@ -145,7 +174,8 @@ DSA_explore<-function(dem,dmrdat,dmr,coln){
   return(r2s)
 }
 
-#testing_dem <- DSA_explore(site_data[,2:5],testfx,"mags",22)
+###BEFORE RUNNING: make sure coords match between mags and dem data
+testing_dem <- DSA_explore(site_data,testfx,"mags",22)
 
 
 ### Plots -------------------------------------------------------
