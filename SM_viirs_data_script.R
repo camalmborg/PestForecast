@@ -45,9 +45,9 @@ names(viirs_rads) <- gsub("[^.-0-9]", "", names(viirs_rads), fixed = TRUE)
 
 #selecting years and averaging:
 vseq <- seq(1, ncol(viirs_rads), by=12)
-yr_rads <- matrix(nrow=nrow(viirs_rads), ncol=length(seq))
-for (i in 1:length(seq)){
-  yr_rads[,i] <- apply(viirs_rads[,(vseq[i]):(vseq[i]+11)], 1, mean)
+yr_rads <- matrix(nrow=nrow(viirs_rads), ncol=length(vseq))
+for (i in 1:length(vseq)){
+  yr_rads[,i] <- apply(viirs_rads[,(vseq[i]):(vseq[i]+11)], 1, mean, na.rm=T)
 }
 
 
