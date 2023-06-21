@@ -39,9 +39,10 @@ viirs_coms <- viirs_data[,c(grep("cvg",colnames(viirs_data)))]
 #    }
 
 #all zeros 
+# NOTE: for all times cf_cvg==0, avg_rad == 0, so I am making NA's for all 0's
 #making annual averages but skipping 0's:
 viirs_rads[viirs_rads == 0] <- NA
-names(viirs_rads) <- gsub("[^.-0-9]", "", names(viirs_rads), fixed = TRUE)
+#names(viirs_rads) <- gsub("[^.-0-9]", "", names(viirs_rads), fixed = TRUE)
 
 #selecting years and averaging:
 vseq <- seq(1, ncol(viirs_rads), by=12)
@@ -49,6 +50,43 @@ yr_rads <- matrix(nrow=nrow(viirs_rads), ncol=length(vseq))
 for (i in 1:length(vseq)){
   yr_rads[,i] <- apply(viirs_rads[,(vseq[i]):(vseq[i]+11)], 1, mean, na.rm=T)
 }
+
+###----TIME FOR SOME ANALYSES----------------------------------------
+
+library(mgcv)
+
+testfx <- read.csv("SM_distmagrecov_data.csv")
+
+#function for univariate analyses:
+VIIRS_explore<-function(viirs,dmrdat,dmr,coln){
+  #make empty matrix:
+  r2s <- matrix(NA,nrow=1,ncol=ncol(viirs))
+  
+  #loop over all members of dmvars list:
+  for (i in 1:ncol(viirs)){
+    #first extract the list you want:
+    vvariables <- as.data.frame(viirs[as.numeric(dmrdat$sitenum),])
+    #grab column number:
+    cn <- as.matrix(as.numeric(dmrdat$colnum))
+    #grab exploratory response  of choice:
+    y <- as.matrix(as.numeric(dmrdat[,dmr]))
+    x <- as.data.frame(cbind(y,cn,vvariables))
+    vardat <- x[x$cn==coln,]
+    
+    #run the GAM:
+    var.gam <- gam(vardat[,1]~s(vardat[,i+2]),data=vardat)
+    
+    #extract r2:
+    summ <- summary(var.gam)
+    r2s[,i] <-summ$r.sq
+  }
+  # return(vardat)
+  return(r2s)
+}
+
+###BEFORE RUNNING: make sure coords match between mags and dem data
+testing_viirs <- VIIRS_explore(yr_rads,testfx,"mags",22)
+
 
 
 ### Attempt to use opendapr package----------------------------------
