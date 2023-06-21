@@ -26,19 +26,29 @@ for (i in 1:nrow(geo)){
 }
 colnames(coords)<-c("lon","lat")
 
-viirs_RC <- viirs <- viirs_data[,2:217]
+#viirs_RC <- viirs <- viirs_data[,2:217]
 viirs_rads <- viirs_data[,c(grep("avg",colnames(viirs_data)))]
 viirs_coms <- viirs_data[,c(grep("cvg",colnames(viirs_data)))]
 
 #Finding columns where all values == 0:
-zeros <- list()
-mins <- vector()
-for (i in 1:ncol(viirs_rads)){
-       zeros[[i]]<-which(viirs_rads[,i]==0)
-       mins[i]<-min(viirs_rads[,i])
-   }
+# zeros <- list()
+# mins <- vector()
+# for (i in 1:ncol(viirs_rads)){
+#        zeros[[i]]<-which(viirs_rads[,i]==0)
+#        mins[i]<-min(viirs_rads[,i])
+#    }
 
+#all zeros 
 #making annual averages but skipping 0's:
+viirs_rads[viirs_rads == 0] <- NA
+names(viirs_rads) <- gsub("[^.-0-9]", "", names(viirs_rads), fixed = TRUE)
+
+#selecting years and averaging:
+vseq <- seq(1, ncol(viirs_rads), by=12)
+yr_rads <- matrix(nrow=nrow(viirs_rads), ncol=length(seq))
+for (i in 1:length(seq)){
+  yr_rads[,i] <- apply(viirs_rads[,(vseq[i]):(vseq[i]+11)], 1, mean)
+}
 
 
 ### Attempt to use opendapr package----------------------------------
