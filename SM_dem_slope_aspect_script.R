@@ -56,15 +56,15 @@ for (i in 1:nrow(geo)){
 }
 colnames(coords)<-c("x","y")
 
-site_lat_lon <- read.csv("2022_03_22_5000sites_lat_long_points_for_GEE_asset.csv")
+#site_lat_lon <- read.csv("2022_03_22_5000sites_lat_long_points_for_GEE_asset.csv")
 #coords <- site_lat_lon[,c(2,1)] #correcting order for conversion to spatialpointsdataframe obj
 #set site crs:
-site_crs <- crs(NE_rast)
+#site_crs <- crs(NE_rast)
 #convert sites to spatial:
 #coordinates(sites) <- ~y+x  ##makes a SpatialPoints object
-sites <- SpatialPointsDataFrame(coords = coords, 
-                                data = site_lat_lon,
-                                proj4string = CRS(site_crs))
+# sites <- SpatialPointsDataFrame(coords = coords, 
+#                                 data = site_lat_lon,
+#                                 proj4string = CRS(site_crs))
 
 
 
@@ -83,7 +83,8 @@ slope_d <- terrain(NE_rast, "slope", unit="degrees")
 NE_dem_data <- c(NE_rast, slope_d, aspect_d, NE_twi)
 
 #extracting site values: 
-site_data <- extract(NE_dem_data, coords)
+site_data <- terra::extract(NE_dem_data, coords)
+#note: if tidyverse is employed terra needs to explictly be called for extract()
 
 ### Get DEM data ARCHIVED: USED RASTER PACKAGE-------------------------------
 
