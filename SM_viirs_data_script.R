@@ -123,6 +123,9 @@ viirsrocs <- viirs_ROC(yr_rads,dmrdat,1,22)
 
 demrocs <- viirs_ROC(site_data,dmrdat,1,22)
 
+viirsrocs17 <- viirs_ROC(yr_rads,dmrdat,2,23)
+demrocs17 <- viirs_ROC(yr_rads,dmrdat,2,23)
+
 ###BEFORE RUNNING: make sure coords match between mags and dem data
 testing_viirs <- VIIRS_explore(yr_rads,testfx,"mags",22)
 
