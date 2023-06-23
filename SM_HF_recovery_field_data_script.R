@@ -77,8 +77,16 @@ field_plots <- merge(field_plots,hf_mort, all = TRUE)
 field_plots$mort[is.na(field_plots$mort)] <- 0
 
 ###oak plots:
-hf_oaks <- matrix(nrow=nrow(field_plots), ncol=length(oaks))
+hf_oaks <- as.data.frame(matrix(nrow=nrow(field_plots), ncol=length(oaks)+1))
+hf_oaks[,1]<- field_plots$plot
 
+
+# for (i in 1:length(oaks)){
+#   for (j in 1:row(hf_spec)){
+#     hf_oaks[j,i+1] <- ifelse(unique(hf_spec$plot)[j] == hf_oaks$plot[j] & hf_spec$spp[j,] == oaks[i],
+#                             1,0)
+#   }
+# }
 
 #merge with remote-sensing data:
 #load:
