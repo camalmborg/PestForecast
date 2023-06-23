@@ -66,9 +66,19 @@ hf_condition <- hf_trees %>%
 hf_mort <- hf_condition[hf_condition$Cond=="D",]
 hf_mort$mort<-1
 
+#plots with oaks present:
+oaks <- c("BO", "RO", "WO")
+hf_spec <- hf_trees %>%
+  group_by(plot, spp) %>%
+  summarize(count=n())
+
 ###merge with plot data:
 field_plots <- merge(field_plots,hf_mort, all = TRUE)
 field_plots$mort[is.na(field_plots$mort)] <- 0
+
+###oak plots:
+hf_oaks <- matrix(nrow=nrow(field_plots), ncol=length(oaks))
+
 
 #merge with remote-sensing data:
 #load:
