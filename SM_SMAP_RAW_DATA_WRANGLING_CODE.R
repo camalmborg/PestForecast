@@ -79,9 +79,12 @@ sortSMAP <- SMAPsmap[order(SMAPsmap[,1]),]
 
 
 #make new data frame:
-SMAPmags <- cbind(magsdat, sortSMAP[,4:ncol(sortSMAP)])
+#SMAPmags <- cbind(magsdat, sortSMAP[,4:ncol(sortSMAP)])
 #smap<-SMAPmags[,5:ncol(SMAPmags)]
-
+SMAPdat <- sortSMAP[,4:ncol(sortSMAP)]
+#save data:
+write.csv(SMAPdat, file = "2023_06_26_SMAP_data_sorted.csv")
+save(SMAPdat, file = "SMAP_data.Rdata")
 
 #####-------------------ANALYSES------------------#####################
 
