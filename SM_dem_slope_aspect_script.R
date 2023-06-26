@@ -86,6 +86,10 @@ NE_dem_data <- c(NE_rast, slope_d, aspect_d, NE_twi)
 site_data <- terra::extract(NE_dem_data, coords)
 #note: if tidyverse is employed terra needs to explictly be called for extract()
 
+#saving site data:
+write.csv(site_data, file="2023_06_26_5000sample_site_DEM_slope_aspect_TWI_data.csv")
+save(site_data, file="site_DEM_slope_aspect_TWI_data.RData")
+
 ### Get DEM data ARCHIVED: USED RASTER PACKAGE-------------------------------
 
 #this will get the DEM for the whole USA:
