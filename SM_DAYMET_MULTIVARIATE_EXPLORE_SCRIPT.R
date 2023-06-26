@@ -21,6 +21,8 @@ load("JJ_precip.RData") #cols 4,5 for 2014, 2015
 load("MJJ_precip.RData") #cols 4,5 for 2014, 2015
 load("MJ_precip.RData") #cols 4,5 for 2014, 2015
 load("SON_precip.RData") # col 4 for 2014
+load("SMAP_data.RData") # col 1-4 for Apr-July 2015 soil moisture
+load("site_DEM_slope_aspect_TWI_data.RData") # col 1 for DEM data
 
 #load mags:
 dmr <- read.csv("SM_distmagrecov_data.csv")
@@ -34,7 +36,10 @@ MV_DATA <- cbind(dm_maxtemps[,c(46,47,48,49,50,51,58,59,60,61,62,63)],
                  JJ_precip[,4:5],
                  MJJ_precip[,4:5],
                  MJ_precip[,4:5],
-                 SON_precip[,4])
+                 SON_precip[,4],
+                 SMAPdat[,1:4],
+                 site_data[,1])
+
 
 test_data <- cbind(dm_maxtemps[,c(60,61,62,63)],
                    MAM_spring_precip[,6],
