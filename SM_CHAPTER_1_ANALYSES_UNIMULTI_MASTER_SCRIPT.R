@@ -17,7 +17,7 @@ library(combinat)
 #       analysis - "dpy1"/"dpy2" for 2016/2017 distprob, "mags" for magnitude
 # coln = column number of disturbance - 22 for 2016, 23 for 2017
 
-SM_l_explore<-function(dmvars,dmrdat,dmr,coln){
+spongy_l_explore<-function(dmvars,dmrdat,dmr,coln){
   #make empty matrix:
   r2s <- matrix(NA,nrow=ncol(dmvars[[1]]),ncol=length(dmvars))
   
@@ -53,7 +53,7 @@ SM_l_explore<-function(dmvars,dmrdat,dmr,coln){
 #       analysis - "dpy1"/"dpy2" for 2016/2017 distprob, "mags" for magnitude
 # coln = column number of disturbance - 22 for 2016, 23 for 2017
 
-SM_var_explore<-function(var,dmrdat,dmr,coln){
+spongy_var_explore<-function(var,dmrdat,dmr,coln){
   #make empty matrix:
   r2s <- matrix(NA,nrow=1,ncol=ncol(var))
   
@@ -153,7 +153,7 @@ spongy_var_ROC <- function(var,dmrdat,yr,coln){
 # dmrdat = disturbance magnitude and probability data - object from DISTMAGRECOV 
 #          calculation script
 
-SM_multi_var <- function(data, nvars, dmrdat) {
+spongy_multi_var <- function(data, nvars, dmrdat) {
   #make combinations of nvars variables:
   combi <- t(combn(ncol(data),nvars))
   
@@ -199,7 +199,7 @@ SM_multi_var <- function(data, nvars, dmrdat) {
 # dmrdat = disturbance magnitude and probability data - object from DISTMAGRECOV 
 #          calculation script
 # yr = disturbance year (1 = 2016; 2 = 2017)
-SM_multi_ROC <- function(data,nvars,dmrdat,yr){
+spongy_multi_ROC <- function(data,nvars,dmrdat,yr){
   #make combinations of nvars variables:
   combi <- t(combn(ncol(data),nvars))
   
