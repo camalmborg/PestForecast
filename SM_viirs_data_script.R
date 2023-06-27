@@ -1,6 +1,6 @@
 ### script for VIIRS download(?) and processing
 #this is the script for processing the viirs data. Data are monthly composites
-#of nighttime radiance from GEE
+#of nighttime radiance from GEE. Data are monthly composites 01-01-2013 (inclusive) > 01-01-2022 (not inclusive)
 
 #load libraries:
 library(tidyr)
