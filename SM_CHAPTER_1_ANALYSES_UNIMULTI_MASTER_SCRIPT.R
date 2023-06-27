@@ -151,6 +151,11 @@ spongy_var_ROC <- function(var,dmrdat,yr,coln){
   return(rocs)
 }
 
+# NOTE: the roc's only work if there are sufficient non-NA values for the var.gam 
+# object. I have changed the line in the code to reflect this, but I am not sure
+# how to identify which points it is excluding in the analyses, merely know that it
+# excludes some portion and the amounts need to match to get the ROC values.
+
 ### MULTIVARIATE ANALYSES SECTION ------------------------------------------------
 
 ### Function for Multivariate disturbance magnitude analyses:---------------------
