@@ -123,7 +123,7 @@ spongy_lv_ROC <- function(dmvars,dmrdat,yr,coln){
 #          calculation script
 # yr = year disturbance takes place - 1/2 for 2016/2017 respectively
 # coln = column number of disturbance - 22 for 2016, 23 for 2017
-spongy_var_ROC <- function(var,dmrdat,yr,coln){
+spongy_var_ROC <- function(var,dmrdat,yr,coln,nvar){
   #make empty matrix:
   rocs <- matrix(NA,nrow=ncol(var),ncol=1)
   
