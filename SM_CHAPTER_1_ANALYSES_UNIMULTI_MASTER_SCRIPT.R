@@ -118,9 +118,14 @@ spongy_lv_ROC <- function(dmvars,dmrdat,yr,coln){
 }
 
 ### Matrix input version: ---------------------------------------------------------
+# var = variable of interest (DEM, VIIRS, SMAP etc.)
+# dmrdat = disturbance magnitude and probability data - object from DISTMAGRECOV 
+#          calculation script
+# yr = year disturbance takes place - 1/2 for 2016/2017 respectively
+# coln = column number of disturbance - 22 for 2016, 23 for 2017
 spongy_var_ROC <- function(var,dmrdat,yr,coln){
   #make empty matrix:
-  rocs <- matrix(NA,nrow=ncol(var),ncol=1)  #hard coded rn
+  rocs <- matrix(NA,nrow=ncol(var),ncol=1)
   
   #grab just disturbance probability columns:
   dists<-dmrdat[,grep("^dp",colnames(dmrdat))]
@@ -138,7 +143,8 @@ spongy_var_ROC <- function(var,dmrdat,yr,coln){
   for (i in 1:ncol(var)){  #this is hard coded until further notice
     #loop for filling in R2 table:  
     var.gam<-gam(vardat[,1]~s(vardat[,i+2]), data=vardat, family="binomial")
-    var.roc<-roc(vardat[,1],var.gam$fitted.values)
+    var.roc<-roc(var.gam$y,var.gam$fitted.values)
+    #var.roc <- roc(var.gam[,1], var.gam$fitted.values)
     rocs[i,] <-var.roc$auc
   }
   #return table of AUCs
