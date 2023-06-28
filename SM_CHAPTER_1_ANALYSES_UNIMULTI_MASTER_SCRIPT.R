@@ -248,7 +248,8 @@ spongy_multi_ROC <- function(data,nvars,dmrdat,yr){
     
     #run gam with those data:
     mv_gam <- gam(gam_formula, data=vardat, family="binomial")
-    mv_roc <- roc(vardat[,1], mv_gam$fitted.values)
+    #mv_roc <- roc(vardat[,1], mv_gam$fitted.values)
+    mv_roc<-roc(mv_gam$y,mv_gam$fitted.values)
     rocs[i,2] <- mv_roc$auc
     aics[i] <- mv_gam$aic
   }
