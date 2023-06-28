@@ -177,8 +177,12 @@ spongy_multi_var <- function(data, nvars, dmrdat) {
   #vardattest <- list()
   #vardat loop:
   for (i in 1:nrow(combi)){
+    
+    #first get data:
+    vvar <- as.data.frame(data[as.numeric(dmrdat$sitenum),])
+    
     #make gam variables data frame:
-    vardat <- as.data.frame(cbind(dmrdat$mags, data[,c(combi[i,])]))
+    vardat <- as.data.frame(cbind(vvar$mags, vvar[,c(combi[i,])]))
     
     #make gam explantory variables list
     ex_vars <- c()
@@ -220,13 +224,17 @@ spongy_multi_ROC <- function(data,nvars,dmrdat,yr){
   
   aics <- vector()
   
+  #grab data without missing values:
+  #first get data:
+  vvar <- as.data.frame(data[as.numeric(dmrdat$sitenum),])
+  
   #grab just disturbance probability columns:
   dists<-dmrdat[,grep("^dp",colnames(dmrdat))]
   
   #vardat loop:
   for (i in 1:nrow(combi)){
     #make gam variables data frame:
-    vardat <- as.data.frame(cbind(dists[,yr], data[,c(combi[i,])]))
+    vardat <- as.data.frame(cbind(dists[,yr], vvar[,c(combi[i,])]))
     
     #make gam explantory variables list
     ex_vars <- c()
