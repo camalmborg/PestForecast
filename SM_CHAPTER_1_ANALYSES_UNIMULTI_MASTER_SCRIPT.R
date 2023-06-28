@@ -199,7 +199,7 @@ spongy_multi_var <- function(data, nvars, dmrdat) {
   
   delta <- min(aics)
   delAIC <- aics-delta
-  models <- cbind(r2s, combi, delAIC)
+  models <- as.data.frame(cbind(r2s, combi, delAIC))
   return(models)
 }
 
@@ -247,7 +247,7 @@ spongy_multi_ROC <- function(data,nvars,dmrdat,yr){
   
   delta <- min(aics)
   delAIC <- aics-delta
-  models <- cbind(rocs, combi, delAIC)
+  models <- as.data.frame(cbind(rocs, combi, delAIC))
   return(models)
   
 }
