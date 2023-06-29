@@ -50,6 +50,8 @@ test_data <- cbind(dm_maxtemps[,c(60,61,62,63)],
 #vardat <- as.data.frame(cbind(dmr$mags, MV_DATA[,c(combi[1,])]))
 #mv_gam <- gam(dmr$mags~s(vardat[,1])+s(vardat[,2]),data=vardat)
 
+
+### DISTURBANCE MAGNITUDE MULTIVARIATE LOOP------------------------------------------------
 SM_multi_var <- function(data, nvars, dmrdat) {
   #make combinations of nvars variables:
   combi <- t(combn(ncol(data),nvars))
@@ -144,3 +146,6 @@ SM_multi_ROC <- function(data,nvars,dmrdat,yr){
 
 
 testing_roc_s <- SM_multi_ROC(data,2,testfx,1) #recall if yr=1, coln=22 (2016)
+
+
+### LET'S LOOK AT THESE MODELS, SHALL WE? -------------------------------------
