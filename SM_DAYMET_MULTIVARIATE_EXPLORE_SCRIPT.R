@@ -149,3 +149,27 @@ testing_roc_s <- SM_multi_ROC(data,2,testfx,1) #recall if yr=1, coln=22 (2016)
 
 
 ### LET'S LOOK AT THESE MODELS, SHALL WE? -------------------------------------
+
+#if the model results need to be loaded you can load them here:
+## Dist Mag:
+#read.csv("Analyses_June2023/2023_06_28_multivariate_analyses_3vars.csv")
+## Dist Prob:
+#read.csv("Analyses_June2023/2023_06_28_distprob_multivariate_analyses_3var_2016.csv")
+
+# which model:
+model <- spongy_multi_3var
+
+### finding the top performers by DIC/AIC:
+best <- which(model$delAIC == 0)
+
+### most common variables included:
+#subset data by R2/delAIC:
+topmodels <- model[model$V2 > 0.27,]
+topmodels <- model[model$delAIC < 100,]
+modAIC <- model[order(model$delAIC),]
+modr2 <- model[order(model$V2,decreasing = T),]
+names(which.max(table(topmodels[,3])))
+varvars <- c(sort(unique(topmodels$V3)), 
+             sort(unique(topmodels$V4)), 
+             sort(unique(topmodels$V5)))
+sort(unique(varvars))
