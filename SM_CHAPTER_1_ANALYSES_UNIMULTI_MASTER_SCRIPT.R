@@ -158,7 +158,7 @@ spongy_var_ROC <- function(var,dmrdat,yr,coln,nvar){
     var.roc<-roc(var.gam$y,var.gam$fitted.values)
     #var.roc <- roc(var.gam[,1], var.gam$fitted.values)
     rocs[i,] <-var.roc$auc
-    aic[i] <- var.gam$aic
+    aics[i] <- var.gam$aic
   }
   #return table of AUCs
   #return(rocs)
@@ -283,6 +283,50 @@ spongy_multi_ROC <- function(data,nvars,dmrdat,yr){
 #distmag_univar_16 <- spongy_var_explore(MV_DATA, testfx, "mags", 22)
 #distmag_univar_17 <- spongy_var_explore(MV_DATA, textfx, "mags", 23)
 
+# Daymet:
+distmag_daymet_monthly_univar_16 <- spongy_l_explore(dmvars_mo, testfx, "mags", 22)
+distmag_daymet_monthly_univar_17 <- spongy_l_explore(dmvars_mo, testfx, "mags", 23)
+distmag_daymet_monthly_cs_univar_16 <- spongy_l_explore(dmvars_mo, testfx2, "mags", 22)
+distmag_daymet_monthly_cs_univar_17 <- spongy_l_explore(dmvars_mo, testfx2, "mags", 23)
+# SMAP:
+distmag_SMAP_univar_16 <- spongy_var_explore(SMAPdat, testfx, "mags", 22)
+distmag_SMAP_univar_17 <- spongy_var_explore(SMAPdat, testfx, "mags", 23)
+distmag_SMAP_cs_univar_16 <- spongy_var_explore(SMAPdat, testfx2, "mags", 22)
+distmag_SMAP_cs_univar_17 <- spongy_var_explore(SMAPdat, testfx2, "mags", 23)
+# VIIRS:
+distmag_viirs_univar_16 <- spongy_var_explore(yr_rads, testfx, "mags", 22)
+distmag_viirs_univar_17 <- spongy_var_explore(yr_rads, testfx, "mags", 23)
+distmag_viirs_cs_univar_16 <- spongy_var_explore(yr_rads, testfx2, "mags", 22)
+distmag_viirs_cs_univar_17 <- spongy_var_explore(yr_rads, testfx2, "mags", 23)
+#DEM:
+distmag_DEM_univar_16 <- spongy_var_explore(site_data, testfx, "mags", 22)
+distmag_DEM_univar_17 <- spongy_var_explore(site_data, testfx, "mags", 23)
+distmag_DEM_cs_univar_16 <- spongy_var_explore(site_data, testfx2, "mags", 22)
+distmag_DEM_cs_univar_17 <- spongy_var_explore(site_data, testfx2, "mags", 23)
+
+#write.csv(distmag_DEM_cs_univar_17, file="Analyses_July2023/distmag_DEM_cs_univar_17.csv")
+
 #Disturbance Probability:
-#distprob_univar <- 
+# Daymet:
+distprob_daymet_monthly_univar_16 <- spongy_lv_ROC(dmvars_mo, testfx, 1, 22)
+distprob_daymet_monthly_univar_17 <- spongy_lv_ROC(dmvars_mo, testfx, 2, 23)
+distprob_daymet_monthly_cs_univar_16 <- spongy_lv_ROC(dmvars_mo, testfx2, 1, 22)
+distprob_daymet_monthly_cs_univar_17 <- spongy_lv_ROC(dmvars_mo, testfx2, 2, 23)
+# SMAP:
+distprob_SMAP_univar_16 <- spongy_var_ROC(SMAPdat, testfx, 1, 22)
+distprob_SMAP_univar_17 <- spongy_var_ROC(SMAPdat, testfx, 2, 23)
+distprob_SMAP_cs_univar_16 <- spongy_var_ROC(SMAPdat, testfx2, 1, 22)
+distprob_SMAP_cs_univar_17 <- spongy_var_ROC(SMAPdat, testfx2, 2, 23)
+# VIIRS:
+distmag_viirs_univar_16 <- spongy_var_explore(yr_rads, testfx, "mags", 22)
+distmag_viirs_univar_17 <- spongy_var_explore(yr_rads, testfx, "mags", 23)
+distmag_viirs_cs_univar_16 <- spongy_var_explore(yr_rads, testfx2, "mags", 22)
+distmag_viirs_cs_univar_17 <- spongy_var_explore(yr_rads, testfx2, "mags", 23)
+#DEM:
+distmag_DEM_univar_16 <- spongy_var_explore(site_data, testfx, "mags", 22)
+distmag_DEM_univar_17 <- spongy_var_explore(site_data, testfx, "mags", 23)
+distmag_DEM_cs_univar_16 <- spongy_var_explore(site_data, testfx2, "mags", 22)
+distmag_DEM_cs_univar_17 <- spongy_var_explore(site_data, testfx2, "mags", 23)
+
+write.csv(distprob_daymet_monthly_cs_univar_17, file="Analyses_July2023/distprob_daymet_monthly_cs_univar_17.csv")
 
