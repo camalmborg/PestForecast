@@ -8,7 +8,6 @@ library(pROC)
 library(combinat)
 
 ##### UNIVARIATE ANALYSES SECTION ------------------------------------------------
-
 ### Function for Univariate mags Analyses AS LIST  (Daymet data):----------------------
 # dmvars = data in list - Daymet data (each variable is list member)
 # dmrdat = disturbance magnitude and probability data - object from DISTMAGRECOV 
@@ -20,6 +19,7 @@ library(combinat)
 spongy_l_explore<-function(dmvars,dmrdat,dmr,coln){
   #make empty matrix:
   r2s <- matrix(NA,nrow=ncol(dmvars[[1]]),ncol=length(dmvars))
+  aics <- matrix(NA,nrow=ncol(dmvars[[1]]),ncol=length(dmvars))
   
   #loop over all members of dmvars list:
   for (i in 1:length(dmvars)){
@@ -39,10 +39,13 @@ spongy_l_explore<-function(dmvars,dmrdat,dmr,coln){
       #extract r2:
       summ <- summary(var.gam)
       r2s[j,i] <-summ$r.sq
+      aics[j,i] <- var.gam$aic
     }
   }
   # return(vardat)
-  return(r2s)
+  #return(r2s)
+  models <- as.data.frame(cbind(r2s,aics))
+  return(models)
 }
 
 ### Function for univariate mags analysis NOT in list mode:----------------------------
@@ -56,6 +59,7 @@ spongy_l_explore<-function(dmvars,dmrdat,dmr,coln){
 spongy_var_explore<-function(var,dmrdat,dmr,coln){
   #make empty matrix:
   r2s <- matrix(NA,nrow=1,ncol=ncol(var))
+  aics <- vector()
   
   #loop over all members of dmvars list:
   for (i in 1:ncol(var)){
@@ -71,12 +75,15 @@ spongy_var_explore<-function(var,dmrdat,dmr,coln){
     #run the GAM:
     var.gam <- gam(vardat[,1]~s(vardat[,i+2]),data=vardat)
     
-    #extract r2:
+    #extract r2 and aic:
     summ <- summary(var.gam)
-    r2s[,i] <-summ$r.sq
+    r2s[,i] <- summ$r.sq
+    aics[i] <- var.gam$aic
   }
   # return(vardat)
-  return(r2s)
+  r2s <- t(r2s)
+  models <- as.data.frame(cbind(r2s, aics))
+  return(models)
 }
 
 ### Functions for disturbance probability univariate analyses --------------------
@@ -90,6 +97,7 @@ spongy_var_explore<-function(var,dmrdat,dmr,coln){
 spongy_lv_ROC <- function(dmvars,dmrdat,yr,coln){
   #make empty matrix:
   rocs <- matrix(NA,nrow=ncol(dmvars[[1]]),ncol=length(dmvars))
+  aics <- matrix(NA,nrow=ncol(dmvars[[1]]),ncol=length(dmvars))
   
   #grab just disturbance probability columns:
   dists<-dmrdat[,grep("^dp",colnames(dmrdat))]
@@ -110,10 +118,13 @@ spongy_lv_ROC <- function(dmvars,dmrdat,yr,coln){
       var.gam<-gam(vardat[,1]~s(vardat[,j+2]), data=vardat, family="binomial")
       var.roc<-roc(vardat[,1],var.gam$fitted.values)
       rocs[j,i] <-var.roc$auc
+      aics[j,i] <-var.gam$aic
     }
   }
   #return table of AUCs
-  return(rocs)
+  #return(rocs)
+  models <- as.data.frame(cbind(rocs,aics))
+  return(models)
   
 }
 
@@ -126,6 +137,7 @@ spongy_lv_ROC <- function(dmvars,dmrdat,yr,coln){
 spongy_var_ROC <- function(var,dmrdat,yr,coln,nvar){
   #make empty matrix:
   rocs <- matrix(NA,nrow=ncol(var),ncol=1)
+  aics <- vector()
   
   #grab just disturbance probability columns:
   dists<-dmrdat[,grep("^dp",colnames(dmrdat))]
@@ -146,9 +158,12 @@ spongy_var_ROC <- function(var,dmrdat,yr,coln,nvar){
     var.roc<-roc(var.gam$y,var.gam$fitted.values)
     #var.roc <- roc(var.gam[,1], var.gam$fitted.values)
     rocs[i,] <-var.roc$auc
+    aic[i] <- var.gam$aic
   }
   #return table of AUCs
-  return(rocs)
+  #return(rocs)
+  models <- as.data.frame(cbind(rocs,aics))
+  return(models)
 }
 
 # NOTE: the roc's only work if there are sufficient non-NA values for the var.gam 
@@ -201,9 +216,9 @@ spongy_multi_var <- function(data, nvars, dmrdat) {
     aics[i] <- mv_gam$aic
   }
   
-  delta <- min(aics)
-  delAIC <- aics-delta
-  models <- as.data.frame(cbind(r2s, combi, delAIC))
+  #delta <- min(aics)
+  #delAIC <- aics-delta
+  models <- as.data.frame(cbind(r2s, combi, aics))
   return(models)
 }
 
@@ -254,9 +269,20 @@ spongy_multi_ROC <- function(data,nvars,dmrdat,yr){
     aics[i] <- mv_gam$aic
   }
   
-  delta <- min(aics)
-  delAIC <- aics-delta
-  models <- as.data.frame(cbind(rocs, combi, delAIC))
+  #delta <- min(aics)
+  #delAIC <- aics-delta
+  models <- as.data.frame(cbind(rocs, combi, aics))
   return(models)
   
 }
+
+
+##### RUNNING THE MODELS--------------------------------------------------------
+
+#Disturbance Magnitude:
+#distmag_univar_16 <- spongy_var_explore(MV_DATA, testfx, "mags", 22)
+#distmag_univar_17 <- spongy_var_explore(MV_DATA, textfx, "mags", 23)
+
+#Disturbance Probability:
+#distprob_univar <- 
+
