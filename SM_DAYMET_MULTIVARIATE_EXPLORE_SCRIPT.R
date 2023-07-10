@@ -23,6 +23,7 @@ load("MJ_precip.RData") #cols 4,5 for 2014, 2015
 load("SON_precip.RData") # col 4 for 2014
 load("SMAP_data.RData") # col 1-4 for Apr-July 2015 soil moisture
 load("site_DEM_slope_aspect_TWI_data.RData") # col 1 for DEM data
+load("viirs_annual_averages_data.RData") #not included
 
 #load mags:
 dmr <- read.csv("SM_distmagrecov_data.csv")
@@ -149,6 +150,13 @@ testing_roc_s <- SM_multi_ROC(data,2,testfx,1) #recall if yr=1, coln=22 (2016)
 
 
 ### LET'S LOOK AT THESE MODELS, SHALL WE? -------------------------------------
+
+#Univariate - 7/10/2023 Analysis
+dist_mag_tcg <- read.csv("Analyses_July2023/Dist_Mag_TCG_2016_Models_R2s_AICs.csv")
+dist_prob_tcg <- read.csv("Analyses_July2023/Dist_Prob_TCG_2016_Models_ROCs_AICs.csv")
+dist_mag_cs <- read.csv("Analyses_July2023/Dist_Mag_CS_2016_Models_R2s_AICs.csv")
+dist_prob_cs <- read.csv("Analyses_July2023/Dist_Prob_CS_2016_Models_ROCs_AICs.csv")
+
 
 #if the model results need to be loaded you can load them here:
 ## Dist Mag:
