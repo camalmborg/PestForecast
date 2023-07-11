@@ -197,7 +197,7 @@ spongy_multi_var <- function(data, nvars, dmrdat) {
     vvar <- as.data.frame(data[as.numeric(dmrdat$sitenum),])
     
     #make gam variables data frame:
-    vardat <- as.data.frame(cbind(vvar$mags, vvar[,c(combi[i,])]))
+    vardat <- as.data.frame(cbind(dmrdat$mags, vvar[,c(combi[i,])]))
     
     #make gam explantory variables list
     ex_vars <- c()
