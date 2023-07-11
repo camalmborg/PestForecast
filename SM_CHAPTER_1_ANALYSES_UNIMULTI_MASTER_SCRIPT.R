@@ -279,6 +279,7 @@ spongy_multi_ROC <- function(data,nvars,dmrdat,yr){
 
 ##### RUNNING THE MODELS--------------------------------------------------------
 
+#UNIVARIATE---------------------------------------------------------------------
 #Disturbance Magnitude:
 #distmag_univar_16 <- spongy_var_explore(MV_DATA, testfx, "mags", 22)
 #distmag_univar_17 <- spongy_var_explore(MV_DATA, textfx, "mags", 23)
@@ -330,3 +331,23 @@ distprob_DEM_cs_univar_17 <- spongy_var_ROC(site_data, testfx2, 2, 23)
 
 #write.csv(distprob_DEM_cs_univar_17, file="Analyses_July2023/distprob_DEM_cs_univar_17.csv")
 
+### MULIVARIATE ----------------------------------------------------------------
+#2 variables:
+dist_mag_2var_tcg <- spongy_multi_var(MV_DATA, 2, testfx)
+dist_mag_2var_cs <- spongy_multi_var(MV_DATA, 2, testfx2)
+
+dist_prob_2016_2var_tcg <- spongy_multi_ROC(MV_DATA, 2, testfx, 1)
+dist_prob_2016_2var_cs <- spongy_multi_ROC(MV_DATA, 2, testfx2, 1)
+  
+dist_prob_2017_2var_tcg <- spongy_multi_ROC(MV_DATA, 2, testfx, 2)
+dist_prob_2017_2var_cs <- spongy_multi_ROC(MV_DATA, 2, testfx2, 2)
+
+#3 variables:
+dist_mag_3var_tcg <- spongy_multi_var(MV_DATA, 3, testfx)
+dist_mag_3var_cs <- spongy_multi_var(MV_DATA, 3, testfx2)
+
+dist_prob_2016_3var_tcg <- spongy_multi_ROC(MV_DATA, 3, testfx, 1)
+dist_prob_2016_3var_cs <- spongy_multi_ROC(MV_DATA, 3, testfx2, 1)
+
+dist_prob_2017_3var_tcg <- spongy_multi_ROC(MV_DATA, 3, testfx, 2)
+dist_prob_2017_3var_cs <- spongy_multi_ROC(MV_DATA, 3, testfx2, 2)
