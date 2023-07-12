@@ -13,7 +13,7 @@ library(pROC) #for AUC analyses
 #load data:
 load("DMVARS_MO.RData")
 load("DM_MAXTEMPS_MO.RData") #maxtemp_mos<- c(46,47,48,49,50,51,58,59,60,61,62,63)
-load("DM_MINTEMPS_MO.RData") #mintemp_mos<- c(52, 53)
+#load("DM_MINTEMPS_MO.RData") #mintemp_mos<- c(52, 53)
 load("MAM_spring_precip.RData") #col 6 for 2016
 load("MA_spring_precip.RData") #cols 5,6 for 2015, 2016
 load("AM_spring_precip.RData") #cols 4,6 for 2014, 2016
@@ -157,6 +157,8 @@ dist_mag_tcg <- read.csv("Analyses_July2023/Dist_Mag_TCG_2016_Models_R2s_AICs.cs
 dist_prob_tcg <- read.csv("Analyses_July2023/Dist_Prob_TCG_2016_Models_ROCs_AICs.csv")
 dist_mag_cs <- read.csv("Analyses_July2023/Dist_Mag_CS_2016_Models_R2s_AICs.csv")
 dist_prob_cs <- read.csv("Analyses_July2023/Dist_Prob_CS_2016_Models_ROCs_AICs.csv")
+
+#multivariate - 7/11/2023 Analyses
 
 
 #if the model results need to be loaded you can load them here:
