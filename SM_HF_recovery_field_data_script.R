@@ -81,7 +81,9 @@ for (i in plots){
   hfs <- hf_spec[hf_spec$plot==i,]
   n_trees[i] <- sum(hfs$count)
   n_spec[i] <- nrow(hfs)
-  oak <- hfs[hfs$spp == oaks,]
+  oak <- rbind(hfs[hfs$spp == oaks[1],],
+               hfs[hfs$spp == oaks[2],],
+               hfs[hfs$spp == oaks[3],])
   n_oaks[i] <- sum(oak$count)
 }
 
