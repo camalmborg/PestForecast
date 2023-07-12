@@ -1,14 +1,14 @@
 #HF Field Data Script
 
 ###ARCHIVE ###load GEE data:---------
-#tcg data:
-hfplotstcg<-read.csv("HF_2022_Field_Data/HFplots_tcg_mean.csv")
-#condition scores:
-hfplotscond<-read.csv("HF_2022_Field_Data/HFplots_score_mean.csv")
-
-#remove extra columns:
-hftcg<-hfplotstcg[,2:131]
-hfcond<-hfplotscond[,2:131]
+# #tcg data:
+# hfplotstcg<-read.csv("HF_2022_Field_Data/HFplots_tcg_mean.csv")
+# #condition scores:
+# hfplotscond<-read.csv("HF_2022_Field_Data/HFplots_score_mean.csv")
+# 
+# #remove extra columns:
+# hftcg<-hfplotstcg[,2:131]
+# hfcond<-hfplotscond[,2:131]
 
 # 
 # ###load field data:
@@ -59,7 +59,8 @@ field_plots$longitude <- field_plots$longitude*-1
 #individual tree data (to get plots with mortality observed):
 hf_trees <- read.csv("HF_2022_Field_data/Tree_data - Sheet1.csv")
 hf_trees <- hf_trees %>% 
-  mutate(plot = str_replace(plot, " ", "-"))
+  mutate(plot = str_replace(plot, " ", "-")) %>%
+  mutate(CondBin = ifelse(Cond == "D",1,0))
 hf_condition <- hf_trees %>% 
   group_by(plot, Cond) %>% 
   summarize(count=n())
@@ -72,13 +73,25 @@ hf_spec <- hf_trees %>%
   group_by(plot, spp) %>%
   summarize(count=n())
 
+#count number of trees in each plot:
+n_trees <- vector()
+n_spec <- vector()
+n_oaks <- vector()
+for (i in plots){
+  hfs <- hf_spec[hf_spec$plot==i,]
+  n_trees[i] <- sum(hfs$count)
+  n_spec[i] <- nrow(hfs)
+  oak <- hfs[hfs$spp == oaks,]
+  n_oaks[i] <- sum(oak$count)
+}
+
 ###merge with plot data:
 field_plots <- merge(field_plots,hf_mort, all = TRUE)
 field_plots$mort[is.na(field_plots$mort)] <- 0
 
 ###oak plots:
-hf_oaks <- as.data.frame(matrix(nrow=nrow(field_plots), ncol=length(oaks)+1))
-hf_oaks[,1]<- field_plots$plot
+# hf_oaks <- as.data.frame(matrix(nrow=nrow(field_plots), ncol=length(oaks)+1))
+# hf_oaks[,1]<- field_plots$plot
 
 
 # for (i in 1:length(oaks)){
