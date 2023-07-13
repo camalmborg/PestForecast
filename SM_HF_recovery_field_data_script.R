@@ -28,6 +28,32 @@
 # HF.plot.data<- merge(HF.plot.data, HF.mort, all = TRUE)
 # HF.plot.data$mort[is.na(HF.plot.data$mort)] <- 0
 
+#### HARVARD FOREST DATA:
+file <- "HF_2022_Field_Data/GEE_Data/2023_05_17_hfplots_sample_tcg_mean.csv"
+cfile <- "HF_2022_Field_Data/GEE_Data/2023_05_17_hfplots_sample_score_mean.csv"
+
+#tcg and condition score objects:
+tcg.values<-read.csv(file)
+#tcgs<-tcg.values[,c(grep("^X",colnames(tcg.values)))] #grab with "X1996 eg) for all tcg value columns
+cond.scores<-read.csv(cfile)
+
+#separate lat lons:
+#make coords object:
+geo<-as.data.frame(tcg.values[,".geo"])
+#make lat and lon columns from .geo data:
+coords<-matrix(nrow=nrow(geo),ncol=3)
+for (i in 1:nrow(geo)){
+  #longitudes:
+  lon<-str_extract(geo[i,], "\\d+\\.*\\d*")
+  coords[i,1]<-as.numeric(lon)*-1
+
+  #latitudes:
+  extlon<-sub(lon,"",geo[i,])
+  coords[i,2]<-as.numeric(str_extract(extlon, "\\d+\\.*\\d*"))
+  coords[i,3]<-i
+}
+colnames(coords)<-c("lon","lat","site_id")
+
 
 ###recovery rate slopes for field sites:
 
@@ -98,10 +124,14 @@ for (i in plots){
   n_d_oaks[i] <- sum(oak_d$CondBin)
   rm(hfs,oak, trees, oak_d)
 }
+tree_data <- cbind(plot, n_trees, n_spec, n_oaks, n_dead, n_d_oaks)
 
 ###merge with plot data:
 field_plots <- merge(field_plots,hf_mort, all = TRUE)
 field_plots$mort[is.na(field_plots$mort)] <- 0
+
+field_data <- merge(field_plots, tree_data, all=TRUE)
+field_data <- field_data[-which(is.na(field_data$n_trees)),c(1:11,14:19)]
 
 ###oak plots:
 # hf_oaks <- as.data.frame(matrix(nrow=nrow(field_plots), ncol=length(oaks)+1))
