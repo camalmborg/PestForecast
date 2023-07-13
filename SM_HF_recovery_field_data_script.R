@@ -73,11 +73,15 @@ hf_spec <- hf_trees %>%
   group_by(plot, spp) %>%
   summarize(count=n())
 
-#count number of trees in each plot:
+#count number of trees, species, and oaks in each plot:
+plot <- vector()
 n_trees <- vector()
+n_dead <- vector()
 n_spec <- vector()
 n_oaks <- vector()
+n_d_oaks <- vector()
 for (i in plots){
+  plot[i] <- i
   hfs <- hf_spec[hf_spec$plot==i,]
   n_trees[i] <- sum(hfs$count)
   n_spec[i] <- nrow(hfs)
@@ -85,6 +89,14 @@ for (i in plots){
                hfs[hfs$spp == oaks[2],],
                hfs[hfs$spp == oaks[3],])
   n_oaks[i] <- sum(oak$count)
+  
+  trees <- hf_trees[hf_trees$plot==i,]
+  n_dead[i] <- sum(trees$CondBin)
+  oak_d <- rbind(trees[trees$spp == oaks[1],],
+                 trees[trees$spp == oaks[2],],
+                 trees[trees$spp == oaks[3],])
+  n_d_oaks[i] <- sum(oak_d$CondBin)
+  rm(hfs,oak, trees, oak_d)
 }
 
 ###merge with plot data:
