@@ -134,5 +134,6 @@ spongy_mpr<-function(tcg,cs,distyr){
 testfx<-spongy_mpr(tcg.values,cond.scores,2016)
 testfx2 <- spongy_mpr(cond.scores, cond.scores, 2016)
 
+hf_mags_2 <- spongy_mpr(tcg.values, cond.scores, 2017)
 #once again I am a beautiful genius!!!!
 
