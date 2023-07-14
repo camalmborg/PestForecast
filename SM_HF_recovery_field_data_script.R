@@ -28,7 +28,7 @@
 # HF.plot.data<- merge(HF.plot.data, HF.mort, all = TRUE)
 # HF.plot.data$mort[is.na(HF.plot.data$mort)] <- 0
 
-#### HARVARD FOREST DATA:
+#### HARVARD FOREST DATA:--------------------------------------------------
 file <- "HF_2022_Field_Data/GEE_Data/2023_05_17_hfplots_sample_tcg_mean.csv"
 cfile <- "HF_2022_Field_Data/GEE_Data/2023_05_17_hfplots_sample_score_mean.csv"
 
@@ -55,9 +55,13 @@ for (i in 1:nrow(geo)){
 colnames(coords)<-c("lon","lat","site_id")
 
 
-###recovery rate slopes for field sites:
+#load understory data:
+hf_unds <- "HF_2022_Field_Data/Und_ground_survey.csv"
 
-### HARVARD FOREST SUMMER FIELD DATA 2022 --------------------------
+#load seedling data:
+hf_seedlings <- "HF_2022_Field_Data/Seedlings_long.csv"
+
+### HARVARD FOREST SUMMER FIELD DATA 2022 CLEANING --------------------------
 
 #load libraries:
 library(dplyr)
@@ -100,6 +104,7 @@ hf_spec <- hf_trees %>%
   summarize(count=n())
 
 #count number of trees, species, and oaks in each plot:
+plots <- unique(hf_spec$plot)
 plot <- vector()
 n_trees <- vector()
 n_dead <- vector()
