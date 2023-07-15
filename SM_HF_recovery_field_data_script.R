@@ -1,5 +1,9 @@
 #HF Field Data Script
 
+#load libraries:
+library(dplyr)
+library(tidyverse)
+
 ###ARCHIVE ###load GEE data:---------
 # #tcg data:
 # hfplotstcg<-read.csv("HF_2022_Field_Data/HFplots_tcg_mean.csv")
@@ -56,16 +60,18 @@ colnames(coords)<-c("lon","lat","site_id")
 
 
 #load understory data:
-hf_unds <- "HF_2022_Field_Data/Und_ground_survey.csv"
+hf_unds <- read.csv("HF_2022_Field_Data/Und_ground_survey.csv")
+hf_unds <- hf_unds %>%
+  mutate(plot = str_replace(plot, " ", "-"))
+hf_ground <- hf_unds[hf_unds$type == "g",]
+#hf_unds <- hf_unds[hf_unds$type == "u",]
 
 #load seedling data:
-hf_seedlings <- "HF_2022_Field_Data/Seedlings_long.csv"
+hf_seedlings <- read.csv("HF_2022_Field_Data/Seedlings_long.csv")
+hf_seedlings <- hf_seedlings %>%
+  mutate(plot = str_replace(plot, " ", "-"))
 
 ### HARVARD FOREST SUMMER FIELD DATA 2022 CLEANING --------------------------
-
-#load libraries:
-library(dplyr)
-library(tidyverse)
 
 ###load and fix data-----
 #field plot data:
@@ -97,8 +103,23 @@ hf_condition <- hf_trees %>%
 hf_mort <- hf_condition[hf_condition$Cond=="D",]
 hf_mort$mort<-1
 
-#plots with oaks present:
-oaks <- c("BO", "RO", "WO")
+hf_epsprouts <- hf_trees %>%
+  mutate(Epi.S = ifelse(Epi.S == "Yes",1,0))
+hf_epsprouts <- hf_epsprouts[which(hf_epsprouts$Epi.S==1),]
+hf_sprouts <- hf_epsprouts %>%
+  group_by(plot) %>%
+  summarize(count=n())
+hf_sprouts$sprouts<-1
+
+#merge with plot data:
+field_plots <- merge(field_plots,hf_mort, all = TRUE)
+field_plots$mort[is.na(field_plots$mort)] <- 0
+field_plots <- merge(field_plots,hf_sprouts, all.x = TRUE)
+field_plots$sprouts[is.na(field_plots$sprouts)] <- 0
+
+### Getting tree and oak counts in each plot:
+#species counts in each plot:
+oaks <- c("BO", "RO", "WO", "CO")
 hf_spec <- hf_trees %>%
   group_by(plot, spp) %>%
   summarize(count=n())
@@ -118,25 +139,70 @@ for (i in plots){
   n_spec[i] <- nrow(hfs)
   oak <- rbind(hfs[hfs$spp == oaks[1],],
                hfs[hfs$spp == oaks[2],],
-               hfs[hfs$spp == oaks[3],])
+               hfs[hfs$spp == oaks[3],],
+               hfs[hfs$spp == oaks[4],])
   n_oaks[i] <- sum(oak$count)
   
   trees <- hf_trees[hf_trees$plot==i,]
   n_dead[i] <- sum(trees$CondBin)
   oak_d <- rbind(trees[trees$spp == oaks[1],],
                  trees[trees$spp == oaks[2],],
-                 trees[trees$spp == oaks[3],])
+                 trees[trees$spp == oaks[3],],
+                 trees[trees$spp == oaks[4],])
   n_d_oaks[i] <- sum(oak_d$CondBin)
   rm(hfs,oak, trees, oak_d)
 }
 tree_data <- cbind(plot, n_trees, n_spec, n_oaks, n_dead, n_d_oaks)
 
-###merge with plot data:
-field_plots <- merge(field_plots,hf_mort, all = TRUE)
-field_plots$mort[is.na(field_plots$mort)] <- 0
+#biomass calculations (for % DBH):
+plot <- vector()
+plot_dbh <- vector()
+oak_dbh <- vector()
+dead_dbh <- vector()
+for (i in plots){
+  plot[i] <- i
+  hfs <- hf_trees[hf_trees$plot==i,]
+  plot_dbh[i] <- sum(hfs$dbh)
+  oak <- rbind(hfs[hfs$spp == oaks[1],],
+               hfs[hfs$spp == oaks[2],],
+               hfs[hfs$spp == oaks[3],],
+               hfs[hfs$spp == oaks[4],])
+  oak_dbh[i] <- sum(oak$dbh)  #convert to basal area from DBH!
+  
+  trees <- hf_trees[hf_trees$plot==i,]
+  n_dead[i] <- sum(trees$CondBin)
+  oak_d <- rbind(trees[trees$spp == oaks[1],],
+                 trees[trees$spp == oaks[2],],
+                 trees[trees$spp == oaks[3],],
+                 trees[trees$spp == oaks[4],])
+  n_d_oaks[i] <- sum(oak_d$CondBin)
+  rm(hfs,oak, trees, oak_d)
+}
+
+
+###cleaning seedling data:
+plot <- vector()
+n_seedlings <- data.frame()
+total_seed <- vector()
+for (i in 1:length(plots)){
+  plot[i] <- plots[i]
+  for (j in 1:3){
+    hfs <- hf_seedlings[hf_seedlings$plot == plots[i],]
+    hfs <- hfs[hfs$size == j,]
+    n_seedlings[i,j] <- sum(hfs[,4:7])
+  }
+  total_seed[i] <- sum(n_seedlings[i,])
+  rm(hfs)
+}
+seed_data <- cbind(plot, total_seed, n_seedlings)
 
 field_data <- merge(field_plots, tree_data, all=TRUE)
 field_data <- field_data[-which(is.na(field_data$n_trees)),c(1:11,14:19)]
+field_data <- merge(field_data, seed_data, all=TRUE)
+
+#add ferns data to field data:
+field_data <- cbind(field_data, hf_ground$f.a)
+#write.csv(field_data, file="HF_2022_Field_Data/2023_07_14_hf_field_data_cleaned.csv")
 
 ###oak plots:
 # hf_oaks <- as.data.frame(matrix(nrow=nrow(field_plots), ncol=length(oaks)+1))
@@ -154,7 +220,7 @@ field_data <- field_data[-which(is.na(field_data$n_trees)),c(1:11,14:19)]
 #load:
 hf_mags <- read.csv("HF_2022_Field_Data/HF_mags_recov_from_GEE_data.csv")
 #join:
-hf_data <- cbind(field_plots,hf_mags)
+hf_data <- cbind(field_data,hf_mags)
 
 ### GAM time:
 library(mgcv)
