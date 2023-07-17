@@ -4,34 +4,6 @@
 library(dplyr)
 library(tidyverse)
 
-###ARCHIVE ###load GEE data:---------
-# #tcg data:
-# hfplotstcg<-read.csv("HF_2022_Field_Data/HFplots_tcg_mean.csv")
-# #condition scores:
-# hfplotscond<-read.csv("HF_2022_Field_Data/HFplots_score_mean.csv")
-# 
-# #remove extra columns:
-# hftcg<-hfplotstcg[,2:131]
-# hfcond<-hfplotscond[,2:131]
-
-# 
-# ###load field data:
-# HF.latlon<-read.csv("HF_2022_Field_Data/2022_HF_plots_latlon.csv")
-# HF.plot.data<-read.csv("HF_2022_Field_Data/HF_Plot_data.csv")
-# HF.seedlings<-read.csv("HF_2022_Field_Data/HF_Seedlings_long.csv")
-# HF.trees<-read.csv("HF_2022_Field_Data/HF_Tree_data.csv")
-# HF.understory<-read.csv("HF_2022_Field_Data/HF_Und_ground_survey.csv")
-# 
-# #separating mortality sites:
-# library("dplyr")
-# HF.condition<-HF.trees %>% group_by(plot_2, Cond) %>% summarize(count=n())
-# HF.mort<-HF.condition[HF.condition$Cond=="D",]
-# HF.mort$mort<-1
-# 
-# #merge with plot data:
-# HF.plot.data<- merge(HF.plot.data, HF.mort, all = TRUE)
-# HF.plot.data$mort[is.na(HF.plot.data$mort)] <- 0
-
 #### HARVARD FOREST DATA:--------------------------------------------------
 file <- "HF_2022_Field_Data/GEE_Data/2023_05_17_hfplots_sample_tcg_mean.csv"
 cfile <- "HF_2022_Field_Data/GEE_Data/2023_05_17_hfplots_sample_score_mean.csv"
@@ -86,14 +58,10 @@ field_plots <- field_plots %>%
 field_plots$longitude <- field_plots$longitude*-1
   #mutate(invasives = str_replace(invasives, "yes", "1")) ###need to do the 0/1 replace this this and timber harvest
 
-#making a new lat/lon file:
-# hf_lat_lon <- cbind(field_plots$longitude, field_plots$latitude)
-# colnames(hf_lat_lon) <- c('longitude','latitude')
-# write.csv(hf_lat_lon, file="hf_lat_lon.csv", row.names=TRUE)
-
-
 #individual tree data (to get plots with mortality observed):
 hf_trees <- read.csv("HF_2022_Field_data/Tree_data - Sheet1.csv")
+#calculate Basal Area (BA) from DBH for each tree:
+hf_trees$BA <- hf_trees$dbh^2 * 0.005454
 hf_trees <- hf_trees %>% 
   mutate(plot = str_replace(plot, " ", "-")) %>%
   mutate(CondBin = ifelse(Cond == "D",1,0))
@@ -103,6 +71,7 @@ hf_condition <- hf_trees %>%
 hf_mort <- hf_condition[hf_condition$Cond=="D",]
 hf_mort$mort<-1
 
+#epicormic sprouts present/absent - regrowth/resprout evidence
 hf_epsprouts <- hf_trees %>%
   mutate(Epi.S = ifelse(Epi.S == "Yes",1,0))
 hf_epsprouts <- hf_epsprouts[which(hf_epsprouts$Epi.S==1),]
@@ -128,6 +97,7 @@ hf_spec <- hf_trees %>%
 plots <- unique(hf_spec$plot)
 plot <- vector()
 n_trees <- vector()
+plot_BA_from_BAF <- vector()
 n_dead <- vector()
 n_spec <- vector()
 n_oaks <- vector()
@@ -135,7 +105,10 @@ n_d_oaks <- vector()
 for (i in plots){
   plot[i] <- i
   hfs <- hf_spec[hf_spec$plot==i,]
+  
+  #get number of trees in each plot, number of species, and number of oaks:
   n_trees[i] <- sum(hfs$count)
+  plot_BA_from_BAF[i] <- n_trees[i] * 10 #Basal area per acre >> BA = # trees in * Basal Area Factor (10) 
   n_spec[i] <- nrow(hfs)
   oak <- rbind(hfs[hfs$spp == oaks[1],],
                hfs[hfs$spp == oaks[2],],
@@ -143,6 +116,7 @@ for (i in plots){
                hfs[hfs$spp == oaks[4],])
   n_oaks[i] <- sum(oak$count)
   
+  #get number of dead oaks:
   trees <- hf_trees[hf_trees$plot==i,]
   n_dead[i] <- sum(trees$CondBin)
   oak_d <- rbind(trees[trees$spp == oaks[1],],
@@ -152,32 +126,55 @@ for (i in plots){
   n_d_oaks[i] <- sum(oak_d$CondBin)
   rm(hfs,oak, trees, oak_d)
 }
-tree_data <- cbind(plot, n_trees, n_spec, n_oaks, n_dead, n_d_oaks)
+tree_data <- cbind(plot, n_trees, plot_BA_from_BAF, n_spec, n_oaks, n_dead, n_d_oaks)
 
-#biomass calculations (for % DBH):
+
+###basal area calculations (for % DBH):
 plot <- vector()
 plot_dbh <- vector()
+plot_BA <- vector()
 oak_dbh <- vector()
+oak_BA <- vector()
 dead_dbh <- vector()
+dead_BA <- vector()
+dead_oak_dbh <- vector()
+dead_oak_BA <- vector()
 for (i in plots){
   plot[i] <- i
+  
+  #plot dbh calculation:
   hfs <- hf_trees[hf_trees$plot==i,]
   plot_dbh[i] <- sum(hfs$dbh)
+  plot_BA[i] <- sum(hfs$BA)
   oak <- rbind(hfs[hfs$spp == oaks[1],],
                hfs[hfs$spp == oaks[2],],
                hfs[hfs$spp == oaks[3],],
                hfs[hfs$spp == oaks[4],])
-  oak_dbh[i] <- sum(oak$dbh)  #convert to basal area from DBH!
+  oak_dbh[i] <- sum(oak$dbh)
+  oak_BA[i] <- sum(oak$BA)
   
-  trees <- hf_trees[hf_trees$plot==i,]
-  n_dead[i] <- sum(trees$CondBin)
-  oak_d <- rbind(trees[trees$spp == oaks[1],],
-                 trees[trees$spp == oaks[2],],
-                 trees[trees$spp == oaks[3],],
-                 trees[trees$spp == oaks[4],])
+  #dbh and BA of dead trees in each plot:
+  d_trees <- hfs[hfs$CondBin == 1,]
+  dead_dbh[i] <- sum(d_trees$dbh)
+  dead_BA[i] <- sum(d_trees$BA)
+  
+  #number of dead trees and dead oaks:
+  n_dead[i] <- sum(hfs$CondBin)
+  oak_d <- rbind(hfs[hfs$spp == oaks[1],],
+                 hfs[hfs$spp == oaks[2],],
+                 hfs[hfs$spp == oaks[3],],
+                 hfs[hfs$spp == oaks[4],])
   n_d_oaks[i] <- sum(oak_d$CondBin)
-  rm(hfs,oak, trees, oak_d)
+  
+  #dbh and BA of dead oaks:
+  dead_oak <- oak_d[oak_d$CondBin == 1,]
+  dead_oak_dbh[i] <- sum(dead_oak$dbh)
+  dead_oak_BA[i] <- sum(dead_oak$BA)
+  
+  rm(hfs, oak, d_trees, oak_d, dead_oak)
 }
+
+tree_data <- cbind(tree_data, plot_dbh, plot_BA, dead_dbh, dead_BA, dead_oak_dbh, dead_oak_BA)
 
 
 ###cleaning seedling data:
@@ -204,17 +201,7 @@ field_data <- merge(field_data, seed_data, all=TRUE)
 field_data <- cbind(field_data, hf_ground$f.a)
 #write.csv(field_data, file="HF_2022_Field_Data/2023_07_14_hf_field_data_cleaned.csv")
 
-###oak plots:
-# hf_oaks <- as.data.frame(matrix(nrow=nrow(field_plots), ncol=length(oaks)+1))
-# hf_oaks[,1]<- field_plots$plot
 
-
-# for (i in 1:length(oaks)){
-#   for (j in 1:row(hf_spec)){
-#     hf_oaks[j,i+1] <- ifelse(unique(hf_spec$plot)[j] == hf_oaks$plot[j] & hf_spec$spp[j,] == oaks[i],
-#                             1,0)
-#   }
-# }
 
 #merge with remote-sensing data:
 #load:
@@ -258,3 +245,39 @@ points(x,mu-2*sigma,col=3,pch="-")
 #next stop: plot the gam
 fit <- hf_gam$fitted.values
 points(hf_data$mags, fit, col=4, pch="*")
+
+
+
+###ARCHIVE ###load GEE data:---------
+# #tcg data:
+# hfplotstcg<-read.csv("HF_2022_Field_Data/HFplots_tcg_mean.csv")
+# #condition scores:
+# hfplotscond<-read.csv("HF_2022_Field_Data/HFplots_score_mean.csv")
+# 
+# #remove extra columns:
+# hftcg<-hfplotstcg[,2:131]
+# hfcond<-hfplotscond[,2:131]
+
+# 
+# ###load field data:
+# HF.latlon<-read.csv("HF_2022_Field_Data/2022_HF_plots_latlon.csv")
+# HF.plot.data<-read.csv("HF_2022_Field_Data/HF_Plot_data.csv")
+# HF.seedlings<-read.csv("HF_2022_Field_Data/HF_Seedlings_long.csv")
+# HF.trees<-read.csv("HF_2022_Field_Data/HF_Tree_data.csv")
+# HF.understory<-read.csv("HF_2022_Field_Data/HF_Und_ground_survey.csv")
+# 
+# #separating mortality sites:
+# library("dplyr")
+# HF.condition<-HF.trees %>% group_by(plot_2, Cond) %>% summarize(count=n())
+# HF.mort<-HF.condition[HF.condition$Cond=="D",]
+# HF.mort$mort<-1
+# 
+# #merge with plot data:
+# HF.plot.data<- merge(HF.plot.data, HF.mort, all = TRUE)
+# HF.plot.data$mort[is.na(HF.plot.data$mort)] <- 0
+
+#making a new lat/lon file:
+# hf_lat_lon <- cbind(field_plots$longitude, field_plots$latitude)
+# colnames(hf_lat_lon) <- c('longitude','latitude')
+# write.csv(hf_lat_lon, file="hf_lat_lon.csv", row.names=TRUE)
+
