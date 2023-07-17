@@ -199,14 +199,19 @@ for (i in 1:length(plots)){
   total_seed[i] <- sum(n_seedlings[i,])
   rm(hfs)
 }
-seed_data <- cbind(plot, total_seed, n_seedlings)
+seed_data <- cbind.data.frame(plot, total_seed, n_seedlings)
+colnames(seed_data) <- c("plot", "total_seed", 
+                         "seedlings_size_class_1",
+                         "seedlings_size_class_2",
+                         "seedlings_size_class_3")
 
+#compile:
 field_data <- merge(field_plots, tree_data, all=TRUE)
-field_data <- field_data[-which(is.na(field_data$n_trees)),c(1:11,14:19)]
+field_data <- field_data[-which(is.na(field_data$n_trees)),c(1:11,14:ncol(field_data))]
 field_data <- merge(field_data, seed_data, all=TRUE)
 
 #add ferns data to field data:
-field_data <- cbind(field_data, hf_ground$f.a)
+field_data <- cbind.data.frame(field_data, hf_ground$f.a)
 #write.csv(field_data, file="HF_2022_Field_Data/2023_07_14_hf_field_data_cleaned.csv")
 
 
@@ -215,7 +220,7 @@ field_data <- cbind(field_data, hf_ground$f.a)
 #load:
 hf_mags <- read.csv("HF_2022_Field_Data/HF_mags_recov_from_GEE_data.csv")
 #join:
-hf_data <- cbind(field_data,hf_mags)
+hf_data <- cbind.data.frame(field_data,hf_mags)
 
 ### GAM time:
 library(mgcv)
