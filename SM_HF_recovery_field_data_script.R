@@ -206,9 +206,10 @@ colnames(seed_data) <- c("plot", "total_seed",
                          "seedlings_size_class_3")
 
 #compile:
-field_data <- merge(field_plots, tree_data, all=TRUE)
-field_data <- field_data[-which(is.na(field_data$n_trees)),c(1:11,14:ncol(field_data))]
-field_data <- merge(field_data, seed_data, all=TRUE)
+#field_data <- merge(field_plots, tree_data, all=TRUE)
+#field_data <- field_data[-which(is.na(field_data$n_trees)),c(1:11,14:ncol(field_data))]
+#field_data <- merge(field_data, seed_data, all=TRUE)
+field_data <- cbind.data.frame(field_plots, tree_data[,2:ncol(tree_data)], seed_data[,2:ncol(seed_data)])
 
 #add ferns data to field data:
 field_data <- cbind.data.frame(field_data, hf_ground$f.a)
@@ -218,7 +219,8 @@ field_data <- cbind.data.frame(field_data, hf_ground$f.a)
 
 #merge with remote-sensing data:
 #load:
-hf_mags <- read.csv("HF_2022_Field_Data/HF_mags_recov_from_GEE_data.csv")
+#hf_mags <- read.csv("HF_2022_Field_Data/HF_mags_recov_from_GEE_data.csv")
+hf_mags <- read.csv("HF_2022_Field_Data/2023_07_17_hf_distprobmags_data.csv")
 #join:
 hf_data <- cbind.data.frame(field_data,hf_mags)
 
@@ -226,10 +228,11 @@ hf_data <- cbind.data.frame(field_data,hf_mags)
 library(mgcv)
 library(pROC)
 
+#yvar <- hf_data$mort
 hf_gam <- gam(hf_data$mort ~ s(hf_data$mags), 
               data=hf_data,
               family = "binomial")
-hf_roc<-roc(hf_data$mags,hf_gam$fitted.values)
+hf_roc<-roc(hf_gam$y,hf_gam$fitted.values)
 
 #summ <- 
 
@@ -238,8 +241,8 @@ hf_roc<-roc(hf_data$mags,hf_gam$fitted.values)
 # library(latticeExtra)
 # library(tactile)
 
-plot.roc(hf_data$mort,hf_data$mags,
-         percent=T)
+# plot.roc(hf_data$mort,hf_data$mags,
+#          percent=T)
 
 
 plot(hf_data$mags, hf_data$mort)
