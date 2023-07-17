@@ -107,26 +107,26 @@ for (i in plots){
   hfs <- hf_spec[hf_spec$plot==i,]
   
   #get number of trees in each plot, number of species, and number of oaks:
-  n_trees[i] <- sum(hfs$count)
+  n_trees[i] <- as.numeric(sum(hfs$count))
   plot_BA_from_BAF[i] <- n_trees[i] * 10 #Basal area per acre >> BA = # trees in * Basal Area Factor (10) 
-  n_spec[i] <- nrow(hfs)
+  n_spec[i] <- as.numeric(nrow(hfs))
   oak <- rbind(hfs[hfs$spp == oaks[1],],
                hfs[hfs$spp == oaks[2],],
                hfs[hfs$spp == oaks[3],],
                hfs[hfs$spp == oaks[4],])
-  n_oaks[i] <- sum(oak$count)
+  n_oaks[i] <- as.numeric(sum(oak$count))
   
   #get number of dead oaks:
   trees <- hf_trees[hf_trees$plot==i,]
-  n_dead[i] <- sum(trees$CondBin)
+  n_dead[i] <- as.numeric(sum(trees$CondBin))
   oak_d <- rbind(trees[trees$spp == oaks[1],],
                  trees[trees$spp == oaks[2],],
                  trees[trees$spp == oaks[3],],
                  trees[trees$spp == oaks[4],])
-  n_d_oaks[i] <- sum(oak_d$CondBin)
+  n_d_oaks[i] <- as.numeric(sum(oak_d$CondBin))
   rm(hfs,oak, trees, oak_d)
 }
-tree_data <- cbind(plot, n_trees, plot_BA_from_BAF, n_spec, n_oaks, n_dead, n_d_oaks)
+tree_data <- cbind.data.frame(plot,n_trees, plot_BA_from_BAF, n_spec, n_oaks, n_dead, n_d_oaks)
 
 
 ###basal area calculations (for % DBH):
@@ -144,37 +144,45 @@ for (i in plots){
   
   #plot dbh calculation:
   hfs <- hf_trees[hf_trees$plot==i,]
-  plot_dbh[i] <- sum(hfs$dbh)
-  plot_BA[i] <- sum(hfs$BA)
+  plot_dbh[i] <- as.numeric(sum(hfs$dbh))
+  plot_BA[i] <- as.numeric(sum(hfs$BA))
   oak <- rbind(hfs[hfs$spp == oaks[1],],
                hfs[hfs$spp == oaks[2],],
                hfs[hfs$spp == oaks[3],],
                hfs[hfs$spp == oaks[4],])
-  oak_dbh[i] <- sum(oak$dbh)
-  oak_BA[i] <- sum(oak$BA)
+  oak_dbh[i] <- as.numeric(sum(oak$dbh))
+  oak_BA[i] <- as.numeric(sum(oak$BA))
   
   #dbh and BA of dead trees in each plot:
   d_trees <- hfs[hfs$CondBin == 1,]
-  dead_dbh[i] <- sum(d_trees$dbh)
-  dead_BA[i] <- sum(d_trees$BA)
+  dead_dbh[i] <- as.numeric(sum(d_trees$dbh))
+  dead_BA[i] <- as.numeric(sum(d_trees$BA))
   
   #number of dead trees and dead oaks:
-  n_dead[i] <- sum(hfs$CondBin)
+  n_dead[i] <- as.numeric(sum(hfs$CondBin))
   oak_d <- rbind(hfs[hfs$spp == oaks[1],],
                  hfs[hfs$spp == oaks[2],],
                  hfs[hfs$spp == oaks[3],],
                  hfs[hfs$spp == oaks[4],])
-  n_d_oaks[i] <- sum(oak_d$CondBin)
+  n_d_oaks[i] <- as.numeric(sum(oak_d$CondBin))
   
   #dbh and BA of dead oaks:
   dead_oak <- oak_d[oak_d$CondBin == 1,]
-  dead_oak_dbh[i] <- sum(dead_oak$dbh)
-  dead_oak_BA[i] <- sum(dead_oak$BA)
+  dead_oak_dbh[i] <- as.numeric(sum(dead_oak$dbh))
+  dead_oak_BA[i] <- as.numeric(sum(dead_oak$BA))
   
   rm(hfs, oak, d_trees, oak_d, dead_oak)
 }
 
-tree_data <- cbind(tree_data, plot_dbh, plot_BA, dead_dbh, dead_BA, dead_oak_dbh, dead_oak_BA)
+tree_data <- cbind.data.frame(tree_data, plot_dbh, plot_BA, oak_dbh, oak_BA, dead_dbh, dead_BA, dead_oak_dbh, dead_oak_BA)
+
+#percentage of each plot that is oak:
+tree_data$percent_dbh_oak <- (tree_data$oak_dbh/tree_data$plot_dbh)*100
+tree_data$percent_BA_oak <- (tree_data$oak_BA/tree_data$plot_BA)*100
+tree_data$percent_dead_dbh <- (tree_data$dead_dbh/tree_data$plot_dbh)*100
+tree_data$percent_dead_BA <- (tree_data$dead_BA/tree_data$plot_BA)*100
+tree_data$percent_dead_oak_dbh <- (tree_data$dead_oak_dbh/tree_data$plot_dbh)*100
+tree_data$percent_dead_oak_BA <- (tree_data$dead_oak_BA/tree_data$plot_BA)*100
 
 
 ###cleaning seedling data:
