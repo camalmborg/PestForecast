@@ -18,41 +18,42 @@ y <- as.numeric((tcgs[site,27:80])/1000) #currently Apr 2011-Aug 2020
 x <- 1:length(y)
 #samp_time_series <- tcgjune[site,]
 #par(mar=c(1,1,1,1))
-plot(x, y, frame=FALSE,
-     xlab = "Growing Season Month",
-     ylab = "Condition Score",
-     title = "Sample Plot Time Series (April 2011-August 2020): Fast Recovery",
-     pch = 20,
-     col = "forestgreen",
-     ylim = c(-6.75,4.5))
-lines(x, y, lwd = 1, col="forestgreen")
-
-sample_site <- data.frame(
-  month = x,
-  score = y
-)
-colnames(sample_site) <- c("x","score")
+# plot(x, y, frame=FALSE,
+#      xlab = "Growing Season Month",
+#      ylab = "Condition Score",
+#      title = "Sample Plot Time Series (April 2011-August 2020): Fast Recovery",
+#      pch = 20,
+#      col = "forestgreen",
+#      ylim = c(-6.75,4.5))
+# lines(x, y, lwd = 1, col="forestgreen")
+# 
+# sample_site <- data.frame(
+#   month = x,
+#   score = y
+# )
+# colnames(sample_site) <- c("x","score")
 
 ##GGPLOT VERSION ----------------------
 ##turn this stuff on and change name to save:
 fname = "2023_07_20_Fast_Recov_sample_plot.tiff"
-tiff(fname, units = "in")
+tiff(fname, units = "in", width=12, height=4, res=300)
 ggplot(data = sample_site, mapping = aes(x = x, y = score)) +
-  geom_line() +
-  geom_point() + 
-  ylim(c(-6.75, 4.5)) +
-  labs(title = "Sample Plot Time Series (April 2011-August 2020): Fast Recovery", 
+  geom_line(color="forestgreen") +
+  geom_point(color="forestgreen") + 
+  geom_line(data = filter(sample_site, is.na(score)==FALSE), 
+            linetype = "dashed", color="forestgreen") +
+  ylim(c(-6.75, 4)) +
+  labs(title = "Sample Forest Condition(April 2011-August 2020): Fast Recovery", 
        y="Condition Score",
        x="Growing Season Month") +
-  theme(panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank())
-# 
-# #making a nice time series plot: COULD NOT GET IT TO PLOT
-# time_series <- ggplot(sample_site) +
-#   geom_line(aes(x="x", y="score")) +
-#   ylab("Condition Score") +
-#   xlab("Growing Season Month")
-# time_series
+  scale_x_continuous(breaks = 5)
+  theme_bw() + theme(panel.border = element_blank(), 
+                     panel.grid.major = element_blank(),
+                     panel.grid.minor = element_blank(), 
+                     axis.line = element_line(colour = "black"))
+  # theme(panel.grid.major = element_blank(), 
+  #       panel.grid.minor = element_blank())
+dev.off()
 
 #testing subset sites:
 distsites <- c(10,18,21,30,31,32,47,53,60,
