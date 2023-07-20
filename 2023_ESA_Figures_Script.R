@@ -7,37 +7,49 @@ library(dplyr)
 
 
 # Harvard Forest data - Landsat time series at some of the sites:
-site <- 145
+site <- 41
 #tcg <- tcg.values
 tcg <- cond.scores
 
 #get just the tcg values from data frame:
 tcgs<-tcg[,c(grep("^X",colnames(tcg)))]
 
-#first get just june values:
-#junes<-seq(3,ncol(tcgs),by=5)  #3 is if tcg/condscores data have april in them, 2 if data starts w/May
-#tcgjune<-as.matrix(tcgs[,junes])
-
-y <- as.numeric((tcgs[site,])/1000)
+y <- as.numeric((tcgs[site,27:80])/1000) #currently Apr 2011-Aug 2020
 x <- 1:length(y)
 #samp_time_series <- tcgjune[site,]
 #par(mar=c(1,1,1,1))
-plot(x, y, type = "l",
+plot(x, y, frame=FALSE,
      xlab = "Growing Season Month",
      ylab = "Condition Score",
-     )
+     title = "Sample Plot Time Series (April 2011-August 2020): Fast Recovery",
+     pch = 20,
+     col = "forestgreen",
+     ylim = c(-6.75,4.5))
+lines(x, y, lwd = 1, col="forestgreen")
 
+sample_site <- data.frame(
+  month = x,
+  score = y
+)
+colnames(sample_site) <- c("x","score")
 
-# sample_site <- data.frame(
-#   month = x,
-#   score = y
-# )
-# colnames(sample_site) <- c("x","score")
+##GGPLOT VERSION ----------------------
+##turn this stuff on and change name to save:
+fname = "2023_07_20_Fast_Recov_sample_plot.tiff"
+tiff(fname, units = "in")
+ggplot(data = sample_site, mapping = aes(x = x, y = score)) +
+  geom_line() +
+  geom_point() + 
+  ylim(c(-6.75, 4.5)) +
+  labs(title = "Sample Plot Time Series (April 2011-August 2020): Fast Recovery", 
+       y="Condition Score",
+       x="Growing Season Month") +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank())
 # 
 # #making a nice time series plot: COULD NOT GET IT TO PLOT
-# time_series <- sample_site %>%
-#   ggplot(aes(x="x", y="score")) +
-#   geom_line() +
+# time_series <- ggplot(sample_site) +
+#   geom_line(aes(x="x", y="score")) +
 #   ylab("Condition Score") +
 #   xlab("Growing Season Month")
 # time_series
