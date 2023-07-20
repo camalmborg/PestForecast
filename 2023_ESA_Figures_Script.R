@@ -1,7 +1,13 @@
 #Figures code for ESA 2023
 
+#load libraries:
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+
+
 # Harvard Forest data - Landsat time series at some of the sites:
-site <- 204
+site <- 145
 #tcg <- tcg.values
 tcg <- cond.scores
 
@@ -12,12 +18,31 @@ tcgs<-tcg[,c(grep("^X",colnames(tcg)))]
 #junes<-seq(3,ncol(tcgs),by=5)  #3 is if tcg/condscores data have april in them, 2 if data starts w/May
 #tcgjune<-as.matrix(tcgs[,junes])
 
-y <- tcgs[site, 21:79]
-x <- length(y[1,])
+y <- as.numeric((tcgs[site,])/1000)
+x <- 1:length(y)
 #samp_time_series <- tcgjune[site,]
 #par(mar=c(1,1,1,1))
-plot(1:x, y[1,])
+plot(x, y, type = "l",
+     xlab = "Growing Season Month",
+     ylab = "Condition Score",
+     )
 
+
+# sample_site <- data.frame(
+#   month = x,
+#   score = y
+# )
+# colnames(sample_site) <- c("x","score")
+# 
+# #making a nice time series plot: COULD NOT GET IT TO PLOT
+# time_series <- sample_site %>%
+#   ggplot(aes(x="x", y="score")) +
+#   geom_line() +
+#   ylab("Condition Score") +
+#   xlab("Growing Season Month")
+# time_series
+
+#testing subset sites:
 distsites <- c(10,18,21,30,31,32,47,53,60,
                66,72,97,98,101,102,105,110,
                111,120,130,135,141,142,145,
@@ -36,3 +61,5 @@ ds_mr <- hf_data[distsites,]
 dd_mr <- hf_data[distsdoub,]
 fr_mr <- hf_data[fastrecov,]
 sr_mr <- hf_data[slowrecov,]
+
+
