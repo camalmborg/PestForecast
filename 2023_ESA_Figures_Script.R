@@ -7,7 +7,7 @@ library(dplyr)
 
 
 # Harvard Forest data - Landsat time series at some of the sites:
-site <- 41
+site <- 157
 #tcg <- tcg.values
 tcg <- cond.scores
 
@@ -41,12 +41,12 @@ ggplot(data = sample_site, mapping = aes(x = x, y = score)) +
   geom_line(color="forestgreen") +
   geom_point(color="forestgreen") + 
   geom_line(data = filter(sample_site, is.na(score)==FALSE), 
-            linetype = "dashed", color="forestgreen") +
+            linetype = "dashed", color="forestgreen", size=0.3) +
   ylim(c(-6.75, 4)) +
   labs(title = "Sample Forest Condition(April 2011-August 2020): Fast Recovery", 
        y="Condition Score",
        x="Growing Season Month") +
-  scale_x_continuous(breaks = 5)
+  scale_x_continuous(breaks = seq(min(x), max(x), by = 5)) +
   theme_bw() + theme(panel.border = element_blank(), 
                      panel.grid.major = element_blank(),
                      panel.grid.minor = element_blank(), 
