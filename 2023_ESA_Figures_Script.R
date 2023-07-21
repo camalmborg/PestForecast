@@ -9,6 +9,27 @@ library(pROC)
 
 ### MAKING THE ROC PLOTS FOR MORTALITY:
 
+#set up data for plotting:
+yvar <- hf_data$mort
+xvar <- hf_data$mags
+
+hf_gam <- gam(yvar ~ s(xvar), 
+              data=hf_data,
+              family = "binomial")
+
+hf_roc<-roc(hf_gam$y,hf_gam$fitted.values)
+fit <- hf_gam$fitted.values
+
+# making the plot ---
+# gather data in new dataframe to eliminate duplicate columns error:
+data <- data.frame(hf_data$mags/1000, hf_data$mort, fit)
+names(data) <- c("mags", "mort", "fit")
+ggplot(data=data, mapping = aes(x=mags, y=mort)) +
+  geom_point() +
+  geom_line(data = data, mapping = aes(x=mags, y=fit),
+            lwd=1) +
+  scale_color_gradient(low = "forestgreen", 
+                       high = "orange4")
 
 
 ### MAKING SAMPLE TIME SERIES PLOTS:
