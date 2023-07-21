@@ -7,6 +7,8 @@ library(dplyr)
 library(mgcv)
 library(pROC)
 library(ggforce)
+library(hrbrthemes)
+library(viridis)
 
 ### MAKING THE ROC PLOTS FOR MORTALITY:
 
@@ -25,16 +27,21 @@ fit <- hf_gam$fitted.values
 # gather data in new dataframe to eliminate duplicate columns error:
 data <- data.frame(hf_data$mags/1000, hf_data$mort, fit)
 names(data) <- c("mags", "mort", "fit")
-ggplot(data=data, mapping = aes(x=mags, y=mort, color=mort)) +
-  geom_point() +
+#saving plots:
+tiff("2023_07_21_mort_bin_plot.tiff", units = "in", width=8, height=5, res=300)
+#mortality binary plot:
+ggplot(data=data, mapping = aes(x=mags, y=mort, color=mort,)) +
+  geom_point(size=1.5, show.legend = FALSE) +
   scale_color_gradient(low="forestgreen", high="orange4") +
   geom_line(data = data, mapping = aes(x=mags, y=fit, color=fit),
-            lwd=1.5) +
-  scale_colour_gradient(low="forestgreen", high="orange4")
+            lwd=1.25, show.legend = FALSE) +
+  scale_colour_gradient(low="forestgreen", high="orange4") +
+  ggtitle("Tree Mortality vs Disturbance Magnitude") +
+  ylab("Mortality (Binary)") +
+  xlab("Disturbance Magnitude")
+dev.off()
 
-# ggplot(data=data, mapping = aes(x=mags, y=fit, color=fit)) +
-#   geom_line(lwd=1) +
-#   scale_colour_gradient(low="green", high="red")
+
 
 ### MAKING SAMPLE TIME SERIES PLOTS:
 
