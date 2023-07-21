@@ -6,6 +6,7 @@ library(ggplot2)
 library(dplyr)
 library(mgcv)
 library(pROC)
+library(ggforce)
 
 ### MAKING THE ROC PLOTS FOR MORTALITY:
 
@@ -27,10 +28,13 @@ names(data) <- c("mags", "mort", "fit")
 ggplot(data=data, mapping = aes(x=mags, y=mort)) +
   geom_point() +
   geom_line(data = data, mapping = aes(x=mags, y=fit),
-            lwd=1) +
-  scale_color_gradient(low = "forestgreen", 
-                       high = "orange4")
+            color=round(data$fit*100), lwd=1) +
+  scale_colour_gradient(low="green", high="red")
 
+ggplot(data=data, mapping = aes(x=mags, y=fit),
+       color=round(data$fit*100)) +
+  geom_line(lwd=1) +
+  scale_colour_gradient(low="green", high="red")
 
 ### MAKING SAMPLE TIME SERIES PLOTS:
 
