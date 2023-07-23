@@ -69,7 +69,21 @@ ggplot(plot_data, aes(xvar, yvar)) +
   ylim(c(min(yvar), max(yvar))) +
   labs(x="Disturbance Magnitude",
        y="Percent Dead Trees in Plot")
-  
+
+
+
+### MAKING BOXPLOTS FOR GROUPS OF DATA:
+
+# data for plotting:
+xvar <- hf_data$percent_dead_oak_BA
+yvar <- hf_data$recov.rate
+plot_data <- data.frame(xvar, yvar)
+# divide into quantile groups:
+plot_data <- plot_data %>%
+  mutate(qgroup = ntile(xvar, 4))
+
+ggplot(data = plot_data, aes(x=factor(qgroup), y=yvar)) +
+  geom_boxplot()
 
 
 ### MAKING SAMPLE TIME SERIES PLOTS:
