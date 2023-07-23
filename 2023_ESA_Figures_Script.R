@@ -31,7 +31,7 @@ fit <- hf_gam$fitted.values
 data <- data.frame(hf_data$mags/1000, hf_data$mort, fit)
 names(data) <- c("mags", "mort", "fit")
 #saving plots:
-tiff("2023_07_21_mort_bin_plot.tiff", units = "in", width=8, height=5, res=300)
+#tiff("2023_07_21_mort_bin_plot.tiff", units = "in", width=8, height=5, res=300)
 #mortality binary plot:
 ggplot(data=data, mapping = aes(x=mags, y=mort, color=mort,)) +
   geom_point(size=1.5, show.legend = FALSE) +
@@ -42,14 +42,14 @@ ggplot(data=data, mapping = aes(x=mags, y=mort, color=mort,)) +
   ggtitle("Tree Mortality vs Disturbance Magnitude") +
   ylab("Mortality (Binary)") +
   xlab("Disturbance Magnitude")
-dev.off()
+#dev.off()
 
 
 ### MAKING MORTALITY AND RECOVERY RATE VS % DEAD, % DEAD OAK:
 
 #set up data for plotting:
-yvar <- hf_data$mags
-xvar <- hf_data$oak_dbh
+yvar <- hf_data$percent_dead_oak_BA
+xvar <- hf_data$mags
 plot_data <- data.frame(xvar, yvar)
 
 # run the gam:
@@ -63,10 +63,12 @@ pred$upper <- pred$fit+qt(0.975,hf_gam$df.null)*pred$se.fit
 ggplot(plot_data, aes(xvar, yvar)) +
   geom_point() +
   geom_ribbon(data = pred, alpha=0.3,
-              aes(y=fit, ymin = lower, ymax=upper,
-                  fill="blue")) +
+              aes(y=fit, ymin = lower, ymax=upper), color=0) +
   geom_line(data = pred, aes(xvar, fit)) +
-  ylim(c(0,max(yvar))) 
+  xlim(c(0,max(xvar))) +
+  ylim(c(min(yvar), max(yvar))) +
+  labs(x="Disturbance Magnitude",
+       y="Percent Dead Trees in Plot")
   
 
 
