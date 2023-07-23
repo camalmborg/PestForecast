@@ -10,6 +10,8 @@ library(ggforce)
 library(hrbrthemes)
 library(viridis)
 library(tidygam)
+library(lattice)
+library(tactile)
 
 ### MAKING THE ROC PLOTS FOR MORTALITY:
 
@@ -50,33 +52,22 @@ yvar <- hf_data$mags
 xvar <- hf_data$oak_dbh
 plot_data <- data.frame(xvar, yvar)
 
-#run the gam:
+# run the gam:
 hf_gam <- gam(yvar ~ s(xvar), 
               data=plot_data)
-#confidence intervals:
-ci<-predict(hf_gam, se=T)
-ci$lower<-ci$fit-qt(0.975,hf_gam$df.null)*ci$se.fit
-ci$upper<-ci$fit+qt(0.975,hf_gam$df.null)*ci$se.fit
-l.ci<-data.frame(hf_gam$model$xvar,ci$fit,ci$lower,ci$upper)
-l<-l.ci[order(l.ci[,1]),]
+# get model fit and upper and lower confidence intervals:
+pred <- predict_gam(hf_gam)
+pred$lower <- pred$fit-qt(0.975,hf_gam$df.null)*pred$se.fit
+pred$upper <- pred$fit+qt(0.975,hf_gam$df.null)*pred$se.fit
 
-# #ggplot it:
-# ggplot(data = l.ci, aes(l.ci$hf_gam.model.xvar, l.ci$ci.fit)) +
-#   tidygam::geom_smooth_ci()  ##Could not find this function even though tidygam is loaded
-
-
-hf_plot<-xyplot(yvar ~ xvar, data = plot_data,
-                panel = function(x, y) {
-                  ci <- predict(hf_gam, se=T)
-                  ci$lower <- ci$fit-qt(0.975,hf_gam$df.null)*ci$se.fit
-                  ci$upper <- ci$fit+qt(0.975,hf_gam$df.null)*ci$se.fit
-                  l.ci <- cbind(hf_gam$model$xvar, ci$fit, ci$lower, ci$upper)
-                  l <- l.ci[order(l.ci[,1]),]
-                  panel.ci(l[,1],l[,2],l[,4],l[,3],
-                           fill="seagreen3",alpha = 0.3)
-                  panel.xyplot(x, y, pch=20,col="seagreen")
-                  panel.lines(l[,1], l[,2],lty=1, col='black', lwd=1.5)
-                })
+ggplot(plot_data, aes(xvar, yvar)) +
+  geom_point() +
+  geom_ribbon(data = pred, alpha=0.3,
+              aes(y=fit, ymin = lower, ymax=upper,
+                  fill="blue")) +
+  geom_line(data = pred, aes(xvar, fit)) +
+  ylim(c(0,max(yvar))) 
+  
 
 
 ### MAKING SAMPLE TIME SERIES PLOTS:
