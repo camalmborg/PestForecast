@@ -42,6 +42,24 @@ ggplot(data=data, mapping = aes(x=mags, y=mort, color=mort,)) +
 dev.off()
 
 
+### MAKING MORTALITY AND RECOVERY RATE VS % DEAD, % DEAD OAK:
+
+#set up data for plotting:
+yvar <- hf_data$mags
+xvar <- hf_data$oak_dbh
+
+#run the gam:
+hf_gam <- gam(yvar ~ s(xvar), 
+              data=hf_data)
+#confidence intervals:
+ci<-predict(hf_gam, se=T)
+ci$lower<-ci$fit-qt(0.975,hf_gam$df.null)*ci$se.fit
+ci$upper<-ci$fit+qt(0.975,hf_gam$df.null)*ci$se.fit
+l.ci<-cbind(hf_gam$model$mo,ci$fit,ci$lower,ci$upper)
+l<-l.ci[order(l.ci[,1]),]
+
+#ggplot it:
+
 
 ### MAKING SAMPLE TIME SERIES PLOTS:
 
