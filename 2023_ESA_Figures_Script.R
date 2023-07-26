@@ -25,6 +25,7 @@ hf_gam <- gam(yvar ~ s(xvar),
 
 hf_roc<-roc(hf_gam$y,hf_gam$fitted.values)
 fit <- hf_gam$fitted.values
+#summ <- 
 
 # making the plot ---
 # gather data in new dataframe to eliminate duplicate columns error:
@@ -75,16 +76,40 @@ ggplot(plot_data, aes(xvar, yvar)) +
 ### MAKING BOXPLOTS FOR GROUPS OF DATA:
 
 # data for plotting:
-xvar <- hf_data$percent_dead_oak_BA
-yvar <- hf_data$recov.rate
+xvar <- hf_data$f.a[-168]
+yvar <- hf_data$recov.rate[-168]
 plot_data <- data.frame(xvar, yvar)
-# divide into quantile groups:
-plot_data <- plot_data %>%
-  mutate(qgroup = ntile(xvar, 4))
 
-ggplot(data = plot_data, aes(x=factor(qgroup), y=yvar)) +
-  geom_boxplot()
+ggplot(data = plot_data, aes(x=factor(xvar), y=yvar)) +
+  geom_boxplot() +
+  labs(x="Ferns and Allies Presence/Absence",
+       y="Recovery Rate") +
+ # theme_bw() + 
+  theme(panel.border = element_blank(), 
+                     panel.grid.major = element_blank(),
+                     panel.grid.minor = element_blank(), 
+                     axis.line = element_line(colour = "black"))
 
+
+# data for plotting - seedling size classes data histogram:
+
+seeds1 <- hf_data["seedlings_size_class_1"]
+seeds1$grp = 1
+names(seeds1) <- c("n_seedlings", "grp")
+
+seeds2 <- hf_data["seedlings_size_class_2"]
+seeds2$grp = 2
+names(seeds2) <- c("n_seedlings", "grp")
+
+seeds3 <- hf_data["seedlings_size_class_3"]
+seeds3$grp = 3
+names(seeds3) <- c("n_seedlings", "grp")
+
+all_seeds <- rbind.data.frame(seeds1, seeds2, seeds3)
+
+ggplot(data = all_seeds, aes(x=n_seedlings, fill=as.factor(grp))) +
+  geom_histogram(color="black", alpha=0.3, position = 'identity', binwidth = 1) +
+  scale_fill_manual(values=c("green", "blue", "red"))
 
 ### MAKING SAMPLE TIME SERIES PLOTS:
 
