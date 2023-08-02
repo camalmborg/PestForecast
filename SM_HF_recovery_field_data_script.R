@@ -141,12 +141,16 @@ tree_data <- cbind.data.frame(plot,n_trees, n_spec, n_oaks, n_dead, n_d_oaks)
 plot <- vector()
 plot_dbh <- vector()
 plot_BA <- vector()
+plot_TF <- vector()
 oak_dbh <- vector()
 oak_BA <- vector()
+oak_TF <- vector()
 dead_dbh <- vector()
 dead_BA <- vector()
+dead_TF <- vector()
 dead_oak_dbh <- vector()
 dead_oak_BA <- vector()
+dead_oak_TF <- vector()
 for (i in plots){
   plot[i] <- i
   
@@ -154,17 +158,23 @@ for (i in plots){
   hfs <- hf_trees[hf_trees$plot==i,]
   plot_dbh[i] <- as.numeric(sum(hfs$dbh))
   plot_BA[i] <- as.numeric(sum(hfs$BA))
+  #sum tree factors to get trees per acre:
+  plot_TF[i] <- as.numeric(sum(hfs$TF))
+  
+  #get oak dbh and ba:
   oak <- rbind(hfs[hfs$spp == oaks[1],],
                hfs[hfs$spp == oaks[2],],
                hfs[hfs$spp == oaks[3],],
                hfs[hfs$spp == oaks[4],])
   oak_dbh[i] <- as.numeric(sum(oak$dbh))
   oak_BA[i] <- as.numeric(sum(oak$BA))
+  oak_TF[i] <- as.numeric(sum(oak$TF))
   
   #dbh and BA of dead trees in each plot:
   d_trees <- hfs[hfs$CondBin == 1,]
   dead_dbh[i] <- as.numeric(sum(d_trees$dbh))
   dead_BA[i] <- as.numeric(sum(d_trees$BA))
+  dead_TF[i] <- as.numeric(sum(d_trees$TF))
   
   #number of dead trees and dead oaks:
   n_dead[i] <- as.numeric(sum(hfs$CondBin))
@@ -178,11 +188,15 @@ for (i in plots){
   dead_oak <- oak_d[oak_d$CondBin == 1,]
   dead_oak_dbh[i] <- as.numeric(sum(dead_oak$dbh))
   dead_oak_BA[i] <- as.numeric(sum(dead_oak$BA))
+  dead_oak_TF[i] <- as.numeric(sum(dead_oak$TF))
   
   rm(hfs, oak, d_trees, oak_d, dead_oak)
 }
 
-tree_data <- cbind.data.frame(tree_data, plot_dbh, plot_BA, oak_dbh, oak_BA, dead_dbh, dead_BA, dead_oak_dbh, dead_oak_BA)
+tree_data <- cbind.data.frame(tree_data, plot_dbh, plot_BA, plot_TF, 
+                              oak_dbh, oak_BA, oak_TF, 
+                              dead_dbh, dead_BA, dead_TF,
+                              dead_oak_dbh, dead_oak_BA, dead_oak_TF)
 
 #percentage of each plot that is oak:
 tree_data$percent_dbh_oak <- (tree_data$oak_dbh/tree_data$plot_dbh)*100
@@ -246,8 +260,8 @@ hf_data <- cbind.data.frame(field_data,hf_mags)
 library(mgcv)
 library(pROC)
 
-yvar <- hf_data$recov.rate
-xvar <- hf_data$percent_dead_dbh
+yvar <- hf_data$mags
+xvar <- hf_data$oak_TF
 
 hf_gam <- gam(yvar ~ s(xvar),
               data=hf_data)
@@ -255,7 +269,7 @@ hf_gam <- gam(yvar ~ s(xvar),
 hf_gam <- gam(yvar ~ s(xvar), 
               data=hf_data,
               family = "binomial")
-hf_roc<-roc(hf_gam$y,hf_gam$fitted.values)
+#hf_roc<-roc(hf_gam$y,hf_gam$fitted.values)
 
 #summ <- 
 
