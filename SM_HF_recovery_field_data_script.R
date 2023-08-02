@@ -50,6 +50,7 @@ hf_seedlings <- hf_seedlings %>%
 field_plots <- read.csv("HF_2022_Field_Data/Plot_data  - Sheet1.csv")
 field_plots <- field_plots %>%
   mutate(plot = str_replace(plot, " ", "-")) %>%
+  mutate(hotspot = substr(plot,1,1)) %>%
   mutate(latitude = str_replace(latitude, " N", "")) %>%
   mutate(longitude = str_replace(longitude, " W", "")) %>%
   mutate_at(c('latitude','longitude'), as.numeric) %>%
@@ -61,7 +62,14 @@ field_plots$longitude <- field_plots$longitude*-1
 #individual tree data (to get plots with mortality observed):
 hf_trees <- read.csv("HF_2022_Field_data/Tree_data - Sheet1.csv")
 #calculate Basal Area (BA) from DBH for each tree:
-hf_trees$BA <- hf_trees$dbh^2 * 0.005454
+hf_trees$BA <- hf_trees$dbh^2 * 0.005454 #basal area (ft2) from dbh (inches)
+#calculate Tree Factor (TF) for each tree:
+BAF <- 10  #basal area factor from variable radius sampling design
+hf_trees$TF <- BAF/hf_trees$BA 
+#calculate plot radius for each tree:
+hf_trees$PR <- (sqrt(75.625/BAF)*hf_trees$dbh)
+
+#getting tree mortality counts (binary mortality):
 hf_trees <- hf_trees %>% 
   mutate(plot = str_replace(plot, " ", "-")) %>%
   mutate(CondBin = ifelse(Cond == "D",1,0))
@@ -97,7 +105,7 @@ hf_spec <- hf_trees %>%
 plots <- unique(hf_spec$plot)
 plot <- vector()
 n_trees <- vector()
-plot_BA_from_BAF <- vector()
+#plot_BA_from_BAF <- vector()
 n_dead <- vector()
 n_spec <- vector()
 n_oaks <- vector()
@@ -108,7 +116,7 @@ for (i in plots){
   
   #get number of trees in each plot, number of species, and number of oaks:
   n_trees[i] <- as.numeric(sum(hfs$count))
-  plot_BA_from_BAF[i] <- n_trees[i] * 10 #Basal area per acre >> BA = # trees in * Basal Area Factor (10) 
+  #plot_BA_from_BAF[i] <- n_trees[i] * 10 #Basal area per acre >> BA = # trees in * Basal Area Factor (10) 
   n_spec[i] <- as.numeric(nrow(hfs))
   oak <- rbind(hfs[hfs$spp == oaks[1],],
                hfs[hfs$spp == oaks[2],],
@@ -126,7 +134,7 @@ for (i in plots){
   n_d_oaks[i] <- as.numeric(sum(oak_d$CondBin))
   rm(hfs,oak, trees, oak_d)
 }
-tree_data <- cbind.data.frame(plot,n_trees, plot_BA_from_BAF, n_spec, n_oaks, n_dead, n_d_oaks)
+tree_data <- cbind.data.frame(plot,n_trees, n_spec, n_oaks, n_dead, n_d_oaks)
 
 
 ###basal area calculations (for % DBH):
@@ -184,6 +192,8 @@ tree_data$percent_dead_BA <- (tree_data$dead_BA/tree_data$plot_BA)*100
 tree_data$percent_dead_oak_dbh <- (tree_data$dead_oak_dbh/tree_data$plot_dbh)*100
 tree_data$percent_dead_oak_BA <- (tree_data$dead_oak_BA/tree_data$plot_BA)*100
 
+#for each plot - oak trees per acre:
+#tree_data$oak_per_acre <- 
 
 ###cleaning seedling data:
 plot <- vector()
@@ -212,9 +222,17 @@ colnames(seed_data) <- c("plot", "total_seed",
 field_data <- cbind.data.frame(field_plots, tree_data[,2:ncol(tree_data)], seed_data[,2:ncol(seed_data)])
 
 #add ferns data to field data:
-field_data <- cbind.data.frame(field_data, hf_ground$f.a)
+field_data <- cbind.data.frame(field_data, hf_ground[,2:ncol(hf_ground)])
 #write.csv(field_data, file="HF_2022_Field_Data/2023_07_14_hf_field_data_cleaned.csv")
 
+
+#oak per acre conversions: doing in plot groups
+# BAF <- 10
+# plot_oak_per_acre <- vector()
+# for (i in 1:as.numeric(last(field_data$hotspot))){
+#   plotgrp <- field_data[field_data$hotspot == as.character(i),]
+#   plot_oak_per_acre <- (sum(plotgrp$n_oaks)/nrow(plotgrp)) * (BAF/(0.005454 * sum(plotgrp$oak_dbh)^2))
+# }
 
 
 #merge with remote-sensing data:
@@ -228,8 +246,13 @@ hf_data <- cbind.data.frame(field_data,hf_mags)
 library(mgcv)
 library(pROC)
 
-#yvar <- hf_data$mort
-hf_gam <- gam(hf_data$mort ~ s(hf_data$mags), 
+yvar <- hf_data$recov.rate
+xvar <- hf_data$percent_dead_dbh
+
+hf_gam <- gam(yvar ~ s(xvar),
+              data=hf_data)
+
+hf_gam <- gam(yvar ~ s(xvar), 
               data=hf_data,
               family = "binomial")
 hf_roc<-roc(hf_gam$y,hf_gam$fitted.values)
@@ -245,7 +268,7 @@ hf_roc<-roc(hf_gam$y,hf_gam$fitted.values)
 #          percent=T)
 
 
-plot(hf_data$mags, hf_data$mort)
+plot(xvar, yvar)
 
 #bin means:
 bins=seq(min(hf_data$mags)-1,max(hf_data$mags)+1,length=10)
