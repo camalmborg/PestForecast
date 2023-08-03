@@ -49,7 +49,7 @@ ggplot(data=data, mapping = aes(x=mags, y=mort, color=mort,)) +
 ### MAKING MORTALITY AND RECOVERY RATE VS % DEAD, % DEAD OAK:
 
 #set up data for plotting:
-yvar <- hf_data$percent_dead_oak_BA
+yvar <- hf_data$percent_dead_BA
 xvar <- hf_data$mags
 plot_data <- data.frame(xvar, yvar)
 
@@ -57,20 +57,25 @@ plot_data <- data.frame(xvar, yvar)
 hf_gam <- gam(yvar ~ s(xvar), 
               data=plot_data)
 # get model fit and upper and lower confidence intervals:
-pred <- predict_gam(hf_gam)
+#pred <- predict_gam(hf_gam)
+predicted <- predict(hf_gam, se=T)
+pred <- data.frame(predicted$fit, predicted$se.fit) 
+colnames(pred)=c("fit", "se.fit")
 pred$lower <- pred$fit-qt(0.975,hf_gam$df.null)*pred$se.fit
 pred$upper <- pred$fit+qt(0.975,hf_gam$df.null)*pred$se.fit
 
+#tiff("2023_08_02_precent_basal_area_mags_plot.tiff",
+     #width=9, height=6, units="in", res=300)
 ggplot(plot_data, aes(xvar, yvar)) +
   geom_point() +
   geom_ribbon(data = pred, alpha=0.3,
               aes(y=fit, ymin = lower, ymax=upper), color=0) +
   geom_line(data = pred, aes(xvar, fit)) +
-  xlim(c(0,max(xvar))) +
-  ylim(c(min(yvar), max(yvar))) +
+  xlim(c(-0.5,max(xvar))) +
+  ylim(c(min(yvar-1), max(yvar+15))) +
   labs(x="Disturbance Magnitude",
-       y="Percent Dead Trees in Plot")
-
+       y="Percent Dead BA in Plot")
+#dev.off
 
 
 ### MAKING BOXPLOTS FOR GROUPS OF DATA:
@@ -80,36 +85,77 @@ xvar <- hf_data$f.a[-168]
 yvar <- hf_data$recov.rate[-168]
 plot_data <- data.frame(xvar, yvar)
 
-ggplot(data = plot_data, aes(x=factor(xvar), y=yvar)) +
-  geom_boxplot() +
-  labs(x="Ferns and Allies Presence/Absence",
-       y="Recovery Rate") +
+# tiff(filename = "2023_08_02_ESA_ferns_presence_recov_figure.tiff",
+#      width=8, height=6, units="in", res=300)
+ggplot(data = plot_data, aes(x=factor(xvar), y=yvar, fill=as.factor(xvar))) +
+  geom_violin() +
+  scale_fill_manual(values = c("darkolivegreen1", "darkolivegreen3"),
+                    labels=c("No Ferns Present", "Ferns Present"),
+                    name="Understory") +
+  stat_summary(fun.y="median", geom = "crossbar", width=0.3) +
+  #geom_boxplot(width=0.1, color="black", alpha=0.2) +
  # theme_bw() + 
   theme(panel.border = element_blank(), 
                      panel.grid.major = element_blank(),
                      panel.grid.minor = element_blank(), 
-                     axis.line = element_line(colour = "black"))
+                     axis.line = element_line(colour = "black")) +
+  labs(#x="Ferns and Allies Presence/Absence",
+       y="Recovery Rate")
+# dev.off()
+
+# data for plotting:
+xvar <- hf_data$mort
+yvar <- hf_data$recov.rate
+hs <- hf_data$hotspot
+plot_data <- data.frame(xvar, yvar, hs)
+  
+ggplot(data = plot_data, aes(x=factor(xvar), y=yvar, fill=as.factor(hs))) +
+  geom_violin() +
+  # scale_fill_manual(values = c("darkolivegreen1", "darkolivegreen3"),
+  #                   labels=c("No Ferns Present", "Ferns Present"),
+  #                   name="Understory") +
+  #stat_summary(fun.y="median", geom = "crossbar", width=0.3) +
+  #geom_boxplot(width=0.1, color="black", alpha=0.2) +
+  # theme_bw() + 
+  theme(panel.border = element_blank(), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        axis.line = element_line(colour = "black")) +
+  labs(#x="Ferns and Allies Presence/Absence",
+    y="Recovery Rate")
 
 
 # data for plotting - seedling size classes data histogram:
 
 seeds1 <- hf_data["seedlings_size_class_1"]
+seeds1$recov <- hf_data$recov.rate
 seeds1$grp = 1
-names(seeds1) <- c("n_seedlings", "grp")
+names(seeds1) <- c("n_seedlings", "recov" ,"grp")
 
 seeds2 <- hf_data["seedlings_size_class_2"]
+seeds2$recov <- hf_data$recov.rate
 seeds2$grp = 2
-names(seeds2) <- c("n_seedlings", "grp")
+names(seeds2) <- c("n_seedlings", "recov" ,"grp")
 
 seeds3 <- hf_data["seedlings_size_class_3"]
+seeds3$recov <- hf_data$recov.rate
 seeds3$grp = 3
-names(seeds3) <- c("n_seedlings", "grp")
+names(seeds3) <- c("n_seedlings", "recov" ,"grp")
 
 all_seeds <- rbind.data.frame(seeds1, seeds2, seeds3)
 
-ggplot(data = all_seeds, aes(x=n_seedlings, fill=as.factor(grp))) +
-  geom_histogram(color="black", alpha=0.3, position = 'identity', binwidth = 1) +
-  scale_fill_manual(values=c("green", "blue", "red"))
+# ggplot(data = all_seeds, aes(x=n_seedlings, fill=as.factor(grp))) +
+#   geom_histogram(color="black", alpha=0.3, position = 'identity', binwidth = 1) +
+#   scale_fill_manual(values=c("green", "blue", "red"))
+
+ggplot(data = all_seeds, aes(x=n_seedlings, y=recov, fill=as.factor(grp))) + 
+  geom_violin() +
+  facet_wrap(~grp) +
+  scale_fill_manual(values = c("greenyellow", "green", "green3"),
+                    labels=c("Small (<0.5m)", "Middle ("),
+                    name="Understory") +
+  stat_summary(fun.y="median", geom = "crossbar", width=0.3) 
+
 
 ### MAKING SAMPLE TIME SERIES PLOTS:
 
