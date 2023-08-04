@@ -5,3 +5,5 @@ library(terra)
 library(ggplot2)
 
 plot_usmap(include = c("MA", "CT", "RI"))
+
+plot_usmap(include = c("MA"))
