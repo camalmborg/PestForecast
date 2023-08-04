@@ -49,33 +49,41 @@ ggplot(data=data, mapping = aes(x=mags, y=mort, color=mort,)) +
 ### MAKING MORTALITY AND RECOVERY RATE VS % DEAD, % DEAD OAK:
 
 #set up data for plotting:
-yvar <- hf_data$percent_dead_BA
-xvar <- hf_data$mags
+yvar <- hf_data$recov.rate
+xvar <- hf_data$mags/100
 plot_data <- data.frame(xvar, yvar)
+plot_data <- plot_data[complete.cases(plot_data),]
 
 # run the gam:
 hf_gam <- gam(yvar ~ s(xvar), 
               data=plot_data)
+hf_gam <- lm(yvar~xvar, data=plot_data)
 # get model fit and upper and lower confidence intervals:
-#pred <- predict_gam(hf_gam)
-predicted <- predict(hf_gam, se=T)
-pred <- data.frame(predicted$fit, predicted$se.fit) 
-colnames(pred)=c("fit", "se.fit")
-pred$lower <- pred$fit-qt(0.975,hf_gam$df.null)*pred$se.fit
-pred$upper <- pred$fit+qt(0.975,hf_gam$df.null)*pred$se.fit
+#predicted <- predict(hf_gam, se=T)
+pred <- as.data.frame(predict(hf_gam, interval = "confidence"))
+#pred <- data.frame(predicted$fit, predicted$se.fit) 
+#colnames(pred)=c("fit", "se.fit")
+#pred$lower <- pred$fit-qt(0.975,hf_gam$df.null)*pred$se.fit
+#pred$upper <- pred$fit+qt(0.975,hf_gam$df.null)*pred$se.fit
 
-#tiff("2023_08_02_precent_basal_area_mags_plot.tiff",
-     #width=9, height=6, units="in", res=300)
+tiff("2023_08_03_HF_plots_mags_recovrate_plot.tiff",
+     width=9, height=6, units="in", res=300)
 ggplot(plot_data, aes(xvar, yvar)) +
   geom_point() +
   geom_ribbon(data = pred, alpha=0.3,
-              aes(y=fit, ymin = lower, ymax=upper), color=0) +
-  geom_line(data = pred, aes(xvar, fit)) +
+              aes(x= plot_data$xvar, y=fit, ymin = pred$lwr, ymax=pred$upr), color=0) +
+  geom_line(data = pred, aes(plot_data$xvar, fit)) +
+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank()) +
   xlim(c(-0.5,max(xvar))) +
   ylim(c(min(yvar-1), max(yvar+15))) +
   labs(x="Disturbance Magnitude",
-       y="Percent Dead BA in Plot")
-#dev.off
+       y="Recovery Rate")
+dev.off()
 
 
 ### MAKING BOXPLOTS FOR GROUPS OF DATA:
