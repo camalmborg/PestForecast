@@ -25,14 +25,14 @@ hf_gam <- gam(yvar ~ s(xvar),
 
 hf_roc<-roc(hf_gam$y,hf_gam$fitted.values)
 fit <- hf_gam$fitted.values
-#summ <- 
+summ <- summary(hf_roc)
 
 # making the plot ---
 # gather data in new dataframe to eliminate duplicate columns error:
 data <- data.frame(hf_data$mags/1000, hf_data$mort, fit)
 names(data) <- c("mags", "mort", "fit")
 #saving plots:
-#tiff("2023_07_21_mort_bin_plot.tiff", units = "in", width=8, height=5, res=300)
+tiff("2023_08_04_mort_bin_plot.tiff", units = "in", width=8, height=5, res=300)
 #mortality binary plot:
 ggplot(data=data, mapping = aes(x=mags, y=mort, color=mort,)) +
   geom_point(size=1.5, show.legend = FALSE) +
@@ -40,10 +40,11 @@ ggplot(data=data, mapping = aes(x=mags, y=mort, color=mort,)) +
   geom_line(data = data, mapping = aes(x=mags, y=fit, color=fit),
             lwd=1.25, show.legend = FALSE) +
   scale_colour_gradient(low="forestgreen", high="orange4") +
+  xlim(c(-0.001, 0.23)) +
   ggtitle("Tree Mortality vs Disturbance Magnitude") +
   ylab("Mortality (Binary)") +
   xlab("Disturbance Magnitude")
-#dev.off()
+dev.off()
 
 
 ### MAKING MORTALITY AND RECOVERY RATE VS % DEAD, % DEAD OAK:
@@ -79,7 +80,7 @@ ggplot(plot_data, aes(xvar, yvar)) +
         panel.grid.minor = element_blank(),
         panel.border = element_blank(),
         panel.background = element_blank()) +
-  xlim(c(-0.5,max(xvar))) +
+  xlim(c(-0.01,max(xvar))) +
   ylim(c(min(yvar-1), max(yvar+15))) +
   labs(x="Disturbance Magnitude",
        y="Recovery Rate")
@@ -114,14 +115,16 @@ ggplot(data = plot_data, aes(x=factor(xvar), y=yvar, fill=as.factor(xvar))) +
 # data for plotting:
 xvar <- hf_data$mort
 yvar <- hf_data$recov.rate
-hs <- hf_data$hotspot
-plot_data <- data.frame(xvar, yvar, hs)
+#hs <- hf_data$hotspot
+plot_data <- data.frame(xvar, yvar)
   
-ggplot(data = plot_data, aes(x=factor(xvar), y=yvar, fill=as.factor(hs))) +
-  geom_violin() +
-  # scale_fill_manual(values = c("darkolivegreen1", "darkolivegreen3"),
-  #                   labels=c("No Ferns Present", "Ferns Present"),
-  #                   name="Understory") +
+tiff(filename = "2023_08_08_ESA_mortality_recov_figure.tiff",
+     width=8, height=6, units="in", res=300)
+ggplot(data = plot_data, aes(x=factor(xvar), y=yvar, fill=factor(xvar))) +
+  geom_boxplot() +
+  scale_fill_manual(values = c("forestgreen", "orange4")) +#,
+                    #labels=c("No Mortality", "Mortality"),
+                    #name="Canopy Tree Condition") +
   #stat_summary(fun.y="median", geom = "crossbar", width=0.3) +
   #geom_boxplot(width=0.1, color="black", alpha=0.2) +
   # theme_bw() + 
@@ -129,8 +132,9 @@ ggplot(data = plot_data, aes(x=factor(xvar), y=yvar, fill=as.factor(hs))) +
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(), 
         axis.line = element_line(colour = "black")) +
-  labs(#x="Ferns and Allies Presence/Absence",
+  labs(x="Tree Mortality (Binary)",
     y="Recovery Rate")
+dev.off()
 
 
 # data for plotting - seedling size classes data histogram:
