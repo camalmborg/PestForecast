@@ -28,14 +28,16 @@ uni <- uni %>%
 v2v3 <- data.frame(matrix(nrow=nrow(uni), ncol=2, data=NA))
 colnames(v2v3) <- c("VARIABLE2","VARIABLE3")
 # combine:
-uni <- as.data.frame(cbind(uni$MODEL_ID,uni$VARIABLE1,
-                                   v2v3$VARIABLE2,v2v3$VARIABLE3,
-                                   uni$R2, uni$AIC))
+uni <- cbind.data.frame(uni$MODEL_ID, uni$VARIABLE1,
+                           v2v3$VARIABLE2,v2v3$VARIABLE3,
+                           uni$R2,uni$AIC)
 colnames(uni) <- names(multi)
 
 # Combining them into one big dataframe:
 model <- rbind(uni, multi)
 
+### Calculate delAIC:
+model$delAIC <- model$AIC - min(model$AIC)
 
 ### Choosing best performers:
 
