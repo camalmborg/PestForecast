@@ -30,7 +30,7 @@ load("viirs_annual_averages_data.RData") #not included
 dmr <- read.csv("SM_distmagrecov_data.csv")
 
 #combining all data into on dataframe:
-MV_DATA <- cbind(dm_maxtemps[,c(46,47,48,49,50,51,58,59,60,61,62,63)],
+MV_DATA <- cbind.data.frame(dm_maxtemps[,c(46,47,48,49,50,51,58,59,60,61,62,63)],
                  MAM_spring_precip[,6],
                  MA_spring_precip[,5:6],
                  AM_spring_precip[,5:6],
