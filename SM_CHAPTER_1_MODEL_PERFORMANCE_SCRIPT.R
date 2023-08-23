@@ -6,19 +6,19 @@ library(dplyr)
 library(tidyverse)
 
 # loading the model results masterlist files:
-distmag_uni <- read.csv("CHAPTER_1/CHAPTER 1-DISTMAG-UNI-GAM-ANALYSES-TCG-MASTERLIST.csv")
-distmag_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTMAG-MULTI-GAM-ANALYSES-TCG-MASTERLIST.csv")
+#distmag_uni <- read.csv("CHAPTER_1/CHAPTER 1-DISTMAG-UNI-GAM-ANALYSES-TCG-MASTERLIST.csv")
+#distmag_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTMAG-MULTI-GAM-ANALYSES-TCG-MASTERLIST.csv")
 #distprob16_uni <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2016-UNI-AUC-ANALYSES-TCG-MASTERLIST.csv")
 #distprob16_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2016-MULTI-AUC-ANALYSES-TCG-MASTERLIST.csv")
-#distprob17_uni <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2017-UNI-AUC-ANALYSES-TCG-MASTERLIST.csv")
-#distprob17_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2017-MULTI-AUC-ANALYSES-TCG-MASTERLIST.csv")
+distprob17_uni <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2017-UNI-AUC-ANALYSES-TCG-MASTERLIST.csv")
+distprob17_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2017-MULTI-AUC-ANALYSES-TCG-MASTERLIST.csv")
 
 ### Making uni and multi into something we can Rbind
 # choose group you would like to use from above:
-uni <- distmag_uni
-multi <- distmag_multi
+uni <- distprob17_uni
+multi <- distprob17_multi
 
-# univariate variable and monthyear columns combine:
+# DIST MAG: univariate variable and monthyear columns combine: -------------
 uni <- uni %>%
   mutate(MONTHYEAR = str_replace(MONTHYEAR, " ", "-")) %>%
   mutate(VARIABLE1 = paste(VARIABLE1, MONTHYEAR, sep="_")) %>%
@@ -33,11 +33,35 @@ uni <- cbind.data.frame(uni$MODEL_ID, uni$VARIABLE1,
                            uni$R2,uni$AIC)
 colnames(uni) <- names(multi)
 
-# Combining them into one big dataframe:
+# DIST PROB: univariate variable and monthyear columns combine: -------------
+uni <- uni %>%
+  mutate(MONTHYEAR = str_replace(MONTHYEAR, " ", "-")) %>%
+  mutate(VARIABLE1 = paste(VARIABLE1, MONTHYEAR, sep="_")) %>%
+  select(-c(MONTHYEAR))
+
+# make new dataframe with 2 new NA columsn for VARIABLE2 and VARIABLE3:
+v2v3 <- data.frame(matrix(nrow=nrow(uni), ncol=2, data=NA))
+colnames(v2v3) <- c("VARIABLE2","VARIABLE3")
+# combine:
+uni <- cbind.data.frame(uni$MODEL_ID, uni$VARIABLE1,
+                        v2v3$VARIABLE2,v2v3$VARIABLE3,
+                        uni$AUC,uni$AIC)
+colnames(uni) <- names(multi)
+
+
+### Combining them into one big dataframe:
 model <- rbind(uni, multi)
 
-### Calculate delAIC:
+
+### Calculate delAIC: -----------
 model$delAIC <- model$AIC - min(model$AIC)
 
 ### Choosing best performers:
+modAIC <- model[order(model$delAIC),]
+#modr2 <- model[order(model$R2),]
+modauc <- model[order(model$AUC),]
 
+#write.csv(modAIC, file="CHAPTER_1/dist_mag_models_AICs_sorted.csv")
+#write.csv(modr2, file="CHAPTER_1/dist_mag_models_r2s_sorted.csv")
+#write.csv(modAIC, file="CHAPTER_1/dist_prob_2017_models_AICs_sorted.csv")
+#write.csv(modauc, file="CHAPTER_1/dist_prob_2017_models_auc_sorted.csv")
