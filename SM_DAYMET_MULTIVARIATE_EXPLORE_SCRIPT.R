@@ -185,3 +185,7 @@ varvars <- c(sort(unique(topmodels$V3)),
              sort(unique(topmodels$V4)), 
              sort(unique(topmodels$V5)))
 sort(unique(varvars))
+
+
+### Let's try to combine the AICs for all?
+### Starting with Univariate:
