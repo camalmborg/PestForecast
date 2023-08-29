@@ -22,7 +22,7 @@ spongy_mpr<-function(tcg,cs,distyr){
   sitenum<-as.matrix(1:nrow(tcgs))
   
   #first get just june values:
-  junes<-seq(3,ncol(tcgs),by=5)  #3 is if tcg/condscores data have april in them, 2 if data starts w/May
+  junes<-seq(2,ncol(tcgs),by=5)  #3 is if tcg/condscores data have april in them, 2 if data starts w/May
   tcgjune<-as.matrix(tcgs[,junes])
 
   #identify steady state (mean tcg previous 3 years):
@@ -109,10 +109,9 @@ spongy_mpr<-function(tcg,cs,distyr){
   dmpr<-cbind(tcg.m,csj)
   #LOOP FOR DISTURBANCE PROBABILITY:
   distprob<-matrix(NA,nrow=nrow(dmpr),ncol=2)
-  d = quantile(dmpr[,grep(as.character(distyr-5),colnames(dmpr)):
+  d = quantile(dmpr[,grep(as.character(distyr-6),colnames(dmpr)):
                        grep(as.character(distyr-1),colnames(dmpr))],
-               c(0.1),na.rm=T) #selecting dist sites 1% quant in prev 5 yr. For other data: originally 0.01 
-  #determine if disturbance (cond score < d threshold) occurs
+               c(0.01),na.rm=T) #selecting dist sites 1% quant in prev 5 yr. 
   for (i in 1:nrow(dmpr)){
     if (dmpr[i,]$colnum == min(dmpr$colnum) & dmpr[i,grep(as.character(distyr),colnames(dmpr))] <= d){
       distprob[i,1]<- 1
@@ -132,7 +131,7 @@ spongy_mpr<-function(tcg,cs,distyr){
 }
 
 testfx<-spongy_mpr(tcg.values,cond.scores,2016)
-testfx2 <- spongy_mpr(cond.scores, cond.scores, 2016)
+#testfx2 <- spongy_mpr(cond.scores, cond.scores, 2016)
 
 #hf_mags_2 <- spongy_mpr(tcg.values, cond.scores, 2016)
 #once again I am a beautiful genius!!!!
