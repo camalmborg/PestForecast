@@ -1,7 +1,7 @@
 #### This is the script for processing GEE data from the forest condition tool
 
 #### Load condition score .csv from GEE extract:
-#DONT USE:#cfile<-"2022_08_31_DATAGRAB/2022_08_31_5k_score_mean - 2022_08_31_5k_score_mean.csv"
+#DONT USE:#cfile<-"2022_08_31_DATAGRAB/2022_08_31_5k_score_mean - 2022_08_31_5k_score_mean.csv" #because these are annuals
 #DONT USE:#file<-"2022_08_31_DATAGRAB/2022_08_31_5k_tcg_mean - 2022_08_31_5k_tcg_mean.csv"
 file<-"2022_08_31_DATAGRAB/2022_12_7_sample_tcg_mean_5k.csv"
 cfile<-"2022_08_31_DATAGRAB/2022_12_7_sample_score_mean_5k.csv"
@@ -16,13 +16,18 @@ tcg.values<-read.csv(file)
 cond.scores<-read.csv(cfile)
 
 #### Function for computing disturbance magnitudes, probabilities, and recovery rates:
-spongy_mpr<-function(tcg,cs,distyr){
+#tcg = tcg scores GEE data for all sites
+#cs = condition score GEE data for all sites
+#distyr = year of outbreak (2016)
+#monthnum = 3 if tcg and condscore data include April, 2 if data does not include April
+#seqnum = number of growing season months in tcg/cs data (April-Aug = 5, April-Sep = 6, etc.)
+spongy_mpr<-function(tcg,cs,distyr,monthnum,seqnum){
   #get just the tcg values from data frame:
   tcgs<-tcg[,c(grep("^X",colnames(tcg)))]
   sitenum<-as.matrix(1:nrow(tcgs))
   
   #first get just june values:
-  junes<-seq(2,ncol(tcgs),by=5)  #3 is if tcg/condscores data have april in them, 2 if data starts w/May
+  junes<-seq(monthnum,ncol(tcgs),by=seqnum)  #3 is if tcg/condscores data have april in them, 2 if data starts w/May
   tcgjune<-as.matrix(tcgs[,junes])
 
   #identify steady state (mean tcg previous 3 years):
@@ -130,7 +135,7 @@ spongy_mpr<-function(tcg,cs,distyr){
   return(tcg.m)
 }
 
-testfx<-spongy_mpr(tcg.values,cond.scores,2016)
+#testfx<-spongy_mpr(tcg.values,cond.scores,2016, 2, 5)
 #testfx2 <- spongy_mpr(cond.scores, cond.scores, 2016)
 
 #hf_mags_2 <- spongy_mpr(tcg.values, cond.scores, 2016)
