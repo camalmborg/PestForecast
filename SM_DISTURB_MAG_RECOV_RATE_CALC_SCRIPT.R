@@ -3,14 +3,14 @@
 #### Load condition score .csv from GEE extract:
 #DONT USE:#cfile<-"2022_08_31_DATAGRAB/2022_08_31_5k_score_mean - 2022_08_31_5k_score_mean.csv" #because these are annuals
 #DONT USE:#file<-"2022_08_31_DATAGRAB/2022_08_31_5k_tcg_mean - 2022_08_31_5k_tcg_mean.csv"
-file<-"2022_08_31_DATAGRAB/2022_12_7_sample_tcg_mean_5k.csv"
-cfile<-"2022_08_31_DATAGRAB/2022_12_7_sample_score_mean_5k.csv"
-#file <- "2023_03_08_DATAGRAB/2023_03_08_5000_sites_sample_tcg_mean.csv"
-#cfile <- "2023_03_08_DATAGRAB/2023_03_08_5000_sites_sample_score_mean.csv"
+#file<-"2022_08_31_DATAGRAB/2022_12_7_sample_tcg_mean_5k.csv"
+#cfile<-"2022_08_31_DATAGRAB/2022_12_7_sample_score_mean_5k.csv"
 
 #### HARVARD FOREST DATA:
-file <- "HF_2022_Field_Data/GEE_Data/2023_05_17_hfplots_sample_tcg_mean.csv"
-cfile <- "HF_2022_Field_Data/GEE_Data/2023_05_17_hfplots_sample_score_mean.csv"
+#file <- "HF_2022_Field_Data/GEE_Data/2023_05_17_hfplots_sample_tcg_mean.csv"
+#cfile <- "HF_2022_Field_Data/GEE_Data/2023_05_17_hfplots_sample_score_mean.csv"
+file <- "HF_2022_Field_Data/GEE_Data/2023_08_31_HF_sample_tcg_mean.csv"
+cfile <- "HF_2022_Field_Data/GEE_Data/2023_08_31_HF_sample_score_mean.csv"
 
 #tcg and condition score objects:
 tcg.values<-read.csv(file)
@@ -264,4 +264,5 @@ spongy_mpr_2<-function(tcg,cs,distyr,monthnum,seqnum){
   return(tcg.m)
 }
 
-ddtest <- spongy_mpr_2(tcg.values, cond.scores, 2016, 2, 5)
+hf_fx_tcg <- spongy_mpr_2(tcg.values, cond.scores, 2016, 2, 5)
+hf_fx_cs <- spongy_mpr_2(cond.scores, cond.scores, 2016, 2, 5)
