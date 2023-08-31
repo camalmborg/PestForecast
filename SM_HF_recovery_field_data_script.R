@@ -5,8 +5,8 @@ library(dplyr)
 library(tidyverse)
 
 #### HARVARD FOREST DATA:--------------------------------------------------
-file <- "HF_2022_Field_Data/GEE_Data/2023_05_17_hfplots_sample_tcg_mean.csv"
-cfile <- "HF_2022_Field_Data/GEE_Data/2023_05_17_hfplots_sample_score_mean.csv"
+file <- "HF_2022_Field_Data/GEE_Data/2023_08_31_HF_sample_tcg_mean.csv"
+cfile <- "HF_2022_Field_Data/GEE_Data/2023_08_31_HF_sample_score_mean.csv"
 
 #tcg and condition score objects:
 tcg.values<-read.csv(file)
@@ -252,7 +252,8 @@ field_data <- cbind.data.frame(field_data, hf_ground[,2:ncol(hf_ground)])
 #merge with remote-sensing data:
 #load:
 #hf_mags <- read.csv("HF_2022_Field_Data/HF_mags_recov_from_GEE_data.csv")
-hf_mags <- read.csv("HF_2022_Field_Data/2023_07_17_hf_distprobmags_data.csv")
+#hf_mags <- read.csv("HF_2022_Field_Data/2023_07_17_hf_distprobmags_data.csv")
+hf_mags <- read.csv("HF_2022_Field_Data/2023_08_31_hf_cs_mags_data.csv")
 #join:
 hf_data <- cbind.data.frame(field_data,hf_mags)
 
@@ -260,15 +261,15 @@ hf_data <- cbind.data.frame(field_data,hf_mags)
 library(mgcv)
 library(pROC)
 
-yvar <- hf_data$mags
-xvar <- hf_data$oak_TF
-
-hf_gam <- gam(yvar ~ s(xvar),
-              data=hf_data)
-
-hf_gam <- gam(yvar ~ s(xvar), 
-              data=hf_data,
-              family = "binomial")
+# yvar <- hf_data$mags
+# xvar <- hf_data$oak_TF
+# 
+# hf_gam <- gam(yvar ~ s(xvar),
+#               data=hf_data)
+# 
+# hf_gam <- gam(yvar ~ s(xvar), 
+#               data=hf_data,
+#               family = "binomial")
 #hf_roc<-roc(hf_gam$y,hf_gam$fitted.values)
 
 #summ <- 
@@ -282,7 +283,7 @@ hf_gam <- gam(yvar ~ s(xvar),
 #          percent=T)
 
 
-plot(xvar, yvar)
+# plot(xvar, yvar)
 
 #bin means:
 bins=seq(min(hf_data$mags)-1,max(hf_data$mags)+1,length=10)
