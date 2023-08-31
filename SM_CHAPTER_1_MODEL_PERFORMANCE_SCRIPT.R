@@ -10,13 +10,20 @@ library(tidyverse)
 #distmag_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTMAG-MULTI-GAM-ANALYSES-TCG-MASTERLIST.csv")
 #distprob16_uni <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2016-UNI-AUC-ANALYSES-TCG-MASTERLIST.csv")
 #distprob16_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2016-MULTI-AUC-ANALYSES-TCG-MASTERLIST.csv")
-distprob17_uni <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2017-UNI-AUC-ANALYSES-TCG-MASTERLIST.csv")
-distprob17_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2017-MULTI-AUC-ANALYSES-TCG-MASTERLIST.csv")
+#distprob17_uni <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2017-UNI-AUC-ANALYSES-TCG-MASTERLIST.csv")
+#distprob17_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2017-MULTI-AUC-ANALYSES-TCG-MASTERLIST.csv")
+
+distmag_uni <- read.csv("CHAPTER_1/CHAPTER 1-DISTMAG-UNI-GAM-ANALYSES-CS-MASTERLIST.csv")
+distmag_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTMAG-MULTI-GAM-ANALYSES-CS-MASTERLIST.csv")
+distprob16_uni <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2016-UNI-AUC-ANALYSES-CS-MASTERLIST.csv")
+distprob16_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2016-MULTI-AUC-ANALYSES-CS-MASTERLIST.csv")
+#distprob17_uni <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2017-UNI-AUC-ANALYSES-CS-MASTERLIST.csv")
+#distprob17_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2017-MULTI-AUC-ANALYSES-CS-MASTERLIST.csv")
 
 ### Making uni and multi into something we can Rbind
 # choose group you would like to use from above:
-uni <- distprob17_uni
-multi <- distprob17_multi
+uni <- distmag_uni
+multi <- distmag_multi
 
 # DIST MAG: univariate variable and monthyear columns combine: -------------
 uni <- uni %>%
