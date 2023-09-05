@@ -272,6 +272,12 @@ dmvars<-spongy_met(cond.scores,2011,2017,
 test_dmv <- spongy_met(cond.samp, 2015, 2017, c("tmax..deg.c.", "tmin..deg.c."),
                        c("maxtemp", "mintemp"),2)
 
+
+dmvars_seas <- spongy_met(cond.scores, 2013, 2016, 
+                          c("tmax..deg.c.","tmin..deg.c.","prcp..mm.day.","vp..Pa."),
+                          c("maxtemp","mintemp","pcp","vpd"),2)
+save(dmvars_seas, file="DMVARS_SEAS.RData")
+
 #### Getting seasonal variable values for analyses:-----
 ## Quick function for making sequences to extract 
 ## monthly values based on # of years of daymet data downloaded:
@@ -289,7 +295,7 @@ dm_me <- function(x,yrs,month){
 # spongyvars<-cbind(dm_me(dmvars$maxtemp,2,c(1,6)),
 #                   dm_me(dmvars$pcp,2,c(1,6)))
 
-### Expanding DM_ME to make seasonal daymet averages for spring, summer, fall, winter months
+### Expanding DM_ME to make seasonal daymet averages for spring, summer, fall, winter months---------
 #spring = march/april/may (3,4,5), summer = june/july/august (6/7/8)
 
 #if necessary:
