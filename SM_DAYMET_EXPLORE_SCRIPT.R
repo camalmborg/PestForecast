@@ -37,14 +37,14 @@ dm_explore<-function(dmvars,dmrdat,dmr,coln){
 
 testing <- dm_explore(dmvars_mo,testfx,"mags",22)
 
-season <- c("SPRING", "SUMMER", "FALL", "WINTER")
-sprmonths <- c("MarApr", "AprMay", "MayJunJul")
+#season <- c("SPRING", "SUMMER", "FALL", "WINTER")
+#sprmonths <- c("MarApr", "AprMay", "MayJunJul")
 #summonths <- c("MayJun", "JunJul", "JulAug")
 #winmonths <- c("NovDec","DecJan", "JanFeb")
 
 #filename <- "2023_05_10_Daymet_monthly_analysis_2011_2017_r2s.csv"
-filename <- paste0("Analyses_Daymet_seasonal/2023_05_15_daymet_seasonal_analyses_", "ANNUAL", ".csv")
-write.csv(testing, file=filename)
+#filename <- paste0("Analyses_Daymet_seasonal/2023_05_15_daymet_seasonal_analyses_", "ANNUAL", ".csv")
+#write.csv(testing, file=filename)
 
 
 #----------#### MAKING FIGURES: ####------------------------
@@ -88,4 +88,16 @@ print(dmplot)
 # dev.off()
 
 ##---------------------------------------------------------------------####
+
+# Making a new seasonal calculation script:
+
+# 3 month combos version ----
+seqfx<-function(x,y){
+  seq(x,(y*12),by=12) #x = month (1=jan, 2=feb, etc.)
+}
+
+#grab variable of interest from daymet list:
+var <- dmvars_mo[[1]]
+#make the season sequences:
+#spring <- c(seq())
 
