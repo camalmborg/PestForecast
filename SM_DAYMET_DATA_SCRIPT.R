@@ -209,16 +209,16 @@ spongy_met<-function(scores,startyr,endyr,var,filenm,VorS){
     seas_meanvar[[i]] <- matrix(NA, nrow=4, ncol=length(metyears))
       for(j in 1:length(metyears)){
         for (s in 1:4){
-          if (s==1){
+          if (s==2){
             seas_meanvar[[i]][s,j] <- mean(dmvar[[i]][j, spring])
           }
-          if (s==2){
+          if (s==3){
             seas_meanvar[[i]][s,j] <- mean(dmvar[[i]][j, summer])
           }
-          if (s==3){
+          if (s==4){
             seas_meanvar[[i]][s,j] <- mean(dmvar[[i]][j, fall])
           }
-          if(s==4){
+          if(s==1){
             # seas_meanvar[[i]][s,j] <- mean(c(dmvar[[i]][(j-1),winterd],
             #                                  dmvar[[i]][j,winterjf]))
             if ((j-1)==0){
