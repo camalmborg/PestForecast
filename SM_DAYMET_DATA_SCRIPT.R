@@ -27,6 +27,7 @@ cond.samp<-cond.scores[1:2,]
 #endyr == end year of analysis 
 #var == variables of interest from daymet eg. c("tmax..deg.c.","tmin..deg.c.","prcp..mm.day.","vp..Pa.")
 #filenm ==  c("maxtemp","mintemp","pcp","vpd")
+#VorS == monthly or seasonal averages 1=monthly avg, 2=seasonal (D(yr-1)JF, MAM, JJA, SON)
 spongy_met<-function(scores,startyr,endyr,var,filenm,VorS){
   ##Section for getting sites from GEE dataset:
   #geographic coordinates from GEE extract:
