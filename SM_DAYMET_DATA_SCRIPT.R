@@ -27,7 +27,7 @@ cond.samp<-cond.scores[1:2,]
 #endyr == end year of analysis 
 #var == variables of interest from daymet eg. c("tmax..deg.c.","tmin..deg.c.","prcp..mm.day.","vp..Pa.")
 #filenm ==  c("maxtemp","mintemp","pcp","vpd")
-spongy_met<-function(scores,startyr,endyr,var,filenm){
+spongy_met<-function(scores,startyr,endyr,var,filenm,VorS){
   ##Section for getting sites from GEE dataset:
   #geographic coordinates from GEE extract:
   geo<-as.data.frame(scores[,".geo"])
@@ -71,11 +71,12 @@ spongy_met<-function(scores,startyr,endyr,var,filenm){
     metyears=unique(metyr)
   }
   
+  if(VorS == 1){
+  
+  ### MONTHLY:
   #make empty matrix for all daymet variable data:
   #dm.v<-matrix(data=NA, nrow=nrow(sites))
   dm.v<-list()
-  dm.s<-list()
-  
   ##Loop for extracting daymet variables of interest (var):
   for (k in 1:length(var)){
     dmvar<-list()
@@ -85,16 +86,11 @@ spongy_met<-function(scores,startyr,endyr,var,filenm){
       dmvar[[i]]<-matrix(NA,length(metyears),365)
       for(j in 1:nrow(dm[[i]]$data)){
         dmvar[[i]][as.numeric(as.factor(metyr))[j], 
-                  dm[[i]]$data$yday[j]]=dm[[i]]$data[[var[k]]][j]
+                   dm[[i]]$data$yday[j]]=dm[[i]]$data[[var[k]]][j]
       }
     }
-  #save data:
-  #save(dmvar,file=paste0(filenm[k],".RData"))
-  
   ##Section for computing monthly average variable values:
   meanvar<-list()
-  seas_meanvar<-list()
-  
   #monthly breaks:
   jan<-c(doy[1:31])
   feb<-c(doy[32:59])
@@ -108,43 +104,6 @@ spongy_met<-function(scores,startyr,endyr,var,filenm){
   oct<-c(doy[274:304])
   nov<-c(doy[305:334])
   dec<-c(doy[335:365])
-  
-  #seasons breaks:
-  winterd <- c(doy[335:365])
-  winterjf <- c(doy[1:59])
-  spring <- c(doy[60:151])
-  summer <- c(doy[152:243])
-  fall <- c(doy[244:334])
-  
-  ##Loop for getting mean values per season
-  for (i in nsites){
-    seas_meanvar[[i]] <- matrix(NA, nrow=4, ncol=length(metyears))
-      for(j in 1:length(metyears)){
-        for (s in 1:4){
-          if (s==1){
-            seas_meanvar[[i]][s,j] <- mean(dmvar[[i]][j, spring])
-          }
-          if (s==2){
-            seas_meanvar[[i]][s,j] <- mean(dmvar[[i]][j, summer])
-          }
-          if (s==3){
-            seas_meanvar[[i]][s,j] <- mean(dmvar[[i]][j, fall])
-          }
-          if(s==4){
-            # seas_meanvar[[i]][s,j] <- mean(c(dmvar[[i]][(j-1),winterd],
-            #                                  dmvar[[i]][j,winterjf]))
-            if ((j-1)==0){
-              seas_meanvar[[i]][s,j] <- mean(c(dmvar[[i]][j, winterjf]))
-            }
-            if((j-1)!=0){
-              seas_meanvar[[i]][s,j] <- mean(c(dmvar[[i]][(j-1), winterd],
-                                               dmvar[[i]][j, winterjf]))
-            }
-          }
-        }
-      }
-    }
-
   ##Loop for getting mean values per month
   for (i in nsites){
     meanvar[[i]]<-matrix(NA, nrow=12, ncol=length(metyears))
@@ -191,14 +150,11 @@ spongy_met<-function(scores,startyr,endyr,var,filenm){
   }
   #save meanvar data:
   #save(meanvar, file=paste0(filenm[k],"_monthly_means_TEST",".Rdata"))
-  
   ### Getting mean values into 1 matrix:
   #number of years:
   alltime=c(1,1:(endyr-startyr)+1)
   #months:
   mons=1:12
-  #seasons:
-  seas=1:4
   
   ## Loop for extracting monthly values
   x.p <- matrix(data=NA, nrow=nrow(sites))
@@ -212,16 +168,74 @@ spongy_met<-function(scores,startyr,endyr,var,filenm){
     }
     x.p <- cbind(x.p,x)
     rm(x) #remove last loop
-    }
+  }
   #remove x.p NA column, remove x.p extra variable
   envar <- x.p[,2:((length(mons)*length(alltime))+1)] #remove NA column
   rm(x.p)
-
+  
   #add to daymet variable:
   dm.v[[filenm[k]]]<-envar
   rm(envar)
+  }
+  return(dm.v)
+} else {
+  
+  ### SEASONAL:
+  dm.s<-list()
+  ##Loop for extracting daymet variables of interest (var):
+  for (k in 1:length(var)){
+    dmvar<-list()
+    for (i in nsites){
+      metyr<-dm[[i]]$data$year
+      metyears<-unique(metyr)
+      dmvar[[i]]<-matrix(NA,length(metyears),365)
+      for(j in 1:nrow(dm[[i]]$data)){
+        dmvar[[i]][as.numeric(as.factor(metyr))[j], 
+                  dm[[i]]$data$yday[j]]=dm[[i]]$data[[var[k]]][j]
+      }
+    }
+  #save data:
+  #save(dmvar,file=paste0(filenm[k],".RData"))
+  seas_meanvar<-list()
+  #seasons breaks:
+  winterd <- c(doy[335:365])
+  winterjf <- c(doy[1:59])
+  spring <- c(doy[60:151])
+  summer <- c(doy[152:243])
+  fall <- c(doy[244:334])
+  ##Loop for getting mean values per season
+  for (i in nsites){
+    seas_meanvar[[i]] <- matrix(NA, nrow=4, ncol=length(metyears))
+      for(j in 1:length(metyears)){
+        for (s in 1:4){
+          if (s==1){
+            seas_meanvar[[i]][s,j] <- mean(dmvar[[i]][j, spring])
+          }
+          if (s==2){
+            seas_meanvar[[i]][s,j] <- mean(dmvar[[i]][j, summer])
+          }
+          if (s==3){
+            seas_meanvar[[i]][s,j] <- mean(dmvar[[i]][j, fall])
+          }
+          if(s==4){
+            # seas_meanvar[[i]][s,j] <- mean(c(dmvar[[i]][(j-1),winterd],
+            #                                  dmvar[[i]][j,winterjf]))
+            if ((j-1)==0){
+              seas_meanvar[[i]][s,j] <- mean(c(dmvar[[i]][j, winterjf]))
+            }
+            if((j-1)!=0){
+              seas_meanvar[[i]][s,j] <- mean(c(dmvar[[i]][(j-1), winterd],
+                                               dmvar[[i]][j, winterjf]))
+            }
+          }
+        }
+      }
+    }
 
-
+  #number of years:
+  alltime=c(1,1:(endyr-startyr)+1)
+  #seasons:
+  seas=1:4
   #Loop for seasonal:
   x.ps <- matrix(data=NA, nrow=nrow(sites))
   for (p in alltime){
@@ -243,18 +257,19 @@ spongy_met<-function(scores,startyr,endyr,var,filenm){
   dm.s[[filenm[k]]]<-seas_envar
   rm(seas_envar)
   }
-  return(dm.v)#, dm.s)
+  return(dm.s)
+  }
 }
 
 #(as characters):
 #testing, testing, is this thing on?
 dmvars<-spongy_met(cond.scores,2011,2017,
                    c("tmax..deg.c.","tmin..deg.c.","prcp..mm.day.","vp..Pa."),
-                   c("maxtemp","mintemp","pcp","vpd"))
+                   c("maxtemp","mintemp","pcp","vpd"),1)
 
 
 test_dmv <- spongy_met(cond.samp, 2015, 2017, c("tmax..deg.c.", "tmin..deg.c."),
-                       c("maxtemp", "mintemp"))
+                       c("maxtemp", "mintemp"),2)
 
 #### Getting seasonal variable values for analyses:-----
 ## Quick function for making sequences to extract 
