@@ -98,6 +98,13 @@ seqfx<-function(x,y){
 
 #grab variable of interest from daymet list:
 var <- dmvars_mo[[1]]
+#seasons:
+spring <- c(3,4,5)
 #make the season sequences:
-#spring <- c(seq())
+for (i in length(sns)){
+  
+}
+spring <- sort(c(seqfx(spring[1],8),
+                 seqfx(spring[2],8),
+                 seqfx(spring[3],8)))
 
