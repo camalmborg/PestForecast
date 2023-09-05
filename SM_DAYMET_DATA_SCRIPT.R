@@ -214,8 +214,12 @@ dm_me_seasonal <- function(x,yrs,month){
   m_id <- vector()
   y_id <- vector()
   n_id <- c(1:(length(month)*yrs))
+  
   for (i in 1:length(month)){
-    colpyr <- c(seq(month[i],yrs*12,by=12))
+    if (month[i]==12){
+      colpyr <- c(seq((month[i]*2),(yrs-1)*12, by=12))
+    } else {colpyr <- c(seq(month[i],yrs*12,by=12))
+    }
     mcols <- c(mcols,colpyr)
     m_id <- c(m_id, rep(month[i], times=yrs))
     y_id <- c(y_id, rep(1:yrs))
