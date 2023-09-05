@@ -22,8 +22,8 @@ distprob16_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2016-MULTI-AUC-ANALYSE
 
 ### Making uni and multi into something we can Rbind
 # choose group you would like to use from above:
-uni <- distmag_uni
-multi <- distmag_multi
+uni <- distprob16_uni
+multi <- distprob16_multi
 
 # DIST MAG: univariate variable and monthyear columns combine: -------------
 uni <- uni %>%
@@ -68,7 +68,7 @@ modAIC <- model[order(model$delAIC),]
 #modr2 <- model[order(model$R2),]
 modauc <- model[order(model$AUC),]
 
-#write.csv(modAIC, file="CHAPTER_1/dist_mag_models_AICs_sorted.csv")
-#write.csv(modr2, file="CHAPTER_1/dist_mag_models_r2s_sorted.csv")
-#write.csv(modAIC, file="CHAPTER_1/dist_prob_2017_models_AICs_sorted.csv")
-#write.csv(modauc, file="CHAPTER_1/dist_prob_2017_models_auc_sorted.csv")
+#write.csv(modAIC, file="CHAPTER_1/dist_mag_cs_models_AICs_sorted.csv")
+#write.csv(modr2, file="CHAPTER_1/dist_mag_cs_models_r2s_sorted.csv")
+write.csv(modAIC, file="CHAPTER_1/dist_prob_2016_cs_models_AICs_sorted.csv")
+write.csv(modauc, file="CHAPTER_1/dist_prob_2016_cs_models_auc_sorted.csv")
