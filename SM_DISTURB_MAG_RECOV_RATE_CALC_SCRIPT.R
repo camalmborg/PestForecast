@@ -5,6 +5,8 @@
 #DONT USE:#file<-"2022_08_31_DATAGRAB/2022_08_31_5k_tcg_mean - 2022_08_31_5k_tcg_mean.csv"
 file<-"2022_08_31_DATAGRAB/2022_12_7_sample_tcg_mean_5k.csv"
 cfile<-"2022_08_31_DATAGRAB/2022_12_7_sample_score_mean_5k.csv"
+#file <- "2023_03_08_DATAGRAB/2023_5000_points_sample_tcg_mean.csv"
+#cfile <- "2023_03_08_DATAGRAB/2023_5000_points_sample_score_mean.csv"
 
 #### HARVARD FOREST DATA:
 #file <- "HF_2022_Field_Data/GEE_Data/2023_05_17_hfplots_sample_tcg_mean.csv"
@@ -138,7 +140,7 @@ spongy_mpr<-function(tcg,cs,distyr,monthnum,seqnum){
   return(tcg.m)
 }
 
-testfx<-spongy_mpr(tcg.values,cond.scores,2016, 2, 5)
+testfx<-spongy_mpr(tcg.values,cond.scores, 2016, 2, 5)
 testfx2 <- spongy_mpr(cond.scores, cond.scores, 2016, 2, 5)
 
 #hf_mags_2 <- spongy_mpr(tcg.values, cond.scores, 2016)
