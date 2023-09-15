@@ -12,6 +12,7 @@ library(pROC) #for AUC analyses
 
 #load data:
 load("DMVARS_MO.RData")
+load("DMVARS_SEAS.RData")
 load("DM_MAXTEMPS_MO.RData") #maxtemp_mos<- c(46,47,48,49,50,51,58,59,60,61,62,63)
 #load("DM_MINTEMPS_MO.RData") #mintemp_mos<- c(52, 53)
 load("MAM_spring_precip.RData") #col 6 for 2016
