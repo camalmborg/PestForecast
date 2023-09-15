@@ -14,7 +14,7 @@ library(combinat)
 #          calculation script
 # dmr = which from disturbance probability, magnitude, or recovery to use for 
 #       analysis - "dpy1"/"dpy2" for 2016/2017 distprob, "mags" for magnitude
-# coln = column number of disturbance - 22 for 2016, 23 for 2017
+# coln = column number of disturbance - 22 for 2016, 23 for 2017 in my current data
 
 spongy_l_explore<-function(dmvars,dmrdat,dmr,coln){
   #make empty matrix:
