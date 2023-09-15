@@ -13,16 +13,19 @@ library(tidyverse)
 #distprob17_uni <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2017-UNI-AUC-ANALYSES-TCG-MASTERLIST.csv")
 #distprob17_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2017-MULTI-AUC-ANALYSES-TCG-MASTERLIST.csv")
 
-distmag_uni <- read.csv("CHAPTER_1/CHAPTER 1-DISTMAG-UNI-GAM-ANALYSES-CS-MASTERLIST.csv")
-distmag_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTMAG-MULTI-GAM-ANALYSES-CS-MASTERLIST.csv")
-distprob16_uni <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2016-UNI-AUC-ANALYSES-CS-MASTERLIST.csv")
-distprob16_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2016-MULTI-AUC-ANALYSES-CS-MASTERLIST.csv")
+#distmag_uni <- read.csv("CHAPTER_1/CHAPTER 1-DISTMAG-UNI-GAM-ANALYSES-CS-MASTERLIST.csv")
+#distmag_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTMAG-MULTI-GAM-ANALYSES-CS-MASTERLIST.csv")
+#distprob16_uni <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2016-UNI-AUC-ANALYSES-CS-MASTERLIST.csv")
+#distprob16_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2016-MULTI-AUC-ANALYSES-CS-MASTERLIST.csv")
 #distprob17_uni <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2017-UNI-AUC-ANALYSES-CS-MASTERLIST.csv")
 #distprob17_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2017-MULTI-AUC-ANALYSES-CS-MASTERLIST.csv")
 
+distmag_uni <- read.csv("CHAPTER_1/2023_September/2023_09_UNI_Dist_Mag_TCG_2017_Models_R2s_AICs.csv")
+distmagcs_uni <- read.csv("CHAPTER_1/2023_September/2023_09_UNI_Dist_Mag_CS_2017_Models_R2s_AICs.csv")
+
 ### Making uni and multi into something we can Rbind
 # choose group you would like to use from above:
-uni <- distprob16_uni
+uni <- distmagcs_uni
 multi <- distprob16_multi
 
 # DIST MAG: univariate variable and monthyear columns combine: -------------
@@ -59,14 +62,13 @@ colnames(uni) <- names(multi)
 ### Combining them into one big dataframe:
 model <- rbind(uni, multi)
 
-
 ### Calculate delAIC: -----------
 model$delAIC <- model$AIC - min(model$AIC)
 
 ### Choosing best performers:
 modAIC <- model[order(model$delAIC),]
-#modr2 <- model[order(model$R2),]
-modauc <- model[order(model$AUC),]
+modr2 <- model[order(model$R2),]
+#modauc <- model[order(model$AUC),]
 
 #write.csv(modAIC, file="CHAPTER_1/dist_mag_cs_models_AICs_sorted.csv")
 #write.csv(modr2, file="CHAPTER_1/dist_mag_cs_models_r2s_sorted.csv")
