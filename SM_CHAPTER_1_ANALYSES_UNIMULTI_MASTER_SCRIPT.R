@@ -7,6 +7,10 @@ library(mgcv)
 library(pROC)
 library(combinat)
 
+### load data:
+MV_DATA <- read.csv("Analyses_September2023/MV_2023_09_DATA.csv")
+dmr <- read.csv("Analyses_September2023/2023_09_DMR_DATA_TCG_2016.csv")
+
 ##### UNIVARIATE ANALYSES SECTION ------------------------------------------------
 ### Function for Univariate mags Analyses AS LIST  (Daymet data):----------------------
 # dmvars = data in list - Daymet data (each variable is list member)
@@ -286,9 +290,9 @@ spongy_multi_ROC <- function(data,nvars,dmrdat,yr){
 
 # Daymet:
 distmag_daymet_monthly_univar_16 <- spongy_l_explore(dmvars_mo, testfx, "mags", 22)
-distmag_daymet_monthly_univar_17 <- spongy_l_explore(dmvars_mo, testfx, "mags", 23)
+#distmag_daymet_monthly_univar_17 <- spongy_l_explore(dmvars_mo, testfx, "mags", 23)
 distmag_daymet_monthly_cs_univar_16 <- spongy_l_explore(dmvars_mo, testfx2, "mags", 22)
-distmag_daymet_monthly_cs_univar_17 <- spongy_l_explore(dmvars_mo, testfx2, "mags", 23)
+#distmag_daymet_monthly_cs_univar_17 <- spongy_l_explore(dmvars_mo, testfx2, "mags", 23)
 # SMAP:
 distmag_SMAP_univar_16 <- spongy_var_explore(SMAPdat, testfx, "mags", 22)
 distmag_SMAP_univar_17 <- spongy_var_explore(SMAPdat, testfx, "mags", 23)
