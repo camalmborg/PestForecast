@@ -20,12 +20,12 @@ library(tidyverse)
 #distprob17_uni <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2017-UNI-AUC-ANALYSES-CS-MASTERLIST.csv")
 #distprob17_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2017-MULTI-AUC-ANALYSES-CS-MASTERLIST.csv")
 
-distmag_uni <- read.csv("CHAPTER_1/2023_September/2023_09_UNI_Dist_Mag_TCG_2017_Models_R2s_AICs.csv")
-distmagcs_uni <- read.csv("CHAPTER_1/2023_September/2023_09_UNI_Dist_Mag_CS_2017_Models_R2s_AICs.csv")
+distmag_uni <- read.csv("CHAPTER_1/2023_September/2023_09_UNI_Dist_Mag_TCG_2016_Models_R2s_AICs.csv")
+distmagcs_uni <- read.csv("CHAPTER_1/2023_September/2023_09_UNI_Dist_Mag_CS_2016_Models_R2s_AICs.csv")
 
 ### Making uni and multi into something we can Rbind
 # choose group you would like to use from above:
-uni <- distmagcs_uni
+uni <- distmag_uni
 multi <- distprob16_multi
 
 # DIST MAG: univariate variable and monthyear columns combine: -------------
