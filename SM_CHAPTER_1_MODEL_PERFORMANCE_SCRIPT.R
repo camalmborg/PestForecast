@@ -22,17 +22,26 @@ library(tidyverse)
 
 distmag_uni <- read.csv("CHAPTER_1/2023_September/2023_09_UNI_Dist_Mag_TCG_2016_Models_R2s_AICs.csv")
 distmagcs_uni <- read.csv("CHAPTER_1/2023_September/2023_09_UNI_Dist_Mag_CS_2016_Models_R2s_AICs.csv")
+distmag_multi <- read.csv("CHAPTER_1/2023_September/CHAPTER 1-DISTMAG2016- MULTI-GAM-ANALYSES-TCG-MASTERLIST.csv")
+distmagcs_multi <- read.csv("CHAPTER_1/2023_September/CHAPTER 1-DISTMAG2016- MULTI-GAM-ANALYSES-CS-MASTERLIST.csv")
 
 ### Making uni and multi into something we can Rbind
 # choose group you would like to use from above:
-uni <- distmag_uni
-multi <- distprob16_multi
+#uni <- distmag_uni
+#multi <- distmag_multi
+
+uni <- distmagcs_uni
+multi <- distmagcs_multi
 
 # DIST MAG: univariate variable and monthyear columns combine: -------------
+# uni <- uni %>%
+#   mutate(MONTHYEAR = str_replace(MONTHYEAR, " ", "-")) %>%
+#   mutate(VARIABLE1 = paste(VARIABLE1, MONTHYEAR, sep="_")) %>%
+#   select(-c(MONTHYEAR))
+
 uni <- uni %>%
-  mutate(MONTHYEAR = str_replace(MONTHYEAR, " ", "-")) %>%
-  mutate(VARIABLE1 = paste(VARIABLE1, MONTHYEAR, sep="_")) %>%
-  select(-c(MONTHYEAR))
+  unite(VARIABLE1, c("VarYear", "VarMonth", "Variable")) %>%
+  rename(MODEL_ID = Model)
 
 # make new dataframe with 2 new NA columsn for VARIABLE2 and VARIABLE3:
 v2v3 <- data.frame(matrix(nrow=nrow(uni), ncol=2, data=NA))
