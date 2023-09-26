@@ -9,7 +9,8 @@ library(combinat)
 
 ### load data:
 MV_DATA <- read.csv("Analyses_September2023/MV_2023_09_DATA.csv")
-dmr <- read.csv("Analyses_September2023/2023_09_DMR_DATA_TCG_2016.csv")
+#dmr <- read.csv("Analyses_September2023/2023_09_DMR_DATA_TCG_2016.csv")
+#dmrcs <- read.csv("Analyses_September2023/2023_09_DMR_DATA_CS_2016.csv")
 
 ##### UNIVARIATE ANALYSES SECTION ------------------------------------------------
 ### Function for Univariate mags Analyses AS LIST  (Daymet data):----------------------
