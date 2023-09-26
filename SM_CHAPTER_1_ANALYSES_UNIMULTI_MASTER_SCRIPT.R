@@ -317,6 +317,12 @@ distprob_daymet_monthly_univar_16 <- spongy_lv_ROC(dmvars_mo, testfx, 1, 22)
 distprob_daymet_monthly_univar_17 <- spongy_lv_ROC(dmvars_mo, testfx, 2, 23)
 distprob_daymet_monthly_cs_univar_16 <- spongy_lv_ROC(dmvars_mo, testfx2, 1, 22)
 distprob_daymet_monthly_cs_univar_17 <- spongy_lv_ROC(dmvars_mo, testfx2, 2, 23)
+
+distprob_daymet_seasonal_univar_16 <- spongy_lv_ROC(dmvars_seas, testfx, 1, 22)
+distprob_daymet_seasonal_univar_17 <- spongy_lv_ROC(dmvars_seas, testfx, 2, 23)
+distprob_daymet_seasonal_cs_univar_16 <- spongy_lv_ROC(dmvars_seas, testfx2, 1, 22)
+distprob_daymet_seasonal_cs_univar_17 <- spongy_lv_ROC(dmvars_seas, testfx2, 2, 23)
+
 # SMAP:
 distprob_SMAP_univar_16 <- spongy_var_ROC(SMAPdat, testfx, 1, 22)
 distprob_SMAP_univar_17 <- spongy_var_ROC(SMAPdat, testfx, 2, 23)
