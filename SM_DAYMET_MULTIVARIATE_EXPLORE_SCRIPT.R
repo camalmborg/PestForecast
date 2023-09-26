@@ -56,7 +56,17 @@ MV_2023_09_DATA <- cbind.data.frame(dmvars_mo[[1]][,c(62)],
                                     SMAPdat[,1:7],
                                     site_data[,1])
 
-MV_2023_09_DATA_DP <- cbind.data.frame(dmvars_mo[[]])
+MV_2023_09_DATA_DP <- cbind.data.frame(dmvars_mo[[1]][,c(37)],
+                                       dmvars_seas[[1]][,c(5)],
+                                       dmvars_mo[[2]][,c(37,44,52,56,61)],
+                                       dmvars_seas[[2]][,c(5,7,9,11,13)],
+                                       dmvars_mo[[3]][,c(41,43,47,55,61,64)],
+                                       dmvars_seas[[3]][,c(6,7,8,10,11,12,14)],
+                                       dmvars_mo[[4]][,c(37,52,53,55,56,57)],
+                                       dmvars_seas[[4]][,c(5,10,11,12)],
+                                       SMAPdat[c(3,4,7,8)],
+                                       site_data[,1])
+
 
 # test_data <- cbind(dm_maxtemps[,c(60,61,62,63)],
 #                    MAM_spring_precip[,6],
