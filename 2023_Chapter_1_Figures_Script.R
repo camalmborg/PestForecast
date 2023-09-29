@@ -15,8 +15,8 @@ load("CHAPTER_1/2023_09_distmag_bestunimodels_variables_data.RData")
 #dmr <- read.csv("SM_distmagrecov_data_2017_tcg.csv")
 #dmrcs <- read.csv("SM_distmagrecov_data_2016_cs.csv")
 #dmrcs <- read.csv("SM_distmagrecov_data_2017_cs.csv")
-dmr_tcg <- read.csv("CHAPTER_1/2023_09_DMR_DATA_CS_2016.csv")
-dmr_cs <- read.csv("CHAPTER_1/2023_09_DMR_DATA_TCG_2016.csv")
+dmr_tcg <- read.csv("CHAPTER_1/2023_09_DMR_DATA_TCG_2016.csv")
+dmr_cs <- read.csv("CHAPTER_1/2023_09_DMR_DATA_CS_2016.csv")
 
 ### loading best models data:
 best_tcg <- read.csv("CHAPTER_1/2023_09_29_DISTMAG_2016_TCG_delAICsort.csv")
@@ -26,6 +26,8 @@ best_cs <- read.csv("CHAPTER_1/2023_09_29_DISTMAG_2016_CS_delAICsort.csv")
 library(ggplot2)
 library(tidyverse)
 library(mgcv)
+library(mgcViz)
+library(gratia)
 library(tidygam)
 library(pROC)
 library(viridis)
@@ -51,16 +53,98 @@ ggplot(data=data, aes(x=xvar, y=yvar)) +
 
 
 
-### DISTURBANCE MAGNITUDE FIGURES: multivariate
+### DISTURBANCE MAGNITUDE FIGURES: multivariate ------
 
-# choose data type tcg or cs
+# MAKING THE GAM:
+# choose data type tcg or cs:
 models <- best_tcg
 #models <- best_cs
+
+# choose matching mags data:
+mags <- dmr_tcg[,c("sitenum","mags")]
+#mags <- dmr_cs$mags
 
 # take top performers:
 tops <- models[1:10,grep("^VARIABLE",colnames(models))]
 
+# where should the plots be saved?
+plot_folder <- "Analyses_September2023/Figures_Multi/distmag/"
+plot_type <- "tcg/"
+#plot_type <- "cs/"
 
-for (i in 1:10){
+# #start the loop here >>>
+# # grab model variable column numbers:
+# v1 <- as.numeric(tops[i, 1])
+# v2 <- as.numeric(tops[i, 2])
+# v3 <- as.numeric(tops[i, 3])
+# 
+# # grab variables:
+# vars <- cbind(MV_2023_09_DATA[,c(v1,v2,v3)])
+# var_nms <- as.character(c(v1,v2,v3))
+# plot_nm <- paste0("2023_09_plot_", as.character(i), "_vars_",
+#                     paste(var_nms, collapse = "_"))
+# 
+# # combine data:
+# data <- cbind.data.frame(mags$mags, vars[mags$sitenum,])
+# colnames(data) <- c("mags", "var1", "var2", "var3")
+# 
+# # make the formula:
+# ex_vars <- c()
+# for (j in 1:ncol(data)){
+#   ex_vars[j] <- paste0('s(', names(data[j+1]), ')')
+# }
+# 
+# #make a single string:
+# gam_formula <- as.formula(paste("mags ~",
+#                                 paste(ex_vars, collapse='+')))
+# 
+# # make the model:
+# dm_gam <- gam(gam_formula, data=data, method="REML")
+# 
+# # FIGURE SECTION:
+# tiff(paste0(plot_folder,plot_type,plot_nm,".tiff"),
+#      units="in", width=6, height=4, res=300)
+# draw(dm_gam)
+# dev.off()
+
+
+for (i in 1:nrow(tops)){
+  #start the loop here >>>
+  # grab model variable column numbers:
+  v1 <- as.numeric(tops[i, 1])
+  v2 <- as.numeric(tops[i, 2])
+  v3 <- as.numeric(tops[i, 3])
   
+  # grab variables:
+  vars <- cbind(MV_2023_09_DATA[,c(v1,v2,v3)])
+  var_nms <- as.character(c(v1,v2,v3))
+  plot_nm <- paste0("2023_09_plot_", as.character(i), "_vars_",
+                    paste(var_nms, collapse = "_"))
+
+  # combine data:
+  data <- cbind.data.frame(mags$mags, vars[mags$sitenum,])
+  colnames(data) <- c("mags", "var1", "var2", "var3")
+
+  # make the formula:
+  ex_vars <- c()
+  for (j in 1:ncol(data)-1){
+    ex_vars[j] <- paste0('s(', names(data[j+1]), ')')
+  }
+
+  #make a single string:
+  gam_formula <- as.formula(paste("mags ~",
+                                  paste(ex_vars, collapse='+')))
+
+  # make the model:
+  dm_gam <- gam(gam_formula, data=data, method="REML")
+  #gam_list[[i]] <- dm_gam
+
+  # FIGURE SECTION:
+  # tiff(paste0(plot_folder,plot_type,plot_nm,".tiff"),
+  #      units="in", width=6, height=4, res=200)
+  plot <- draw(dm_gam)
+  ggsave(plot, file = paste0(plot_folder,plot_type,plot_nm,".tiff"),
+         units="in", width=6, height=4, dpi=200)
+  #dev.off()
 }
+
