@@ -6,6 +6,7 @@
 #load("SMAP_data.RData") # col 1-4 for Apr-July 2015 soil moisture
 #load("site_DEM_slope_aspect_TWI_data.RData") # col 1 for DEM data
 #load("viirs_annual_averages_data.RData")
+load("CHAPTER_1/2023_09_distmag_bestunimodels_variables_data.RData")
 
 
 ### loading magnitude data:
@@ -17,6 +18,9 @@
 dmr_tcg <- read.csv("CHAPTER_1/2023_09_DMR_DATA_CS_2016.csv")
 dmr_cs <- read.csv("CHAPTER_1/2023_09_DMR_DATA_TCG_2016.csv")
 
+### loading best models data:
+best_tcg <- read.csv("CHAPTER_1/2023_09_29_DISTMAG_2016_TCG_delAICsort.csv")
+best_cs <- read.csv("CHAPTER_1/2023_09_29_DISTMAG_2016_CS_delAICsort.csv")
 
 ### Libraries for figures:
 library(ggplot2)
@@ -45,3 +49,18 @@ ggplot(data=data, aes(x=xvar, y=yvar)) +
   geom_smooth(method = "gam") +
   ggtitle("July 2014 VPD")
 
+
+
+### DISTURBANCE MAGNITUDE FIGURES: multivariate
+
+# choose data type tcg or cs
+models <- best_tcg
+#models <- best_cs
+
+# take top performers:
+tops <- models[1:10,grep("^VARIABLE",colnames(models))]
+
+
+for (i in 1:10){
+  
+}
