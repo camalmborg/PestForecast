@@ -1,18 +1,21 @@
 ### Making Figures for Chapter 1 Univariate Analyses:
 
 ### loading environmental variables data:
-load("DMVARS_MO.RData") ##daymet monthly variables
-load("DMVARS_SEAS.RData") ##daymet seasonal variables
-load("SMAP_data.RData") # col 1-4 for Apr-July 2015 soil moisture
+#load("DMVARS_MO.RData") ##daymet monthly variables
+#load("DMVARS_SEAS.RData") ##daymet seasonal variables
+#load("SMAP_data.RData") # col 1-4 for Apr-July 2015 soil moisture
 #load("site_DEM_slope_aspect_TWI_data.RData") # col 1 for DEM data
 #load("viirs_annual_averages_data.RData")
+
 
 ### loading magnitude data:
 #dmr <- read.csv("SM_distmagrecov_data.csv")
 #dmr <- read.csv("SM_distmagrecov_data_2016_tcg.csv")
 #dmr <- read.csv("SM_distmagrecov_data_2017_tcg.csv")
-dmrcs <- read.csv("SM_distmagrecov_data_2016_cs.csv")
+#dmrcs <- read.csv("SM_distmagrecov_data_2016_cs.csv")
 #dmrcs <- read.csv("SM_distmagrecov_data_2017_cs.csv")
+dmr_tcg <- read.csv("CHAPTER_1/2023_09_DMR_DATA_CS_2016.csv")
+dmr_cs <- read.csv("CHAPTER_1/2023_09_DMR_DATA_TCG_2016.csv")
 
 
 ### Libraries for figures:

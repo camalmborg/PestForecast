@@ -13,7 +13,7 @@ library(pROC) #for AUC analyses
 #load data:
 load("DMVARS_MO.RData")
 load("DMVARS_SEAS.RData")
-load("DM_MAXTEMPS_MO.RData") #maxtemp_mos<- c(46,47,48,49,50,51,58,59,60,61,62,63)
+#load("DM_MAXTEMPS_MO.RData") #maxtemp_mos<- c(46,47,48,49,50,51,58,59,60,61,62,63)
 #load("DM_MINTEMPS_MO.RData") #mintemp_mos<- c(52, 53)
 # load("MAM_spring_precip.RData") #col 6 for 2016
 # load("MA_spring_precip.RData") #cols 5,6 for 2015, 2016
@@ -186,30 +186,30 @@ dist_prob_cs <- read.csv("Analyses_July2023/Dist_Prob_CS_2016_Models_ROCs_AICs.c
 #multivariate - 7/11/2023 Analyses
 
 
-#if the model results need to be loaded you can load them here:
-## Dist Mag:
-#read.csv("Analyses_June2023/2023_06_28_multivariate_analyses_3vars.csv")
-## Dist Prob:
-#read.csv("Analyses_June2023/2023_06_28_distprob_multivariate_analyses_3var_2016.csv")
-
-# which model:
-model <- spongy_multi_3var
-model <- dist_mag_tcg
-
-### finding the top performers by DIC/AIC:
-best <- which(model$delAIC == 0)
-
-### most common variables included:
-#subset data by R2/delAIC:
-topmodels <- model[model$V2 > 0.27,]
-topmodels <- model[model$delAIC < 100,]
-modAIC <- model[order(model$delAIC),]
-modr2 <- model[order(model$V2,decreasing = T),]
-names(which.max(table(topmodels[,3])))
-varvars <- c(sort(unique(topmodels$V3)), 
-             sort(unique(topmodels$V4)), 
-             sort(unique(topmodels$V5)))
-sort(unique(varvars))
+# #if the model results need to be loaded you can load them here:
+# ## Dist Mag:
+# #read.csv("Analyses_June2023/2023_06_28_multivariate_analyses_3vars.csv")
+# ## Dist Prob:
+# #read.csv("Analyses_June2023/2023_06_28_distprob_multivariate_analyses_3var_2016.csv")
+# 
+# # which model:
+# model <- spongy_multi_3var
+# model <- dist_mag_tcg
+# 
+# ### finding the top performers by DIC/AIC:
+# best <- which(model$delAIC == 0)
+# 
+# ### most common variables included:
+# #subset data by R2/delAIC:
+# topmodels <- model[model$V2 > 0.27,]
+# topmodels <- model[model$delAIC < 100,]
+# modAIC <- model[order(model$delAIC),]
+# modr2 <- model[order(model$V2,decreasing = T),]
+# names(which.max(table(topmodels[,3])))
+# varvars <- c(sort(unique(topmodels$V3)), 
+#              sort(unique(topmodels$V4)), 
+#              sort(unique(topmodels$V5)))
+# sort(unique(varvars))
 
 
 ### Let's try to combine the AICs for all?

@@ -20,25 +20,25 @@ library(tidyverse)
 #distprob17_uni <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2017-UNI-AUC-ANALYSES-CS-MASTERLIST.csv")
 #distprob17_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB2017-MULTI-AUC-ANALYSES-CS-MASTERLIST.csv")
 
-#distmag_uni <- read.csv("CHAPTER_1/2023_September/2023_09_UNI_Dist_Mag_TCG_2016_Models_R2s_AICs.csv")
-#distmagcs_uni <- read.csv("CHAPTER_1/2023_September/2023_09_UNI_Dist_Mag_CS_2016_Models_R2s_AICs.csv")
-#distmag_multi <- read.csv("CHAPTER_1/2023_September/CHAPTER 1-DISTMAG2016- MULTI-GAM-ANALYSES-TCG-MASTERLIST.csv")
-#distmagcs_multi <- read.csv("CHAPTER_1/2023_September/CHAPTER 1-DISTMAG2016- MULTI-GAM-ANALYSES-CS-MASTERLIST.csv")
+distmag_uni <- read.csv("CHAPTER_1/2023_September/2023_09_UNI_Dist_Mag_TCG_2016_Models_R2s_AICs.csv")
+distmagcs_uni <- read.csv("CHAPTER_1/2023_September/2023_09_UNI_Dist_Mag_CS_2016_Models_R2s_AICs.csv")
+distmag_multi <- read.csv("CHAPTER_1/2023_September/CHAPTER 1-DISTMAG2016-MULTI-GAM-ANALYSES-TCG-MASTERLIST.csv")
+distmagcs_multi <- read.csv("CHAPTER_1/2023_September/CHAPTER 1-DISTMAG2016- MULTI-GAM-ANALYSES-CS-MASTERLIST.csv")
 
 #distprob_uni <- read.csv("Analyses_September2023/2023_09_UNI_Dist_Prob_TCG_2016_Models_ROCs_AICs.csv")
 #distprob_uni <- read.csv("Analyses_September2023/2023_09_UNI_Dist_Prob_TCG_2017_Models_ROCs_AICs.csv")
 #distprob_uni <- read.csv("Analyses_September2023/2023_09_UNI_Dist_Prob_CS_2016_Models_ROCs_AICs.csv")
-distprob_uni <- read.csv("Analyses_September2023/2023_09_UNI_Dist_Prob_CS_2017_Models_ROCs_AICs.csv")
+#distprob_uni <- read.csv("Analyses_September2023/2023_09_UNI_Dist_Prob_CS_2017_Models_ROCs_AICs.csv")
+
 
 ### Making uni and multi into something we can Rbind
 # choose group you would like to use from above:
 #uni <- distmag_uni
 #multi <- distmag_multi
 
-#uni <- distmagcs_uni
-#multi <- distmagcs_multi
+uni <- distmagcs_uni
+multi <- distmagcs_multi
 
-uni <- distprob_uni
 
 # DIST MAG: univariate variable and monthyear columns combine: -------------
 # uni <- uni %>%
@@ -83,11 +83,11 @@ model$delAIC <- model$AIC - min(model$AIC)
 
 ### Choosing best performers:
 modAIC <- model[order(model$delAIC),]
-#modr2 <- model[order(model$R2),]
+modr2 <- model[order(model$R2),]
 #modauc <- model[order(model$AUC),]
-modauc <- model[order(model$ROC),]
+#modauc <- model[order(model$ROC),]
 
-#write.csv(modAIC, file="CHAPTER_1/dist_mag_cs_models_AICs_sorted.csv")
-#write.csv(modr2, file="CHAPTER_1/dist_mag_cs_models_r2s_sorted.csv")
-write.csv(modAIC, file="CHAPTER_1/dist_prob_2017_cs_models_AICs_sorted.csv")
-write.csv(modauc, file="CHAPTER_1/dist_prob_2017_cs_models_auc_sorted.csv")
+write.csv(modAIC, file="CHAPTER_1/2023_09_29_DISTMAG_2016_CS_delAICsort.csv")
+write.csv(modr2, file="CHAPTER_1/2023_09_29_DISTMAG_2016_CS_r2sort.csv")
+#write.csv(modAIC, file="CHAPTER_1/dist_prob_2017_cs_models_AICs_sorted.csv")
+#write.csv(modauc, file="CHAPTER_1/dist_prob_2017_cs_models_auc_sorted.csv")
