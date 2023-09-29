@@ -57,56 +57,20 @@ ggplot(data=data, aes(x=xvar, y=yvar)) +
 
 # MAKING THE GAM:
 # choose data type tcg or cs:
-models <- best_tcg
-#models <- best_cs
+#models <- best_tcg
+models <- best_cs
 
 # choose matching mags data:
-mags <- dmr_tcg[,c("sitenum","mags")]
-#mags <- dmr_cs$mags
+#mags <- dmr_tcg[,c("sitenum","mags")]
+mags <- dmr_cs[,c("sitenum","mags")]
 
 # take top performers:
 tops <- models[1:10,grep("^VARIABLE",colnames(models))]
 
 # where should the plots be saved?
 plot_folder <- "Analyses_September2023/Figures_Multi/distmag/"
-plot_type <- "tcg/"
-#plot_type <- "cs/"
-
-# #start the loop here >>>
-# # grab model variable column numbers:
-# v1 <- as.numeric(tops[i, 1])
-# v2 <- as.numeric(tops[i, 2])
-# v3 <- as.numeric(tops[i, 3])
-# 
-# # grab variables:
-# vars <- cbind(MV_2023_09_DATA[,c(v1,v2,v3)])
-# var_nms <- as.character(c(v1,v2,v3))
-# plot_nm <- paste0("2023_09_plot_", as.character(i), "_vars_",
-#                     paste(var_nms, collapse = "_"))
-# 
-# # combine data:
-# data <- cbind.data.frame(mags$mags, vars[mags$sitenum,])
-# colnames(data) <- c("mags", "var1", "var2", "var3")
-# 
-# # make the formula:
-# ex_vars <- c()
-# for (j in 1:ncol(data)){
-#   ex_vars[j] <- paste0('s(', names(data[j+1]), ')')
-# }
-# 
-# #make a single string:
-# gam_formula <- as.formula(paste("mags ~",
-#                                 paste(ex_vars, collapse='+')))
-# 
-# # make the model:
-# dm_gam <- gam(gam_formula, data=data, method="REML")
-# 
-# # FIGURE SECTION:
-# tiff(paste0(plot_folder,plot_type,plot_nm,".tiff"),
-#      units="in", width=6, height=4, res=300)
-# draw(dm_gam)
-# dev.off()
-
+#plot_type <- "tcg/"
+plot_type <- "cs/"
 
 for (i in 1:nrow(tops)){
   #start the loop here >>>
