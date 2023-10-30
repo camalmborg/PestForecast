@@ -58,21 +58,21 @@ ggplot(data=data, aes(x=xvar, y=yvar)) +
 # MAKING THE GAM:
 # choose data type tcg or cs:
 #models <- dm_bio_best_cs
-models <- dp17_bio_best_tcg
+models <- dp16_bio_best_cs
 
 # choose matching mags data:
 #mags <- dmr_tcg[,c("sitenum","mags")]
 #mags <- dmr_cs[,c("sitenum","mags")]
-probs <- dmr_tcg[,c("sitenum", "dpy2")]
-#probs <- dmr_cs[,c("sitenum", "dpy2")]
+#probs <- dmr_tcg[,c("sitenum", "dpy1")]
+probs <- dmr_cs[,c("sitenum", "dpy1")]
 
 # take top performers:
 tops <- models[1:25,grep("^VARIABLE",colnames(models))]
 
 # where should the plots be saved?
-plot_folder <- "Analyses_September2023/Figures_Multi/dp17_bio_best/"
-plot_type <- "tcg/"
-#plot_type <- "cs/"
+plot_folder <- "Analyses_September2023/Figures_Multi/dp16_bio_best/"
+#plot_type <- "tcg/"
+plot_type <- "cs/"
 
 ### dist mag plots: -----
 for (i in 1:nrow(tops)){
