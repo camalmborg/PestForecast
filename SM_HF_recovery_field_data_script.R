@@ -261,18 +261,27 @@ hf_data <- cbind.data.frame(field_data,hf_mags)
 library(mgcv)
 library(pROC)
 
-# yvar <- hf_data$mags
-# xvar <- hf_data$oak_TF
-# 
-# hf_gam <- gam(yvar ~ s(xvar),
-#               data=hf_data)
-# 
-# hf_gam <- gam(yvar ~ s(xvar), 
-#               data=hf_data,
-#               family = "binomial")
-#hf_roc<-roc(hf_gam$y,hf_gam$fitted.values)
+yvar <- hf_data$mort
+xvar <- hf_data$mags
+#data <- cbind.data.frame(xvar,yvar)
 
-#summ <- 
+hf_gam <- gam(yvar ~ s(xvar),
+              data=data,
+              family = "binomial")
+hf_roc<-roc(hf_gam$y,hf_gam$fitted.values)
+fit <- hf_gam$fitted.values
+
+missing <- which(is.na(xvar) | is.na(yvar))
+
+#plot data:
+data <- cbind.data.frame(xvar[-missing], yvar[-missing], fit)
+colnames(data) <-c("xvar","yvar","fit")
+#plot:
+ggplot(data=data, mapping = aes(x=xvar, y=yvar,)) +
+  geom_point(size=1.5, show.legend = FALSE) +
+  geom_line(data = data, mapping = aes(x=xvar, y=fit),
+            lwd=1.25, show.legend = FALSE) +
+  xlim(c(-0.001, max(xvar)))
 
 ### Making some plots:
 # library(lattice)
@@ -284,21 +293,21 @@ library(pROC)
 
 
 # plot(xvar, yvar)
-
-#bin means:
-bins=seq(min(hf_data$mags)-1,max(hf_data$mags)+1,length=10)
-bin = findInterval(hf_data$mags,bins)
-mu = tapply(hf_data$mort,bin,mean,na.rm=TRUE)
-n  = tapply(hf_data$mort,bin,length)
-sigma = sqrt(mu*(1-mu)/n)
-x = min(hf_data$mags)-1 + cumsum(diff(bins))
-points(x,mu,col=2)
-points(x,mu+2*sigma,col=3,pch="-")
-points(x,mu-2*sigma,col=3,pch="-")
+# 
+# #bin means:
+# bins=seq(min(hf_data$mags)-1,max(hf_data$mags)+1,length=10)
+# bin = findInterval(hf_data$mags,bins)
+# mu = tapply(hf_data$mort,bin,mean,na.rm=TRUE)
+# n  = tapply(hf_data$mort,bin,length)
+# sigma = sqrt(mu*(1-mu)/n)
+# x = min(hf_data$mags)-1 + cumsum(diff(bins))
+# points(x,mu,col=2)
+# points(x,mu+2*sigma,col=3,pch="-")
+# points(x,mu-2*sigma,col=3,pch="-")
 
 #next stop: plot the gam
-fit <- hf_gam$fitted.values
-points(hf_data$mags, fit, col=4, pch="*")
+# fit <- hf_gam$fitted.values
+# points(hf_data$mags, fit, col=4, pch="*")
 
 
 
