@@ -90,7 +90,7 @@ distmag_vars <- c(2, 6, 7, 11, 12, 13, 14, 15, 16, 17,
                   22, 23, 24, 25, 31, 32, 33)
 distprob_vars <- c( 2, 7, 8, 9, 10, 11, 12,
                     18, 19, 20, 21, 22, 23, 24, 25,
-                    32, 33, 34, 35, 38, 39, 40)
+                    32, 33, 34, 35, 38, 40)
 
 dm_bio_best_tcg <- best_tcg[best_tcg$VARIABLE1 %in% distmag_vars &
                        best_tcg$VARIABLE2 %in% distmag_vars &
