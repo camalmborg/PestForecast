@@ -364,3 +364,24 @@ dist_prob_2017_3var_tcg <- spongy_multi_ROC(MV_DATA, 3, testfx, 2)
 dist_prob_2017_3var_cs <- spongy_multi_ROC(MV_DATA, 3, testfx2, 2)
 
 write.csv(dist_mag_2var_cs, file="Analyses_September2023/dist_mag_2016_2var_cs.csv")
+
+#2,3 + 4 var and 5 var versions with bio_best top performers (dmvs, dpvs) - 11/3
+dist_mag_2var_tcg <- spongy_multi_var(MV_2023_09_DATA[,dmvs], 2, testfx)
+dist_mag_2var_cs <- spongy_multi_var(MV_2023_09_DATA[,dmvs], 2, testfx2)
+
+dist_mag_3var_tcg <- spongy_multi_var(MV_2023_09_DATA[,dmvs], 3, testfx)
+dist_mag_3var_cs <- spongy_multi_var(MV_2023_09_DATA[,dmvs], 3, testfx2)
+
+dist_mag_4var_tcg <- spongy_multi_var(MV_2023_09_DATA[,dmvs],4,testfx)
+dist_mag_4var_cs <- spongy_multi_var(MV_2023_09_DATA[,dmvs],4,testfx2)
+
+dist_mag_5var_tcg <- spongy_multi_var(MV_2023_09_DATA[,dmvs],5,testfx)
+dist_mag_5var_cs <- spongy_multi_var(MV_2023_09_DATA[,dmvs],5,testfx2)
+
+#distprob : to be run 
+dist_prob_2016_4var_tcg <- spongy_multi_ROC(MV_2023_09_DATA_DP[,dpvs],4,testfx,1)
+dist_prob_2016_4var_cs <- spongy_multi_ROC(MV_2023_09_DATA_DP[,dpvs],4,testfx2,1)
+dist_prob_2017_4var_tcg <- spongy_multi_ROC(MV_2023_09_DATA_DP[,dpvs],4,testfx,2)
+dist_prob_2017_4var_cs <- spongy_multi_ROC(MV_2023_09_DATA_DP[,dpvs],4,testfx2,2)
+
+
