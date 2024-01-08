@@ -17,10 +17,10 @@ library(tidyverse)
 # distprob17tcg_uni <- read.csv()
 # distprob17cs_uni <- read.csv()
   
-distprob16cs_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB-2016-MULTI-AUC-ANALYSES-CS-MASTERLIST.csv")
-distprob16tcg_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB-2016-MULTI-AUC-ANALYSES-TCG-MASTERLIST.csv")
-distprob17cs_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB-2017-MULTI-AUC-ANALYSES-CS-MASTERLIST.csv")
-distprob17tcg_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB-2017-MULTI-AUC-ANALYSES-TCG-MASTERLIST.csv")
+# distprob16cs_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB-2016-MULTI-AUC-ANALYSES-CS-MASTERLIST.csv")
+# distprob16tcg_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB-2016-MULTI-AUC-ANALYSES-TCG-MASTERLIST.csv")
+# distprob17cs_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB-2017-MULTI-AUC-ANALYSES-CS-MASTERLIST.csv")
+# distprob17tcg_multi <- read.csv("CHAPTER_1/CHAPTER 1-DISTPROB-2017-MULTI-AUC-ANALYSES-TCG-MASTERLIST.csv")
   
 ### Making uni and multi into something we can Rbind
 # choose group you would like to use from above:
@@ -69,18 +69,20 @@ colnames(uni) <- names(multi)
 ### Combining them into one big dataframe:
 model <- rbind(uni, multi)
 
+model <- read.csv("Analyses_December2023/Dist_Mag/2023_12_BIO_BEST_MODELS_DIST_MAG_CS.csv")
+
 ### Calculate delAIC: -----------
 model$delAIC <- model$AIC - min(model$AIC)
-model$delAIC <- model$aics - min(model$aics)
+#model$delAIC <- model$aics - min(model$aics)
 
 ### Choosing best performers:
 modAIC <- model[order(model$delAIC),]
-#modr2 <- model[order(model$R2),]
+modr2 <- model[order(model$R2),]
 modauc <- model[order(model$AUC),]
 #modauc <- model[order(model$ROC),]
 
-write.csv(modAIC, file="CHAPTER_1/2023_09_29_DISTMAG_2016_CS_delAICsort.csv")
-write.csv(modr2, file="CHAPTER_1/2023_09_29_DISTMAG_2016_CS_r2sort.csv")
+write.csv(modAIC, file="CHAPTER_1/2024_01_08_DISTMAG_CS_delAICsort.csv")
+#write.csv(modr2, file="CHAPTER_1/2023_09_29_DISTMAG_2016_CS_r2sort.csv")
 #write.csv(modAIC, file="CHAPTER_1/dist_prob_2017_cs_models_AICs_sorted.csv")
 #write.csv(modauc, file="CHAPTER_1/dist_prob_2017_cs_models_auc_sorted.csv")
 
@@ -112,3 +114,9 @@ dp17_bio_best_tcg <- distprob17tcg_multi[distprob17tcg_multi$VARIABLE1 %in% dist
 dp17_bio_best_cs <- distprob16cs_multi[distprob17cs_multi$VARIABLE1 %in% distprob_vars &
                                          distprob17cs_multi$VARIABLE2 %in% distprob_vars &
                                          distprob17cs_multi$VARIABLE3 %in% distprob_vars,]
+
+#multivariate analyses with bio_best variables 11/3
+dmvs <- distmag_vars[c(2,3,4,6,10,11,12,15)] #best performers multiple times
+dpvs <- distprob_vars[c(7,8,17,18,19,20,21)]
+
+  
