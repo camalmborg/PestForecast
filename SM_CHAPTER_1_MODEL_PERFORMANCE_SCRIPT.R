@@ -69,7 +69,9 @@ colnames(uni) <- names(multi)
 ### Combining them into one big dataframe:
 model <- rbind(uni, multi)
 
-model <- read.csv("Analyses_December2023/Dist_Mag/2023_12_BIO_BEST_MODELS_DIST_MAG_CS.csv")
+#model <- read.csv("Analyses_December2023/Dist_Mag/2023_12_BIO_BEST_MODELS_DIST_MAG_CS.csv")
+model <- read.csv("Analyses_December2023/Dist_Prob/2023_12_BIO_BEST_MODELS_DIST_PROB_2017_TCG.csv")
+
 
 ### Calculate delAIC: -----------
 model$delAIC <- model$AIC - min(model$AIC)
@@ -77,11 +79,11 @@ model$delAIC <- model$AIC - min(model$AIC)
 
 ### Choosing best performers:
 modAIC <- model[order(model$delAIC),]
-modr2 <- model[order(model$R2),]
-modauc <- model[order(model$AUC),]
+#modr2 <- model[order(model$R2),]
+#modauc <- model[order(model$AUC),]
 #modauc <- model[order(model$ROC),]
 
-write.csv(modAIC, file="CHAPTER_1/2024_01_08_DISTMAG_CS_delAICsort.csv")
+write.csv(modAIC, file="CHAPTER_1/2024_01_10_DISTPROB_17_TCG_delAICsort.csv")
 #write.csv(modr2, file="CHAPTER_1/2023_09_29_DISTMAG_2016_CS_r2sort.csv")
 #write.csv(modAIC, file="CHAPTER_1/dist_prob_2017_cs_models_AICs_sorted.csv")
 #write.csv(modauc, file="CHAPTER_1/dist_prob_2017_cs_models_auc_sorted.csv")
