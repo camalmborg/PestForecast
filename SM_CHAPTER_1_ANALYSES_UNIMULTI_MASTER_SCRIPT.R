@@ -9,8 +9,8 @@ library(combinat)
 
 ### load data:
 MV_DATA <- read.csv("Analyses_September2023/MV_2023_09_DATA.csv")
-#dmr <- read.csv("Analyses_September2023/2023_09_DMR_DATA_TCG_2016.csv")
-#dmrcs <- read.csv("Analyses_September2023/2023_09_DMR_DATA_CS_2016.csv")
+dmr <- read.csv("Analyses_September2023/2023_09_DMR_DATA_TCG_2016.csv")
+dmrcs <- read.csv("Analyses_September2023/2023_09_DMR_DATA_CS_2016.csv")
 
 ##### UNIVARIATE ANALYSES SECTION ------------------------------------------------
 ### Function for Univariate mags Analyses AS LIST  (Daymet data):----------------------
@@ -407,4 +407,66 @@ dist_prob_2016_5var_cs <- spongy_multi_ROC(MV_2023_09_DATA_DP[,dpvs],5,testfx2,1
 dist_prob_2017_5var_tcg <- spongy_multi_ROC(MV_2023_09_DATA_DP[,dpvs],5,testfx,2)
 dist_prob_2017_5var_cs <- spongy_multi_ROC(MV_2023_09_DATA_DP[,dpvs],5,testfx2,2)
 
+
+
+### 1/18/2024 Running 5+ manual models:
+
+# load data---
+# for dist mag:
+# the environmental variables
+dmvars_mags <- read.csv("CHAPTER_1/DATA/MV_2023_12_DATA_distmag.csv")[,-1]
+# the distmagrecov data
+dmr <- read.csv("CHAPTER_1/DATA/2023_12_DMR_DATA_TCG.csv")
+#dmr <- read.csv("Analyses_September2023/2023_09_DMR_DATA_TCG_2016.csv") #2016 group
+
+# for dist prob:
+# the environmental variables
+dmvars_prob <- read.csv("CHAPTER_1/DATA/MV_2023_12_DATA_distprob.csv")[,-1]
+# the distmagrecov data
+# dmrcs <- read.csv("CHAPTER_1/DATA/2023_12_DMR_DATA_CS.csv")
+
+
+# first get data we need for models:
+# choose dmr data you need, either tcg (dmr) or cs (dmrcs)
+data <- dmvars_mags
+dmrdat <- dmr
+#dmrdat <- dmrcs
+vvar <- as.data.frame(data[as.numeric(dmrdat$sitenum),])
+
+# For saving the results:
+r2s <- c()
+aics <- c()
+model_num <- c()
+model_vars <- c()
+
+# MANUAL SECTION - input variables and model run number here:
+# model run number (i)
+i = 3
+# make gam variables data frame
+vars <- c(1,3,4,5,7)
+
+# make dataframe for running model
+vardat <- as.data.frame(cbind(dmrdat$mags, vvar[,vars]))
+
+#make gam explantory variables list:
+# how many variables included in models
+nvars <- ncol(vardat)-1
+ex_vars <- c()
+for (j in 1:nvars){
+  ex_vars[j] <- paste0('s(vardat[,', j+1, '])')
+}
+
+#make a single string:
+gam_formula <- as.formula(paste("vardat[,1] ~ ",
+                                paste(ex_vars, collapse='+')))
+
+# run gam with those data:
+mv_gam <- gam(gam_formula)
+summ <- summary(mv_gam)
+
+# model run number (i)
+model_num[i] <- i
+r2s[i] <- summ$r.sq
+aics[i] <- mv_gam$aic
+model_vars[i] <- paste(vars,collapse=",")
 
