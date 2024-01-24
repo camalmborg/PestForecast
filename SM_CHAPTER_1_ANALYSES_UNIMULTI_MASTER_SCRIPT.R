@@ -443,9 +443,9 @@ model_vars <- c()
 
 # MANUAL SECTION - input variables and model run number here:
 # model run number (i)
-i = 5
+i = 9
 # make gam variables data frame 
-vars <- c(1,2,3,4,6)
+vars <- c(1,2,3,4,5,6,7)
 
 # make dataframe for running model
 #vardat <- as.data.frame(cbind(dmrdat$mags, vvar[,vars]))
@@ -480,10 +480,11 @@ gam_formula <- as.formula(paste("vardat[,1] ~ ",
 #run gam with those data:
 mv_gam <- gam(gam_formula, data=vardat, family="binomial")
 summ <- summary(mv_gam)
+model_num[i] <- i
 #r2s[i] <- summ$r.sq
 mv_roc<-roc(mv_gam$y,mv_gam$fitted.values)
 aucs[i] <- mv_roc$auc
 aics[i] <- mv_gam$aic
 model_vars[i] <- paste(vars,collapse=",")
 
-#cbind(model_num, aucs, aics, model_vars)
+best_distprob_models_tcg <- cbind(model_num, aucs, aics, model_vars)
