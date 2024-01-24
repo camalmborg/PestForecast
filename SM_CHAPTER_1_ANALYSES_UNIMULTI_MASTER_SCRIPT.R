@@ -409,44 +409,47 @@ dist_prob_2017_5var_cs <- spongy_multi_ROC(MV_2023_09_DATA_DP[,dpvs],5,testfx2,2
 
 
 
-### 1/18/2024 Running 5+ manual models:
+### 1/18/2024 Running 5+ manual models: Dist Mag
+### 1/24/2024 Running 5+ manual models: Dist Prob
 
 # load data---
 # for dist mag:
 # the environmental variables
-dmvars_mags <- read.csv("CHAPTER_1/DATA/MV_2023_12_DATA_distmag.csv")[,-1]
-# the distmagrecov data
+dmvars_mags <- read.csv("CHAPTER_1/DATA/MV_2023_12_DATA_distmag.csv")[,-1]  #dist mag
+dmvars_prob <- read.csv("CHAPTER_1/DATA/MV_2023_12_DATA_distprob.csv")[,-1] #dist prob
+
+# the distmagrecov data TCG
 dmr <- read.csv("CHAPTER_1/DATA/2023_12_DMR_DATA_TCG.csv")
 #dmr <- read.csv("Analyses_September2023/2023_09_DMR_DATA_TCG_2016.csv") #2016 group
 
-# for dist prob:
-# the environmental variables
-dmvars_prob <- read.csv("CHAPTER_1/DATA/MV_2023_12_DATA_distprob.csv")[,-1]
-# the distmagrecov data
-# dmrcs <- read.csv("CHAPTER_1/DATA/2023_12_DMR_DATA_CS.csv")
+# the distmagrecov data CS
+dmrcs <- read.csv("CHAPTER_1/DATA/2023_12_DMR_DATA_CS.csv")
 
 
 # first get data we need for models:
 # choose dmr data you need, either tcg (dmr) or cs (dmrcs)
-data <- dmvars_mags
+#data <- dmvars_mags
+data <- dmvars_prob
 dmrdat <- dmr
 #dmrdat <- dmrcs
 vvar <- as.data.frame(data[as.numeric(dmrdat$sitenum),])
 
 # For saving the results:
-r2s <- c()
+#r2s <- c()
 aics <- c()
+aucs <- c()
 model_num <- c()
 model_vars <- c()
 
 # MANUAL SECTION - input variables and model run number here:
 # model run number (i)
-i = 3
-# make gam variables data frame
-vars <- c(1,3,4,5,7)
+i = 5
+# make gam variables data frame 
+vars <- c(1,2,3,4,6)
 
 # make dataframe for running model
-vardat <- as.data.frame(cbind(dmrdat$mags, vvar[,vars]))
+#vardat <- as.data.frame(cbind(dmrdat$mags, vvar[,vars]))
+vardat <- as.data.frame(cbind(dmrdat$dpy1, vvar[,vars]))
 
 #make gam explantory variables list:
 # how many variables included in models
@@ -460,13 +463,27 @@ for (j in 1:nvars){
 gam_formula <- as.formula(paste("vardat[,1] ~ ",
                                 paste(ex_vars, collapse='+')))
 
-# run gam with those data:
-mv_gam <- gam(gam_formula)
-summ <- summary(mv_gam)
+### DIST MAG:
+# # run gam with those data:
+# mv_gam <- gam(gam_formula)
+# summ <- summary(mv_gam)
+# 
+# # model run number (i)
+# model_num[i] <- i
+# r2s[i] <- summ$r.sq
+# aics[i] <- mv_gam$aic
+# model_vars[i] <- paste(vars,collapse=",")
 
-# model run number (i)
-model_num[i] <- i
-r2s[i] <- summ$r.sq
+# cbind(model_num, r2s, aics, model_vars)
+
+### DIST PROB:
+#run gam with those data:
+mv_gam <- gam(gam_formula, data=vardat, family="binomial")
+summ <- summary(mv_gam)
+#r2s[i] <- summ$r.sq
+mv_roc<-roc(mv_gam$y,mv_gam$fitted.values)
+aucs[i] <- mv_roc$auc
 aics[i] <- mv_gam$aic
 model_vars[i] <- paste(vars,collapse=",")
 
+#cbind(model_num, aucs, aics, model_vars)
