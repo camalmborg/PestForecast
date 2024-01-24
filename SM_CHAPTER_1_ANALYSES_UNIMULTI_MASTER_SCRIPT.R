@@ -430,8 +430,8 @@ dmrcs <- read.csv("CHAPTER_1/DATA/2023_12_DMR_DATA_CS.csv")
 # choose dmr data you need, either tcg (dmr) or cs (dmrcs)
 #data <- dmvars_mags
 data <- dmvars_prob
-dmrdat <- dmr
-#dmrdat <- dmrcs
+#dmrdat <- dmr
+dmrdat <- dmrcs
 vvar <- as.data.frame(data[as.numeric(dmrdat$sitenum),])
 
 # For saving the results:
@@ -487,4 +487,4 @@ aucs[i] <- mv_roc$auc
 aics[i] <- mv_gam$aic
 model_vars[i] <- paste(vars,collapse=",")
 
-best_distprob_models_tcg <- cbind(model_num, aucs, aics, model_vars)
+#best_distprob_models_cs <- cbind(model_num, aucs, aics, model_vars)
