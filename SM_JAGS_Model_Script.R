@@ -1,23 +1,28 @@
 #This script is the JAGS model for pest disturbance mag and prob forecast
 
 ### THE LIBRARIES:
+library(tidyverse)
+library(dplyr)
 library(rjags)
 library(coda)
-# library(ecoforecastR)
-# library(tidyverse)
-# library(dplyr)
+#library(ecoforecastR)
 
 ### THE DATA:
 # condition scores inputs
 cfile <- "2023_03_08_DATAGRAB/2023_5000_points_sample_score_mean.csv"
 scores <- read.csv(cfile)
-# 
+# isolate data we want:
+cs <- scores %>%
+  # Drop unwanted columns
+  dplyr::select(dplyr::starts_with("X")) %>%
+  # Select just June averages for best disturbance visual without seasonality
+  dplyr::select(dplyr::contains(".06."))
 
-#load hatch-feed temp,vpd,precip dataset:
-#hf16<-read.csv("hf16_dataset_03_2022.csv")
-hf16<-read.csv("hatchfeed16_daymet_tpv_mags_data.csv")
-hf16<-hf16[,-c(3)]
-hfnoX<-as.matrix(hf16[,2:ncol(hf16)])
+# covariate data - for parameterizations
+#varfile <- ""
+#vars <- read.csv(varfile)
+
+
 
 ##SELECT SITES:
 #2016 dist mag sites:
