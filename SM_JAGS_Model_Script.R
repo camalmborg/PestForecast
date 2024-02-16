@@ -44,29 +44,26 @@ for(j in 1:nchain){
 }
 
 
-#THE MODEL:
+### THE MODEL:
+#use the single time step version of the model:
 spongy_disturb <- "model{
 
 ###Loop over individual sites
 for (s in 1:ns){
 
   #### Data Model
-  for(t in 1:n){
-    y[s,t] ~ dnorm(x[s,t],tau_obs)
-  }
+  y[s] ~ dnorm(x[s,t],tau_obs)
   
   #### Process Model
-  for(t in 2:n){
-    muN[s,t]<-R*x[s,t-1] ##step 3: dealing with modeling R
-    x[s,t] ~ dnorm(mu[s,t],tau_add)
-    muD[s,t] ~ dnorm(mu0[s,t],pa0) ##step 1: process model on mu0
+  muN[s,t]<-R*x[s,t-1] ##step 3: dealing with modeling R
+  x[s,t] ~ dnorm(mu[s,t],tau_add)
+  muD[s,t] ~ dnorm(mu0[s,t],pa0) ##step 1: process model on mu0
     
-    D[s,t] ~ dbern(p) ##step 2: adding process model here
+  D[s,t] ~ dbern(p) ##step 2: adding process model here
     
-    mu[s,t] <- D[s,t]*muD[s,t] + (1-D[s,t])*muN[s,t]
-    mu0[s,t] <- beta0 ## + beta[1] * variables
-  }
-  
+  mu[s,t] <- D[s,t]*muD[s,t] + (1-D[s,t])*muN[s,t]
+  mu0[s,t] <- beta0 ## + beta[1] * variables
+
   x[s,1]~dnorm(x_ic,tau_ic)
   
 }#end loop over sites
