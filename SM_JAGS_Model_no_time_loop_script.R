@@ -107,6 +107,8 @@ for (s in 1:ns){
  ##x[s] ~ dnorm(mu[s],tau_add)
   muD[s] ~ dnorm(mu0[s],pa0) 
   D[s] ~ dbern(p)
+  #logit(D[s]) <- alpha[1] + alpha[2]*z[s]
+  #alpha[1] ~ dnorm(0.0,0.0001)
   mu[s] <- D[s]*muD[s] + (1-D[s])*muN[s]
  ##mu0[s] <- beta0
   mu0[s] <- beta0 + beta[1]*pcp[s,1] + beta[2]*pcp[s,2]
