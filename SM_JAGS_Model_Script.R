@@ -9,14 +9,18 @@ library(coda)
 
 ### THE DATA:
 # condition scores inputs
-cfile <- "2023_03_08_DATAGRAB/2023_5000_points_sample_score_mean.csv"
+#cfile <- "2023_03_08_DATAGRAB/2023_03_08_5000_sites_sample_score_mean.csv" #2005-2022
+cfile <- "2022_08_31_DATAGRAB/2022_12_7_sample_score_mean_5k.csv" #1995-2020, original grab
 scores <- read.csv(cfile)
 # isolate data we want:
 cs <- scores %>%
   # Drop unwanted columns
   dplyr::select(dplyr::starts_with("X")) %>%
   # Select just June averages for best disturbance visual without seasonality
-  dplyr::select(dplyr::contains(".06."))
+  dplyr::select(dplyr::contains(".06.")) %>%
+  # 
+  dplyr::rename_with(~ str_replace_all(., c("X|_score_mean|_cs_mean" = "", 
+                                       "\\." = "-")))
 
 # covariate data - for parameterizations
 #varfile <- ""
