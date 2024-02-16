@@ -1,19 +1,17 @@
-#This script updates the initial runs of the JAGS model for pest forecast
-#Initially the model ran on 50 test sites, not the full 5000 (4997) sites
-#New script updates the initial dataset build and includes the updated model
+#This script is the JAGS model for pest disturbance mag and prob forecast
 
-#THE LIBRARIES
+### THE LIBRARIES:
 library(rjags)
 library(coda)
-#library(ecoforecastR)
-#library(tidyverse)
-#library(dplyr)
+# library(ecoforecastR)
+# library(tidyverse)
+# library(dplyr)
 
-
-#load full dataset (5000 sites):
-#model uses condition scores, not TCG raw data
-cond.scores.mo<-read.csv("2020_07_10_sample_score_mean_MONTHLY.csv")
-condscores<-cond.scores.mo[,2:131]
+### THE DATA:
+# condition scores inputs
+cfile <- "2023_03_08_DATAGRAB/2023_5000_points_sample_score_mean.csv"
+scores <- read.csv(cfile)
+# 
 
 #load hatch-feed temp,vpd,precip dataset:
 #hf16<-read.csv("hf16_dataset_03_2022.csv")
