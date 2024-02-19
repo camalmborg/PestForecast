@@ -51,31 +51,31 @@ spongy_disturb <- "model{
 ###Loop over individual sites
 for (s in 1:ns){
 
-  #### Data Model
+  #### Data Model:
   y[s] ~ dnorm(x[s,t],tau_obs)
   
-  #### Process Model
-  muN[s,t]<-R*x[s,t-1] ##step 3: dealing with modeling R
-  x[s,t] ~ dnorm(mu[s,t],tau_add)
-  muD[s,t] ~ dnorm(mu0[s,t],pa0) ##step 1: process model on mu0
+  #### Process Model:
+  muN[s] <- R*x[s]                   ##step 3: dealing with modeling R (Chap 2 - RECOV)
+  x[s,t] ~ dnorm(mu[s],tau_add)
+  muD[s,t] ~ dnorm(mu0[s,t],pa0)   ##step 1: process model on mu0 (MAG)
     
-  D[s,t] ~ dbern(p) ##step 2: adding process model here
+  D[s,t] ~ dbern(p)                ##step 2: adding process model here (PROB)
     
-  mu[s,t] <- D[s,t]*muD[s,t] + (1-D[s,t])*muN[s,t]
-  mu0[s,t] <- beta0 ## + beta[1] * variables
+  mu[s,t] <- D[s,t]*muD[s,t] + (1-D[s,t]) * muN[s,t]
+  mu0[s,t] <- beta0   ## + beta[1] * variables 
 
-  x[s,1]~dnorm(x_ic,tau_ic)
+  x[s]~dnorm(x_ic,tau_ic)
   
 }#end loop over sites
   
   #### Priors
-  tau_obs ~ dgamma(t_obs,a_obs)
-  tau_add ~ dgamma(a_add,t_add)
-  R ~ dnorm(rmean,rprec)  #rho term
+  tau_obs ~ dgamma(t_obs,a_obs)   ##observation error (data model)
+  tau_add ~ dgamma(a_add,t_add)   ##process error (process model)
+  R ~ dnorm(rmean,rprec)          ##rho paramter (recovery rate)
   p ~ dunif(0,1)  #disturbance probability
   beta0 ~ dnorm(-5,1) #param for calculating mean of disturbed state
   pa0 ~ dgamma(1,1) #precision of disturbed state
-  # beta[1] 
+  # beta[1]   ## COVARIATES WILL BE ADDED HERE
   
 }
 "
