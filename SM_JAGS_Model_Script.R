@@ -35,12 +35,16 @@ distyear <- 2016
 cs <- cs[dmr$X,]
 # get disturbance years for each:
 dists <- vector()
+cs_dists <- vector()
 for (i in 1:nrow(cs)){
+  # get disturbance year colname
   if (dmr$dpy1[i] > 0) {
     dists[i] <- colnames(cs[grep(paste0("^", distyear, sep = ""), names(cs))])
   } else {
     dists[i] <- colnames(cs[grep(paste0("^",distyear+1, sep = ""), names(cs))])
   }
+  # get condition score associated with disturbance year
+  cs_dists[i] <- cs[i, dists[i]]
 }
 
 # # standard deviations for precisions
@@ -116,8 +120,12 @@ for (s in 1:ns){
 smpl <- sample(nrow(cs), 5)
 # make sample
 cs_samp <- cs[smpl,]
-# number of sites of sample:
+# number of sites of sample
 nsites = nrow(cs_samp)
+# get dist years for cs_samp group
+dist_samp <- dists[as.numeric(rownames(cs_samp))]
+# make the single timestep data for each site
+cs_samp_dist <- cs_dists[as.numeric(rownames(cs_samp))]
 
 ### initial state of model parameters:
 init<-list()
@@ -130,7 +138,7 @@ for(j in 1:nchain){
 
 ### MODEL INPUTS
 # data and parameters for sites model:   #for full sample ns = nrow(scores)
-data = list(y = cs_samp, ns = nsites,    
+data = list(y = cs_samp_dist, ns = nsites,    
               x_ic = 0, tau_ic = 0.1,
               a_obs = 0.1, t_obs = 0.1,
               #a_add = 0.1, t_add = 0.1,
@@ -143,12 +151,10 @@ j.pests <- jags.model (file = textConnection(spongy_disturb),
                        n.chains = 3)
 
 
-# jpout<-coda.samples(j.pests, 
-#                     variable.names = c("beta0", "beta[1]", "beta[2]",
-#                                        "beta[3]", "beta[4]",
-#                                        "tau_add","tau_obs", 
-#                                        "pa0"),
-#                     n.iter = 50000,
-#                     thin=2)
+jpout<-coda.samples(j.pests,
+                    variable.names = c("beta0", "tau_obs",
+                                       "pa0"),
+                    n.iter = 50000,
+                    thin=2)
 
 
