@@ -101,6 +101,7 @@ for (s in 1:ns){
 
   #### Data Model
   y[s] ~ dnorm(mu[s],tau_obs)
+  ## y[s,t] ~ dnorm(x[s],tau_obs)
   
   #### Process Model
   muN[s]<-R*x[s]
