@@ -19,21 +19,22 @@ cs <- scores %>%
   dplyr::select(dplyr::starts_with("X")) %>%
   # Select just June averages for best disturbance visual without seasonality
   dplyr::select(dplyr::contains(".06.")) %>%
-  # 
+  # rename with date, without extra characters
   dplyr::rename_with(~ str_replace_all(., c("X|_score_mean|_cs_mean" = "", 
                                        "\\." = "-")))
 # # number of sites
 # nsites = nrow(cs)
 
-# disturbance year data:
+# disturbance year data
 dmr_file <- "CHAPTER_1/DATA/2023_12_DMR_DATA_TCG.csv"
 dmr <- read.csv(dmr_file)
 
+# choose disturbance onset year
 distyear <- 2016
 
 # disturbance data for sample
 cs <- cs[dmr$X,]
-# get disturbance years for each:
+# get disturbance years and condition score value at dist year for each:
 dists <- vector()
 cs_dists <- vector()
 for (i in 1:nrow(cs)){
@@ -58,7 +59,7 @@ for (i in 1:nrow(cs)){
 #   # 
 #   dplyr::rename_with(~ str_replace_all(., c("X|_score_stddevs" = "", 
 #                                             "\\." = "-")))
-# # convert to precisions
+# # convert to precisions -- DOESN'T WORK RIGHT YET 2/19/24
 # prec_convert<-function(x){
 #   prec<-matrix(NA,nrow=length(x),ncol=1)
 #   for (i in 1:length(x)){
@@ -72,8 +73,13 @@ for (i in 1:nrow(cs)){
 
 
 # covariate data - for parameterizations
-#varfile <- ""
-#vars <- read.csv(varfile)
+# the environmental variables
+# for disturbance magnitude parameters
+#varfile_m <- "CHAPTER_1/DATA/MV_2023_12_DATA_distmag.csv"
+#magvars <- read.csv(varfile_m)[,-1]
+# for disturbance probability parameters
+#varfile_p <- "CHAPTER_1/DATA/MV_2023_12_DATA_distprob.csv"
+#probvars <- read.csv(varfile_p)[,-1]
 
 
 ### THE MODEL:
