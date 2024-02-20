@@ -21,7 +21,7 @@ magvars <- magvars[dmr$X,]
 
 ### Load model list data frame:
 modfile <- "CHAPTER_1/2024_02_JAGS_models/2024_02_20_Dist_Mag_Models.csv"
-#modfile <- "CHAPTER_1/2024_02_JAGS_models/2024_02_2X_Dist_Prob_Models.csv"
+#modfile <- "CHAPTER_1/2024_02_JAGS_models/2024_02_20_Dist_Prob_Models.csv"
 # disturbance magnitude
 modeldf <- read.csv(modfile, header = F)
 # disturbance probability
