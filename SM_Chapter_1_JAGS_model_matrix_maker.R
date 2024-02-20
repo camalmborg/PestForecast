@@ -23,11 +23,25 @@ magvars <- magvars[dmr$X,]
 modfile <- "CHAPTER_1/2024_02_JAGS_models/2024_02_20_Dist_Mag_Models.csv"
 #modfile <- "CHAPTER_1/2024_02_JAGS_models/2024_02_2X_Dist_Prob_Models.csv"
 # disturbance magnitude
-magmodels <- read.csv(modfile, header = F)
+modeldf <- read.csv(modfile, header = F)
 # disturbance probability
-#probmodels <-read.csv(modfile, header = F)
+#modeldf <-read.csv(modfile, header = F)
 
 ### Making list of data for models:
 # empty list
-magls <- list()
+#magls <- list()
+#probls <- list()
+# mag or prob
+covs <- magvars
+#covs <- probvars
 # loop over models
+for (i in 1:nrow(modeldf)){
+  # grab column numbers from model table
+  cols <- as.numeric(modeldf[i,])
+  # remove NAs
+  cols <- cols[!is.na(cols)]
+  # make dataframe with columns from covariates
+  df <- cbind(covs[,c(cols)])
+  # add to the list
+  magls[[i]] <- df
+}
