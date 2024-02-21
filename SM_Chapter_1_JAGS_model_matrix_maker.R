@@ -29,9 +29,8 @@ modeldf <- read.csv(modfile, header = F)
 
 ### Making list of data for models:
 # empty list
-#magls <- list()
-#probls <- list()
-# mag or prob
+covls <- list()
+# mag (magvars) or prob (probvars)
 covs <- magvars
 #covs <- probvars
 # loop over models
@@ -43,5 +42,9 @@ for (i in 1:nrow(modeldf)){
   # make dataframe with columns from covariates
   df <- cbind(covs[,c(cols)])
   # add to the list
-  magls[[i]] <- df
+  covls[[i]] <- df  ## have to change this line to make sure its mags or prob
 }
+
+# for saving result
+#magls <- covls
+probls <- covls
