@@ -8,4 +8,53 @@ library(coda)
 library(MCMCvis)
 #library(ecoforecastR)
 
-### 
+
+### OUT object:
+# model name
+jagmod = j.pests
+# iterations and thinning
+niter = 100000
+jthin = 2
+# variable names object
+jagvars <- c("beta0", "tau_obs", "pa0")
+
+# run from model in SM_JAGS_Model_script
+jpout<-coda.samples(jagmod,
+                    variable.names = jagvars,
+                    n.iter = niter,
+                    thin = jthin)
+
+### Let's do some diagnostics:
+# plot trace and density plots
+#plot(jpout)
+
+# GBR 
+gelman.diag(jpout)
+
+# GBR plot
+gelman.plot(jpout)
+
+# discarding burn in
+# set burn in based on GBR
+burnin <- 2000
+# remove burn in
+jburn <- window(jpout, start = burnin)
+# plot burn in output
+#plot(jburn)
+
+# autocorrelation plots
+acfplot(jburn)  # ask Mike about this one
+
+# effective sample size
+effectiveSize(jburn)
+
+# summary
+summary(jburn)
+
+# correlation plots
+# convert MCMC to matrix
+out <- as.matrix(jburn)
+# pairs plot
+pairs(out)
+# correlations summary
+cor(out)
