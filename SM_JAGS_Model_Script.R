@@ -5,6 +5,7 @@ library(tidyverse)
 library(dplyr)
 library(rjags)
 library(coda)
+#library(MCMCvis)
 #library(ecoforecastR)
 
 
@@ -123,7 +124,7 @@ for (s in 1:ns){
 
 ### SELECT SITES:
 # random selection of sites for testing
-smpl <- sample(nrow(cs), 5)
+smpl <- sample(nrow(cs), 25)
 # make sample
 cs_samp <- cs[smpl,]
 # number of sites of sample
@@ -157,10 +158,10 @@ j.pests <- jags.model (file = textConnection(spongy_disturb),
                        n.chains = 3)
 
 
-jpout<-coda.samples(j.pests,
-                    variable.names = c("beta0", "tau_obs",
-                                       "pa0"),
-                    n.iter = 50000,
-                    thin=2)
+# jpout<-coda.samples(j.pests,
+#                     variable.names = c("beta0", "tau_obs",
+#                                        "D", "pa0"),
+#                     n.iter = 50000,
+#                     thin=2)
 
 
