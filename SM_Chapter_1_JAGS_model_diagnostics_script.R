@@ -13,8 +13,8 @@ library(MCMCvis)
 # model name
 jagmod = j.pests
 # iterations and thinning
-niter = 100000
-jthin = 2
+niter = 200000
+jthin = 1
 # variable names object
 jagvars <- c("beta0", "tau_obs", "pa0")
 
@@ -26,7 +26,7 @@ jpout<-coda.samples(jagmod,
 
 ### Let's do some diagnostics:
 # plot trace and density plots
-#plot(jpout)
+plot(jpout)
 
 # GBR 
 gelman.diag(jpout)
@@ -36,11 +36,11 @@ gelman.plot(jpout)
 
 # discarding burn in
 # set burn in based on GBR
-burnin <- 2000
+burnin <- 20000
 # remove burn in
 jburn <- window(jpout, start = burnin)
 # plot burn in output
-#plot(jburn)
+plot(jburn)
 
 # autocorrelation plots
 acfplot(jburn)  # ask Mike about this one
