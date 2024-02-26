@@ -17,7 +17,7 @@ dmr_file <- "CHAPTER_1/DATA/2023_12_DMR_DATA_TCG.csv"
 dmr <- read.csv(dmr_file)
 # environmental data without missing sites
 magvars <- magvars[dmr$X,]
-
+probvars <- probvars[dmr$X,]
 
 ### Load model list data frame:
 #modfile <- "CHAPTER_1/2024_02_JAGS_models/2024_02_20_Dist_Mag_Models.csv"
@@ -30,20 +30,22 @@ modeldf <- read.csv(modfile, header = F)
 # empty list
 covls <- list()
 # mag (magvars) or prob (probvars)
-covs <- magvars
-#covs <- probvars
+#covs <- magvars
+covs <- probvars
 # loop over models
 for (i in 1:nrow(modeldf)){
   # grab column numbers from model table
-  cols <- as.numeric(modeldf[i,])
+  cols <- as.numeric(modeldf[i,])  #add a row of ones to each, make i into i+1
   # remove NAs
   cols <- cols[!is.na(cols)]
+  # make column of 1s for matrix multiplication step in JAGS model (intercept term)
+  int <- rep(1, nrow(covs))
   # make dataframe with columns from covariates
-  df <- cbind(covs[,c(cols)])
+  df <- cbind(int, covs[,c(cols)])
   # add to the list
   covls[[i]] <- df  ## have to change this line to make sure its mags or prob
 }
 
 # for saving result
-#magls <- covls
+magls <- covls
 probls <- covls
