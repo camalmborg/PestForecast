@@ -49,3 +49,43 @@ for (i in 1:nrow(modeldf)){
 # for saving result
 magls <- covls
 probls <- covls
+
+
+### MATRIX MULTIPLICATION MODEL ### -----
+spdist_mm <- "model{
+
+###Loop over individual sites
+for (s in 1:ns){
+
+  #### Data Model:
+  y[s] ~ dnorm(mu[s], tau_obs)
+  
+  #### Process Model:
+  muN[s] <- R * x[s]                  ##step 3: dealing with modeling R (Chap 2 - RECOV)
+  #x[s] ~ dnorm(mu[s], tau_add)
+  muD[s] ~ dnorm(mu0[s], pa0)         ##step 1: process model on mu0 (MAG)
+    
+  D[s] ~ dbern(p)                     ##step 2: adding process model here (PROB)
+  #logit(D[s]) <- alpha[1] + alpha[2]*z[s]
+  #alpha[1] ~ dnorm(0.0, 0.0001)
+    
+  mu[s] <- D[s] * muD[s] + (1-D[s]) * muN[s]
+  mu0[s] <- beta0 + inprod(beta[], x[s,])
+
+  x[s]~dnorm(x_ic, tau_ic)
+  
+}#end loop over sites
+  
+  #### Priors
+  tau_obs ~ dgamma(t_obs, a_obs)     ##observation error (data model)
+  #tau_add ~ dgamma(a_add ,t_add)    ##process error (process model)
+  R ~ dnorm(rmean, rprec)            ##rho paramter (recovery rate)
+  p ~ dunif(0,1)  #disturbance probability
+  beta0 ~ dnorm(-5,1) #param for calculating mean of disturbed state
+  pa0 ~ dgamma(1,1) #precision of disturbed state
+  
+  ## covariate matrix:
+  b ~ dmnorm(b0, Vb)
+  
+}
+"
