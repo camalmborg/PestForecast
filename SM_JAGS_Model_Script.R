@@ -76,12 +76,22 @@ for (i in 1:nrow(cs)){
 # covariate data - for parameterizations
 # the environmental variables
 # for disturbance magnitude parameters
-#varfile_m <- "CHAPTER_1/DATA/MV_2023_12_DATA_distmag.csv"
-#magvars <- read.csv(varfile_m)[,-1]
+varfile_m <- "CHAPTER_1/DATA/MV_2023_12_DATA_distmag.csv"
+magvars <- read.csv(varfile_m)[,-1]
 # for disturbance probability parameters
-#varfile_p <- "CHAPTER_1/DATA/MV_2023_12_DATA_distprob.csv"
-#probvars <- read.csv(varfile_p)[,-1]
+varfile_p <- "CHAPTER_1/DATA/MV_2023_12_DATA_distprob.csv"
+probvars <- read.csv(varfile_p)[,-1]
+# environmental data without missing sites
+magvars <- magvars[dmr$X,]
+probvars <- probvars[dmr$X,]
 
+# load disturbance magnitude and disturbance probability best models
+# # disturbance magnitude
+# magmods <- read.csv("CHAPTER_1/2024_02_JAGS_models/2024_02_20_Dist_Mag_Models.csv", header = F)
+# #disturbance probability
+# probmods <- read.csv("CHAPTER_1/2024_02_JAGS_models/2024_02_22_Dist_Prob_Models.csv", header = F)
+# # convert NAs to 0s in each
+# magmods[is.na(magmods)] <- 0
 
 ### THE MODEL:
 #use the single time step version of the model:
@@ -122,9 +132,10 @@ for (s in 1:ns){
 }
 "
 
+
 ### SELECT SITES:
 # random selection of sites for testing
-smpl <- sample(nrow(cs), 25)
+smpl <- sample(nrow(cs), 100)
 # make sample
 cs_samp <- cs[smpl,]
 # number of sites of sample
@@ -163,5 +174,4 @@ j.pests <- jags.model (file = textConnection(spongy_disturb),
 #                                        "D", "pa0"),
 #                     n.iter = 50000,
 #                     thin=2)
-
 
