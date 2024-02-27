@@ -85,7 +85,7 @@ for (s in 1:ns){
   pa0 ~ dgamma(1,1) #precision of disturbed state
   
   ## covariate matrix:
-  b ~ dmnorm(b0, Vb)
+  beta ~ dmnorm(b0, Vb)
   
 }
 "
