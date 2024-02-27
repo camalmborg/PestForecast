@@ -73,53 +73,63 @@ for (i in 1:nrow(cs)){
 # precs<-as.numeric(prec_convert(sds))
 
 
-# covariate data - for parameterizations
-# the environmental variables
-# for disturbance magnitude parameters
-varfile_m <- "CHAPTER_1/DATA/MV_2023_12_DATA_distmag.csv"
-magvars <- read.csv(varfile_m)[,-1]
-# for disturbance probability parameters
-varfile_p <- "CHAPTER_1/DATA/MV_2023_12_DATA_distprob.csv"
-probvars <- read.csv(varfile_p)[,-1]
-# environmental data without missing sites
-magvars <- magvars[dmr$X,]
-probvars <- probvars[dmr$X,]
+# # covariate data - for parameterizations
+# # the environmental variables
+# # for disturbance magnitude parameters
+# varfile_m <- "CHAPTER_1/DATA/MV_2023_12_DATA_distmag.csv"
+# magvars <- read.csv(varfile_m)[,-1]
+# # for disturbance probability parameters
+# varfile_p <- "CHAPTER_1/DATA/MV_2023_12_DATA_distprob.csv"
+# probvars <- read.csv(varfile_p)[,-1]
+# # environmental data without missing sites
+# magvars <- magvars[dmr$X,]
+# probvars <- probvars[dmr$X,]
 
 # load disturbance magnitude and disturbance probability covariates
-# disturbance magnitude
-load("Chapter_1/2024_02_JAGS_modls/magsls.RData")
-# disturbance probability
-load("Chapter_1/2024_02_JAGS_models/probls.RData")
+# # disturbance magnitude
+# load("Chapter_1/2024_02_JAGS_modls/magsls.RData")
+# # disturbance probability
+# load("Chapter_1/2024_02_JAGS_models/probls.RData")
 
-# making covariate data with anomalies rather than raw
-# function:
-anomfx<-function(x){
-  # get mean values for each column
-  means <- apply(x, 2, mean, na.rm=T)
-  # make anomaly matrix
-  anom <- matrix(NA,nrow=nrow(x), ncol=ncol(x))
-  # for each row, fill in covariate anomaly
-  for (i in 1:nrow(x)){
-    for (j in 1:ncol(x)){
-      anom[i,j] <- x[i,j] - means[j] # fill in anomalies for beta[] terms
-    }
-    anom[i,1] <- 1 # make first column 1s for beta0 term
-  }
-  return(anom)
-}
-
-# converting covariate lists to anomaly
-# new empty list to populate with anomaly versions
-anomls <- list()
-# list being converted CHOOSE magls for disturbance magnitude/probls for disturbance probability
-covls <- magls
-#covls <- probls
-# loop for conversion
-for (i in 1:length(covls)){
-  # run cov members through the anomaly machine
-  anomls[[i]] <- anomfx(covls[[i]])
-}
+# # making covariate data with anomalies rather than raw
+# # function:
+# anomfx<-function(x){
+#   # get mean values for each column
+#   means <- apply(x, 2, mean, na.rm=T)
+#   # make anomaly matrix
+#   anom <- matrix(NA,nrow=nrow(x), ncol=ncol(x))
+#   # for each row, fill in covariate anomaly
+#   for (i in 1:nrow(x)){
+#     for (j in 1:ncol(x)){
+#       anom[i,j] <- x[i,j] - means[j] # fill in anomalies for beta[] terms
+#     }
+#     anom[i,1] <- 1 # make first column 1s for beta0 term
+#   }
+#   return(anom)
+# }
 # 
+# # converting covariate lists to anomaly
+# # new empty list to populate with anomaly versions
+# anomls <- list()
+# # list being converted CHOOSE magls for disturbance magnitude/probls for disturbance probability
+# #covls <- magls
+# covls <- probls
+# # loop for conversion
+# for (i in 1:length(covls)){
+#   # run cov members through the anomaly machine
+#   anomls[[i]] <- anomfx(covls[[i]])
+# }
+# # disturbance magnitude saving anomaly version
+# #dmls <- anomls
+# # disturbance probability saving anomaly version
+# dpls <- anomls
+
+# Loading anomaly versions of covariate data 
+# disturbance magnitude
+load("Chapter_1/2024_02_JAGS_models/dmls.RData")
+# disturbance probability
+load("Chapter_1/2024_02_JAGS_models/dpls.RData")
+
 
 ### THE MODEL:
 #use the single time step version of the model:
@@ -141,7 +151,7 @@ for (s in 1:ns){
   #alpha[1] ~ dnorm(0.0, 0.0001)
     
   mu[s] <- D[s] * muD[s] + (1-D[s]) * muN[s]
-  mu0[s] <- beta0   ## + beta[1] * variables ##
+  mu0[s] <- beta0   ## + beta[1] * var
 
   x[s]~dnorm(x_ic, tau_ic)
   
@@ -155,7 +165,8 @@ for (s in 1:ns){
   beta0 ~ dnorm(-5,1) #param for calculating mean of disturbed state
   pa0 ~ dgamma(1,1) #precision of disturbed state
   
-  # beta[1]   ## COVARIATES WILL BE ADDED HERE
+  ## COVARIATES WILL BE ADDED HERE
+  beta[1] ~ dnorm(0,0.0001)  
   
 }
 "
@@ -173,6 +184,10 @@ dist_samp <- dists[as.numeric(rownames(cs_samp))]
 # make the single timestep data for each site
 cs_samp_dist <- cs_dists[as.numeric(rownames(cs_samp))]
 
+# make same sample of covariate data for testing individual beta[] parameters 2/27/24
+dmbeta <- dmls[[1]][smpl,2]
+
+
 ### initial state of model parameters:
 init<-list()
 nchain <- 3
@@ -187,8 +202,9 @@ for(j in 1:nchain){
 data = list(y = cs_samp_dist, ns = nsites,    
               x_ic = 0, tau_ic = 0.1,
               a_obs = 0.1, t_obs = 0.1,
-              #a_add = 0.1, t_add = 0.1,
-              rmean = 0, rprec = 0.00001)
+              #a_add = 0.1, t_add = 0.1, # for precisions from forest condition tool
+              rmean = 0, rprec = 0.00001,
+              var = dmbeta)  #dmbeta is sample covariate data for testing convergence with individual covs 2/27/24
 
 ### RUN THE MODEL
 j.pests <- jags.model (file = textConnection(spongy_disturb),
@@ -197,9 +213,11 @@ j.pests <- jags.model (file = textConnection(spongy_disturb),
                        n.chains = 3)
 
 
-# jpout<-coda.samples(j.pests,
-#                     variable.names = c("beta0", "tau_obs",
-#                                        "D", "pa0"),
-#                     n.iter = 50000,
-#                     thin=2)
+# running on 2/27/2024 for dist mag param convergence check with covariate(s) added
+jpout<-coda.samples(j.pests,
+                    variable.names = c("beta0", "beta[1]",
+                                       "tau_obs",
+                                       "pa0", "p"),
+                    n.iter = 100000,
+                    thin=2)
 
