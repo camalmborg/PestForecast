@@ -13,10 +13,10 @@ library(MCMCvis)
 # model name
 jagmod = j.pests
 # iterations and thinning
-niter = 200000
+niter = 100000
 jthin = 1
 # variable names object
-jagvars <- c("beta0", "tau_obs", "pa0")
+jagvars <- c("beta0", "tau_obs", "pa0", "p")
 
 # run from model in SM_JAGS_Model_script
 jpout<-coda.samples(jagmod,
@@ -36,7 +36,7 @@ gelman.plot(jpout)
 
 # discarding burn in
 # set burn in based on GBR
-burnin <- 20000
+burnin <- 60000
 # remove burn in
 jburn <- window(jpout, start = burnin)
 # plot burn in output
