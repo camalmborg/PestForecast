@@ -36,7 +36,7 @@ gelman.plot(jpout)
 
 # discarding burn in
 # set burn in based on GBR
-burnin <- 60000
+burnin <- 15000
 # remove burn in
 jburn <- window(jpout, start = burnin)
 # plot burn in output
