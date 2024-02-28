@@ -146,14 +146,13 @@ for (s in 1:ns){
   #x[s] ~ dnorm(mu[s], tau_add)
   muD[s] ~ dnorm(mu0[s], pa0)         ##step 1: process model on mu0 (MAG)
     
-  D[s] ~ dbern(p)                     ##step 2: adding process model here (PROB)
-  #logit(D[s]) <- alpha[1] + alpha[2]*z[s]
-  #alpha[1] ~ dnorm(0.0, 0.0001)
+  ##D[s] ~ dbern(p)                     ##step 2: adding process model here (PROB)
+  logit(D[s]) <- alpha0 + (alpha[1]*z[s])
     
   mu[s] <- D[s] * muD[s] + (1-D[s]) * muN[s]
-  mu0[s] <- beta0   ## + beta[1] * var
+  mu0[s] <- beta0 + (beta[1] * v[s]) ##+ (beta[2] * va[s]) + (beta[3] * vb[s])
 
-  x[s]~dnorm(x_ic, tau_ic)
+  x[s] ~ dnorm(x_ic, tau_ic)
   
 }#end loop over sites
   
@@ -163,10 +162,15 @@ for (s in 1:ns){
   R ~ dnorm(rmean, rprec)            ##rho paramter (recovery rate)
   p ~ dunif(0,1)  #disturbance probability
   beta0 ~ dnorm(-5,1) #param for calculating mean of disturbed state
+  alpha0 ~ dnorm(0, 0.0001) 
   pa0 ~ dgamma(1,1) #precision of disturbed state
   
   ## COVARIATES WILL BE ADDED HERE
-  beta[1] ~ dnorm(0,0.0001)  
+  beta[1] ~ dnorm(0, 0.0001)  
+  #beta[2] ~ dnorm(0, 0.0001)
+  #beta[3] ~ dnorm(0, 0.0001)
+  
+  alpha[1] ~ dnorm(0.0, 0.0001)
   
 }
 "
@@ -174,7 +178,7 @@ for (s in 1:ns){
 
 ### SELECT SITES:
 # random selection of sites for testing (before using full sample)
-smpl <- sample(nrow(cs), 25)
+smpl <- sample(nrow(cs), 50)
 # make sample
 cs_samp <- cs[smpl,]
 # number of sites of sample
@@ -185,7 +189,10 @@ dist_samp <- dists[as.numeric(rownames(cs_samp))]
 cs_samp_dist <- cs_dists[as.numeric(rownames(cs_samp))]
 
 # make same sample of covariate data for testing individual beta[] parameters 2/27/24
+# disturbance magnitude
 dmbeta <- dmls[[1]][smpl,2]
+# disturbance probability
+dpalpha <- dpls[[1]][smpl,2]
 
 
 ### initial state of model parameters:
@@ -204,7 +211,7 @@ data = list(y = cs_samp_dist, ns = nsites,
               a_obs = 0.1, t_obs = 0.1,
               #a_add = 0.1, t_add = 0.1, # for precisions from forest condition tool
               rmean = 0, rprec = 0.00001,
-              var = dmbeta)  #dmbeta is sample covariate data for testing convergence with individual covs 2/27/24
+              v = dmbeta, z = dpalpha)  #dmbeta is sample covariate data for testing convergence with individual covs 2/27/24
 
 ### RUN THE MODEL
 j.pests <- jags.model (file = textConnection(spongy_disturb),
@@ -215,7 +222,8 @@ j.pests <- jags.model (file = textConnection(spongy_disturb),
 
 # running on 2/27/2024 for dist mag param convergence check with covariate(s) added
 jpout<-coda.samples(j.pests,
-                    variable.names = c("beta0", "beta[1]",
+                    variable.names = c("beta0", "alpha0",
+                                       "beta[1]", "alpha[1]",
                                        "tau_obs",
                                        "pa0", "p"),
                     n.iter = 100000,
