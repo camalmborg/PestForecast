@@ -139,7 +139,7 @@ spongy_disturb <- "model{
 for (s in 1:ns){
 
   #### Data Model:
-  y[s] ~ dnorm(mu[s], tau_obs)
+  y[s] ~ dnorm(mu[s], tau_obs)  ##3/1 - when adding precisions >> tau_obs[s]
   
   #### Process Model:
   muN[s] <- R * x[s]                  ##step 3: dealing with modeling R (Chap 2 - RECOV)
@@ -152,7 +152,7 @@ for (s in 1:ns){
   mu[s] <- D[s] * muD[s] + (1-D[s]) * muN[s]
   mu0[s] <- beta0 + (beta[1] * v[s]) ##+ (beta[2] * va[s]) + (beta[3] * vb[s])
 
-  x[s] ~ dnorm(x_ic, tau_ic)
+  ##x[s] ~ dnorm(x_ic, tau_ic) ##3/1 - this is where you would put previous timepoint
   
 }#end loop over sites
   
@@ -160,7 +160,7 @@ for (s in 1:ns){
   tau_obs ~ dgamma(t_obs, a_obs)     ##observation error (data model)
   #tau_add ~ dgamma(a_add ,t_add)    ##process error (process model)
   R ~ dnorm(rmean, rprec)            ##rho paramter (recovery rate)
-  p ~ dunif(0,1)  #disturbance probability
+  ##p ~ dunif(0,1)  #disturbance probability
   beta0 ~ dnorm(-5,1) #param for calculating mean of disturbed state
   alpha0 ~ dnorm(0, 0.0001) 
   pa0 ~ dgamma(1,1) #precision of disturbed state
@@ -207,7 +207,7 @@ for(j in 1:nchain){
 ### MODEL INPUTS
 # data and parameters for sites model:   #for full sample ns = nrow(scores)
 data = list(y = cs_samp_dist, ns = nsites,    
-              x_ic = 0, tau_ic = 0.1,
+              #x_ic = 0, tau_ic = 0.1,
               a_obs = 0.1, t_obs = 0.1,
               #a_add = 0.1, t_add = 0.1, # for precisions from forest condition tool
               rmean = 0, rprec = 0.00001,
@@ -225,7 +225,7 @@ jpout<-coda.samples(j.pests,
                     variable.names = c("beta0", "alpha0",
                                        "beta[1]", "alpha[1]",
                                        "tau_obs",
-                                       "pa0", "p"),
+                                       "pa0"),
                     n.iter = 100000,
                     thin=2)
 
