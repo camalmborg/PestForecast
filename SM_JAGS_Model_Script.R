@@ -23,6 +23,18 @@ cs <- scores %>%
   # rename with date, without extra characters
   dplyr::rename_with(~ str_replace_all(., c("X|_score_mean|_cs_mean" = "", 
                                        "\\." = "-")))
+
+# collect previous timesteps for filling in x[s]s
+# isolate data we want
+prevtime <- scores %>%
+  # Drop unwanted columns
+  dplyr::select(dplyr::starts_with("X")) %>%
+  # Select just June averages for best disturbance visual without seasonality
+  dplyr::select(dplyr::contains(".05.")) %>%
+  # rename with date, without extra characters
+  dplyr::rename_with(~ str_replace_all(., c("X|_score_mean|_cs_mean" = "", 
+                                            "\\." = "-")))
+
 # # number of sites
 # nsites = nrow(cs)
 
@@ -35,42 +47,67 @@ distyear <- 2016
 
 # disturbance data for sample
 cs <- cs[dmr$X,]
-# get disturbance years and condition score value at dist year for each:
+# get disturbance years, previous timestep, and condition score value at dist year for each:
 dists <- vector()
 cs_dists <- vector()
+ptmestp <- vector()
+ptime <- vector()
 for (i in 1:nrow(cs)){
   # get disturbance year colname
   if (dmr$dpy1[i] > 0) {
     dists[i] <- colnames(cs[grep(paste0("^", distyear, sep = ""), names(cs))])
+    ptmestp[i] <- colnames(prevtime[grep(paste0("^", distyear, sep = ""), names(prevtime))])
   } else {
     dists[i] <- colnames(cs[grep(paste0("^",distyear+1, sep = ""), names(cs))])
+    ptmestp[i] <- colnames(prevtime[grep(paste0("^", distyear+1, sep = ""), names(prevtime))])
   }
   # get condition score associated with disturbance year
   cs_dists[i] <- cs[i, dists[i]]
+  # get previous time step score for correct disturbance year
+  ptime[i] <- prevtime[i, ptmestp[i]]
 }
 
-# # standard deviations for precisions
-# sdfile <- "2022_08_31_DATAGRAB/2022_12_7_sample_score_stddev_5k.csv"
-# stan_devs <- read.csv(sdfile)
-# sds <- stan_devs %>%
-#   # Drop unwanted columns
-#   dplyr::select(dplyr::starts_with("X")) %>%
-#   # Select just June averages for best disturbance visual without seasonality
-#   dplyr::select(dplyr::contains(".06.")) %>%
-#   # 
-#   dplyr::rename_with(~ str_replace_all(., c("X|_score_stddevs" = "", 
-#                                             "\\." = "-")))
-# # convert to precisions -- DOESN'T WORK RIGHT YET 2/19/24
-# prec_convert<-function(x){
-#   prec<-matrix(NA,nrow=length(x),ncol=1)
-#   for (i in 1:length(x)){
-#     prec[i,]<-1/x[i]
-#     if(is.na(prec[i,])){prec[i,]<-mean(prec,na.rm=T)}
-#   }
-#   return(prec)
-# }
-# # get precisions from std devs
-# precs<-as.numeric(prec_convert(sds))
+### standard deviations for precisions
+sdfile <- "2022_08_31_DATAGRAB/2022_12_7_sample_score_stddev_5k.csv"
+stan_devs <- read.csv(sdfile)
+sds <- stan_devs %>%
+  # Drop unwanted columns
+  dplyr::select(dplyr::starts_with("X")) %>%
+  # Select just June averages for best disturbance visual without seasonality
+  dplyr::select(dplyr::contains(".06.")) %>%
+  # get rid of the other stuff
+  dplyr::rename_with(~ str_replace_all(., c("X|_score_stddev" = "",
+                                            "\\." = "-")))
+sds <- sds[dmr$X,]
+
+### convert to precisions: 
+# use disturbance years to get precisions at dist year for each
+cs_sds <- vector()
+for (i in 1:nrow(sds)){
+  # get condition score associated with disturbance year
+  cs_sds[i] <- sds[i, dists[i]]
+}
+# fill in NA values before precisions calculation
+# find missing June SD sites
+miss_SD <- which(is.na(cs_sds))
+# find missing dist years for SD NA's
+miss_dist <- dists[which(is.na(cs_sds))]
+# take 75%ile for SDs across sites
+sd_75s <- c(quantile(cs_sds[which(dists == unique(dists)[1])], 0.75, na.rm = T),
+            quantile(cs_sds[which(dists == unique(dists)[2])], 0.75, na.rm = T))
+# fill in NAs based on disturbance year
+for (i in 1:length(miss_SD)){
+  if(miss_dist[i] == unique(dists)[1]){
+    cs_sds[miss_SD[i]] <- sd_75s[1]
+  } else {
+    cs_sds[miss_SD[i]] <- sd_75s[2]
+  }
+}
+# convert SDs to precisions:
+cs_precs <- vector()
+for (i in 1:length(cs_sds)){
+  cs_precs[i] <- 1/(cs_sds[i]^2)
+}
 
 
 # # covariate data - for parameterizations
