@@ -16,7 +16,7 @@ jagmod = j.pests
 niter = 100000
 jthin = 1
 # variable names object
-jagvars <- c("beta0", "tau_obs", "pa0", "p")
+jagvars <- c("beta0", "tau_obs", "pa0")#, "R")
 
 # run from model in SM_JAGS_Model_script
 jpout<-coda.samples(jagmod,
@@ -58,3 +58,9 @@ out <- as.matrix(jburn)
 pairs(out)
 # correlations summary
 cor(out)
+
+
+### Model selection step:
+# DIC
+DIC <- dic.samples(j.pests, n,iter = 10000)
+sum <- sum(DIC$deviance, DIC$penalty)
