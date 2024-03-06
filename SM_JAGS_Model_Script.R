@@ -176,12 +176,12 @@ spongy_disturb <- "model{
 for (s in 1:ns){
 
   #### Data Model:
-  y[s] ~ dnorm(mu[s], tau_obs)  ##3/1 - when adding precisions >> tau_obs[s]
+  y[s] ~ dnorm(mu[s], tau_obs[s])  ##3/1 - when adding precisions >> tau_obs[s]
   
   #### Process Model:
-  muN[s] <- R * x[s]                  ##step 3: dealing with modeling R (Chap 2 - RECOV)
+  muN[s] <- R * x[s]                    ##step 3: dealing with modeling R (Chap 2 - RECOV)
   #x[s] ~ dnorm(mu[s], tau_add)
-  muD[s] ~ dnorm(mu0[s], pa0)         ##step 1: process model on mu0 (MAG)
+  muD[s] ~ dnorm(mu0[s], pa0)           ##step 1: process model on mu0 (MAG)
     
   ##D[s] ~ dbern(p)                     ##step 2: adding process model here (PROB)
   logit(D[s]) <- alpha0 + (alpha[1]*z[s])
@@ -194,11 +194,11 @@ for (s in 1:ns){
 }#end loop over sites
   
   #### Priors
-  tau_obs ~ dgamma(t_obs, a_obs)     ##observation error (data model)
-  #tau_add ~ dgamma(a_add ,t_add)    ##process error (process model)
-  R ~ dnorm(rmean, rprec)            ##rho paramter (recovery rate)
-  ##p ~ dunif(0,1)  #disturbance probability
-  beta0 ~ dnorm(-5,1) #param for calculating mean of disturbed state
+  #tau_obs ~ dgamma(t_obs, a_obs)     ##observation error (data model)
+  #tau_add ~ dgamma(a_add ,t_add)     ##process error (process model)
+  R ~ dnorm(rmean, rprec)             ##rho paramter (recovery rate)
+  #p ~ dunif(0,1)                     ##disturbance probability
+  beta0 ~ dnorm(-5,1)                 ##param for calculating mean of disturbed state
   alpha0 ~ dnorm(0, 0.0001) 
   pa0 ~ dgamma(1,1) #precision of disturbed state
   
@@ -208,6 +208,10 @@ for (s in 1:ns){
   #beta[3] ~ dnorm(0, 0.0001)
   
   alpha[1] ~ dnorm(0.0, 0.0001)
+  
+  ## covariate matrix: ADD WHEN READY FOR MODEL RUNS - 3/6/24
+  ##beta ~ dmnorm(b0, Vb)   ## for disturbance magnitude
+  ##alpha ~ dmnorm(a0, Va)  ## for disturbance probability
   
 }
 "
@@ -231,14 +235,17 @@ dmbeta <- dmls[[1]][smpl,2]
 # disturbance probability
 dpalpha <- dpls[[1]][smpl,2]
 
+# precisions samples
+cs_prec_samp <- cs_precs[smpl]
+
 
 ### initial state of model parameters:
-init<-list()
-nchain <- 3
-for(j in 1:nchain){
-  samp<- sample(!is.na(cs_samp),length(cs_samp),replace=TRUE)
-  init[[j]]<-list(tau_add=1/var(diff(samp)),tau_obs=1/var(samp))
-}
+# init<-list()
+# nchain <- 3
+# for(j in 1:nchain){
+#   samp<- sample(!is.na(cs_samp),length(cs_samp),replace=TRUE)
+#   init[[j]]<-list(tau_add=1/var(diff(samp)),tau_obs=1/var(samp))
+# }
 
 
 ### MODEL INPUTS
@@ -249,6 +256,12 @@ data = list(y = cs_samp_dist, ns = nsites,
               #a_add = 0.1, t_add = 0.1, # for precisions from forest condition tool
               rmean = 0, rprec = 0.00001,
               v = dmbeta, z = dpalpha)  #dmbeta is sample covariate data for testing convergence with individual covs 2/27/24
+
+# draft data object for runs with 
+data = list(y = cs_samp_dist, ns = nsites,
+            x = x, tau_obs = cs_prec_samp,
+            rmean = 0, rprec = 0.00001,
+            v = dmbeta, z = dpalpha)
 
 ### RUN THE MODEL
 j.pests <- jags.model (file = textConnection(spongy_disturb),
