@@ -78,7 +78,18 @@ sds <- stan_devs %>%
   # get rid of the other stuff
   dplyr::rename_with(~ str_replace_all(., c("X|_score_stddev" = "",
                                             "\\." = "-")))
+# previous year sds for initial conditions
+prevsds <- stan_devs %>%
+  # Drop unwanted columns
+  dplyr::select(dplyr::starts_with("X")) %>%
+  # Select just June averages for best disturbance visual without seasonality
+  dplyr::select(dplyr::contains(".05.")) %>%
+  # get rid of the other stuff
+  dplyr::rename_with(~ str_replace_all(., c("X|_score_stddev" = "",
+                                            "\\." = "-")))
+
 sds <- sds[dmr$X,]
+prevsds <- prevsds[dmr$X,]
 
 ### convert to precisions: 
 # use disturbance years to get precisions at dist year for each
@@ -103,12 +114,41 @@ for (i in 1:length(miss_SD)){
     cs_sds[miss_SD[i]] <- sd_75s[2]
   }
 }
-# convert SDs to precisions:
+
+# do the same for prev year
+# use disturbance years to get precisions at dist year for each
+prev_sds <- vector()
+for (i in 1:nrow(prevsds)){
+  # get condition score associated with disturbance year
+  prev_sds[i] <- prevsds[i, ptmestp[i]]
+}
+# fill in NA values before precisions calculation
+# find missing June SD sites
+miss_pSD <- which(is.na(prev_sds))
+# find missing dist years for SD NA's
+miss_prev <- dists[which(is.na(prev_sds))]
+# take 75%ile for SDs across sites
+prevsd_75s <- c(quantile(prev_sds[which(ptmestp == unique(ptmestp)[1])], 0.75, na.rm = T),
+                quantile(prev_sds[which(ptmestp == unique(ptmestp)[2])], 0.75, na.rm = T))
+# fill in NAs based on disturbance year
+for (i in 1:length(miss_pSD)){
+  if(miss_prev[i] == unique(ptmestp)[1]){
+    cs_sds[miss_prev[i]] <- prevsd_75s[1]
+  } else {
+    cs_sds[miss_prev[i]] <- prevsd_75s[2]
+  }
+}
+
+# convert SDs to precisions
 cs_precs <- vector()
 for (i in 1:length(cs_sds)){
   cs_precs[i] <- 1/(cs_sds[i]^2)
 }
 
+prev_precs <- vector()
+for (i in 1:length(prev_sds)){
+  prev_precs[i] <- 1/(prev_sds[i]^2)
+}
 
 # # covariate data - for parameterizations
 # # the environmental variables
@@ -259,7 +299,8 @@ data = list(y = cs_samp_dist, ns = nsites,
 
 # draft data object for runs with 
 data = list(y = cs_samp_dist, ns = nsites,
-            x = x, tau_obs = cs_prec_samp,
+            x_ic = x, tau_ic = tic,
+            tau_obs = cs_prec_samp,
             rmean = 0, rprec = 0.00001,
             v = dmbeta, z = dpalpha)
 
