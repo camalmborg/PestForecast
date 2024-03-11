@@ -37,11 +37,13 @@ nlcd_cover <- unique(nlcd$landcover)
 # make data object
 # nlcd variable
 lc <- nlcd$landcover
+# change 41 (deciduous forest class) to 1 for setting reference class in gam
+lc <- replace(lc, lc == 41, 1)
 # column number for disturbance years
 cn <- as.matrix(as.numeric(dmr$colnum))
 # which response variable? "mags" for dist mag, "dpy1" or "dpy2" for dist prob
-#yvar <- "mags"
-yvar <- "dpy1"
+yvar <- "mags"
+#yvar <- "dpy1"
 #yvar <- "dpy2"
 y <- as.matrix(as.numeric(dmr[,yvar]))
 # make data frame to convert to data
@@ -52,12 +54,14 @@ colnames(x) <- c("y", "cn", "lc")
 coln = 22
 #coln = 23
 dat <- x[x$cn == coln,]
+# sort to put reference class first:
+dat <- dat[order(dat$lc),]
 
 # run model
 # disturbance magnitude
 nlcd_gam <- gam(y ~ as.factor(lc), data = dat, method = "REML")
 # disturbance probability
-nlcd_gam <- gam(y ~ as.factor(lc), data = dat, family = "binomial", method = "REML")
+#nlcd_gam <- gam(y ~ as.factor(lc), data = dat, family = "binomial", method = "REML")
 
 # check model summary
 summ <- summary(nlcd_gam)
