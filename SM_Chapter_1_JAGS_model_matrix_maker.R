@@ -3,6 +3,9 @@
 # disturbance probability parameterizations
 
 ### LIBRARIES:
+library(tidyverse)
+library(dplyr)
+
 
 ### LOAD DATA:
 # the environmental variables
@@ -50,6 +53,24 @@ for (i in 1:nrow(modeldf)){
 magls <- covls
 probls <- covls
 
+
+
+### Setting an informative R prior
+#yrs prior for before dist time series
+yrs <- 15
+# time series 1 object
+ts1 <- matrix(data = NA, nrow = nrow(cs), ncol = yrs)
+# time series 2 object
+ts2 <- matrix(data = NA, nrow = nrow(cs), ncol = yrs)
+# make vectors of "before" and "after"
+for (i in 1:nrow(cs)){
+  # pick out disturbance date for each site
+  td <- which(colnames(cs) == dists[i])
+  # put befores in time series 1 object, no lag
+  ts1[i,] <- cs[i, (td-yrs):(td-1)]
+  # put afters in time series 2 object, lag 1
+  ts2[i,] <- cs[i, (td-yrs+1):td]
+}
 
 
 ### MATRIX MULTIPLICATION MODEL ### -----
@@ -102,6 +123,8 @@ for (s in 1:ns){
 # rprec = informative R prior from arima modeling
 # x_ic = previous time step condition score
 # tau_ic = previous time step precision
+# R mean prior - from arima
+# R sd prior - from arima
 
 ### 3/11/2024 DRAFT:
 spdist_mm <- "model{
