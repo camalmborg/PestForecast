@@ -161,10 +161,10 @@ cs_all <- scores %>%
                                             "\\." = "-")))
 #remove missing value columns
 cs_all <- cs_all[dmr$X,]
-#yrs prior for before dist time series
-yrs <- 15
+# months of time series using for cors
+mos <- 25
 # correlations compute
-cors_test = apply(cs_all, 1, function(ts){cor(ts[1:(yrs-1)], ts[2:yrs], use="pairwise.complete.obs")})
+cors = apply(cs_all, 1, function(ts){cor(ts[1:(yrs-1)], ts[2:yrs], use="pairwise.complete.obs")})
 # mean R:
 Rmean <- mean(cors, na.rm = T)
 # var R:
