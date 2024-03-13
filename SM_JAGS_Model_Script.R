@@ -179,6 +179,7 @@ for (i in 1:nrow(cs)){
 Rmean <- mean(cors, na.rm = T)
 # var R:
 Rvar <- var(cors, na.rm = T)
+Rprec <- 1/(sd(cors, na.rm = T)^2)
 
 
 # # covariate data - for parameterizations
@@ -333,7 +334,8 @@ data = list(y = cs_samp_dist, ns = nsites,
             x_ic = x, tau_ic = tic,
             tau_obs = cs_prec_samp,
             rmean = 0, rprec = 0.00001,
-            v = dmbeta, z = dpalpha)
+            v = dmbeta, z = dpalpha,
+            rmean = Rmean, rprec = Rprec)
 
 ### RUN THE MODEL
 j.pests <- jags.model (file = textConnection(spongy_disturb),
