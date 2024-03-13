@@ -54,6 +54,31 @@ magls <- covls
 probls <- covls
 
 
+## informative R prior ("complicated version" 3/13)
+# time series 1 object
+ts1 <- matrix(data = NA, nrow = nrow(cs), ncol = yrs)
+# time series 2 object
+ts2 <- matrix(data = NA, nrow = nrow(cs), ncol = yrs)
+# make cors vector
+cors <- vector()
+# make vectors of "before" and "after"
+for (i in 1:nrow(cs)){
+  # pick out disturbance date for each site
+  td <- which(colnames(cs) == dists[i])
+  # make vector of each row values:
+  v <- cs[i, (td-yrs):(td-1)]
+  v2 <- cs[i, (td-yrs+1):td]
+  # fill in matrices of values for t-1 (ts1) and t (ts2)
+  for (j in 1:ncol(v)){
+    ts1[i,j] <- v[,j]
+    ts2[i,j] <- v2[,j]
+  }
+  #correlation between two time series at each site:
+  cors[i] <- cor(ts1[i,], ts2[i,], use = "complete.obs")
+}
+## ^^ re-did this the "less complicated way" in JAGS model script ^^
+
+
 
 ### MATRIX MULTIPLICATION MODEL ### -----
 spdist_mm <- "model{
