@@ -150,6 +150,37 @@ for (i in 1:length(prev_sds)){
   prev_precs[i] <- 1/(prev_sds[i]^2)
 }
 
+
+### Setting an informative R prior
+#yrs prior for before dist time series
+yrs <- 15
+# time series 1 object
+ts1 <- matrix(data = NA, nrow = nrow(cs), ncol = yrs)
+# time series 2 object
+ts2 <- matrix(data = NA, nrow = nrow(cs), ncol = yrs)
+# make cors vector
+cors <- vector()
+# make vectors of "before" and "after"
+for (i in 1:nrow(cs)){
+  # pick out disturbance date for each site
+  td <- which(colnames(cs) == dists[i])
+  # make vector of each row values:
+  v <- cs[i, (td-yrs):(td-1)]
+  v2 <- cs[i, (td-yrs+1):td]
+  # fill in matrices of values for t-1 (ts1) and t (ts2)
+  for (j in 1:ncol(v)){
+    ts1[i,j] <- v[,j]
+    ts2[i,j] <- v2[,j]
+  }
+  #correlation between two time series at each site:
+  cors[i] <- cor(ts1[i,], ts2[i,], use = "complete.obs")
+}
+# mean R:
+Rmean <- mean(cors, na.rm = T)
+# var R:
+Rvar <- var(cors, na.rm = T)
+
+
 # # covariate data - for parameterizations
 # # the environmental variables
 # # for disturbance magnitude parameters
