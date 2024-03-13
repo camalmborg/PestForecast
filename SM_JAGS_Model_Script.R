@@ -152,29 +152,19 @@ for (i in 1:length(prev_sds)){
 
 
 ### Setting an informative R prior
+# get full time series from score data
+cs_all <- scores %>%
+  # Drop unwanted columns
+  dplyr::select(dplyr::starts_with("X")) %>%
+  # rename with date, without extra characters
+  dplyr::rename_with(~ str_replace_all(., c("X|_score_mean|_cs_mean" = "", 
+                                            "\\." = "-")))
+#remove missing value columns
+cs_all <- cs_all[dmr$X,]
 #yrs prior for before dist time series
 yrs <- 15
-# time series 1 object
-ts1 <- matrix(data = NA, nrow = nrow(cs), ncol = yrs)
-# time series 2 object
-ts2 <- matrix(data = NA, nrow = nrow(cs), ncol = yrs)
-# make cors vector
-cors <- vector()
-# make vectors of "before" and "after"
-for (i in 1:nrow(cs)){
-  # pick out disturbance date for each site
-  td <- which(colnames(cs) == dists[i])
-  # make vector of each row values:
-  v <- cs[i, (td-yrs):(td-1)]
-  v2 <- cs[i, (td-yrs+1):td]
-  # fill in matrices of values for t-1 (ts1) and t (ts2)
-  for (j in 1:ncol(v)){
-    ts1[i,j] <- v[,j]
-    ts2[i,j] <- v2[,j]
-  }
-  #correlation between two time series at each site:
-  cors[i] <- cor(ts1[i,], ts2[i,], use = "complete.obs")
-}
+# correlations compute
+cors_test = apply(cs_all, 1, function(ts){cor(ts[1:(yrs-1)], ts[2:yrs], use="pairwise.complete.obs")})
 # mean R:
 Rmean <- mean(cors, na.rm = T)
 # var R:
