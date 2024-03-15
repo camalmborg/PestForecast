@@ -95,7 +95,7 @@ prevsds <- prevsds[dmr$X,]
 # use disturbance years to get precisions at dist year for each
 cs_sds <- vector()
 for (i in 1:nrow(sds)){
-  # get condition score associated with disturbance year
+  # get condition score sds associated with disturbance year
   cs_sds[i] <- sds[i, dists[i]]
 }
 # fill in NA values before precisions calculation
@@ -123,19 +123,19 @@ for (i in 1:nrow(prevsds)){
   prev_sds[i] <- prevsds[i, ptmestp[i]]
 }
 # fill in NA values before precisions calculation
-# find missing June SD sites
+# find missing previous time step SD sites
 miss_pSD <- which(is.na(prev_sds))
 # find missing dist years for SD NA's
-miss_prev <- dists[which(is.na(prev_sds))]
+miss_prev <- ptmestp[which(is.na(prev_sds))]
 # take 75%ile for SDs across sites
 prevsd_75s <- c(quantile(prev_sds[which(ptmestp == unique(ptmestp)[1])], 0.75, na.rm = T),
                 quantile(prev_sds[which(ptmestp == unique(ptmestp)[2])], 0.75, na.rm = T))
-# fill in NAs based on disturbance year
+# fill in NAs based on previous year
 for (i in 1:length(miss_pSD)){
   if(miss_prev[i] == unique(ptmestp)[1]){
-    cs_sds[miss_prev[i]] <- prevsd_75s[1]
+      prev_sds[miss_pSD[i]] <- prevsd_75s[1]
   } else {
-    cs_sds[miss_prev[i]] <- prevsd_75s[2]
+      prev_sds[miss_pSD[i]] <- prevsd_75s[2]
   }
 }
 
@@ -164,12 +164,12 @@ cs_all <- cs_all[dmr$X,]
 # months of time series using for cors
 mos <- 25
 # correlations compute
-cors = apply(cs_all, 1, function(ts){cor(ts[1:(yrs-1)], ts[2:yrs], use="pairwise.complete.obs")})
+cors = apply(cs_all, 1, function(ts){cor(ts[1:(mos-1)], ts[2:mos], use="pairwise.complete.obs")})
 # mean R:
-Rmean <- mean(cors, na.rm = T)
+R_mean <- mean(cors, na.rm = T)
 # var R:
 Rvar <- var(cors, na.rm = T)
-Rprec <- 1/(sd(cors, na.rm = T)^2)
+R_prec <- 1/(sd(cors, na.rm = T)^2)
 
 
 # # covariate data - for parameterizations
@@ -238,11 +238,11 @@ spongy_disturb <- "model{
 for (s in 1:ns){
 
   #### Data Model:
-  y[s] ~ dnorm(mu[s], tau_obs[s])  ##3/1 - when adding precisions >> tau_obs[s]
+  y[s] ~ dnorm(mu[s], tau_obs[s])       ##3/1 - when adding precisions >> tau_obs[s]
   
   #### Process Model:
   muN[s] <- R * x[s]                    ##step 3: dealing with modeling R (Chap 2 - RECOV)
-  #x[s] ~ dnorm(mu[s], tau_add)
+  ##x[s] ~ dnorm(mu[s], tau_add)
   muD[s] ~ dnorm(mu0[s], pa0)           ##step 1: process model on mu0 (MAG)
     
   ##D[s] ~ dbern(p)                     ##step 2: adding process model here (PROB)
@@ -251,7 +251,7 @@ for (s in 1:ns){
   mu[s] <- D[s] * muD[s] + (1-D[s]) * muN[s]
   mu0[s] <- beta0 + (beta[1] * v[s]) ##+ (beta[2] * va[s]) + (beta[3] * vb[s])
 
-  ##x[s] ~ dnorm(x_ic, tau_ic) ##3/1 - this is where you would put previous timepoint
+  x[s] ~ dnorm(x_ic, tau_ic) ##3/1 - this is where you would put previous timepoint
   
 }#end loop over sites
   
@@ -300,6 +300,10 @@ dpalpha <- dpls[[1]][smpl,2]
 # precisions samples
 cs_prec_samp <- cs_precs[smpl]
 
+# previous time point sample
+xic <- ptmestp[smpl]
+tic <- prev_precs[smpl]
+
 
 ### initial state of model parameters:
 # init<-list()
@@ -311,21 +315,20 @@ cs_prec_samp <- cs_precs[smpl]
 
 
 ### MODEL INPUTS
-# data and parameters for sites model:   #for full sample ns = nrow(scores)
-data = list(y = cs_samp_dist, ns = nsites,    
-              #x_ic = 0, tau_ic = 0.1,
-              a_obs = 0.1, t_obs = 0.1,
-              #a_add = 0.1, t_add = 0.1, # for precisions from forest condition tool
-              rmean = 0, rprec = 0.00001,
-              v = dmbeta, z = dpalpha)  #dmbeta is sample covariate data for testing convergence with individual covs 2/27/24
+# # data and parameters for sites model:   #for full sample ns = nrow(scores)
+# data = list(y = cs_samp_dist, ns = nsites,    
+#               #x_ic = 0, tau_ic = 0.1,
+#               a_obs = 0.1, t_obs = 0.1,
+#               #a_add = 0.1, t_add = 0.1, # for precisions from forest condition tool
+#               rmean = 0, rprec = 0.00001,
+#               v = dmbeta, z = dpalpha)  #dmbeta is sample covariate data for testing convergence with individual covs 2/27/24
 
 # draft data object for runs with 
 data = list(y = cs_samp_dist, ns = nsites,
-            x_ic = x, tau_ic = tic,
+            x_ic = xic, tau_ic = tic,
             tau_obs = cs_prec_samp,
-            rmean = 0, rprec = 0.00001,
             v = dmbeta, z = dpalpha,
-            rmean = Rmean, rprec = Rprec)
+            rmean = R_mean, rprec = R_prec)
 
 ### RUN THE MODEL
 j.pests <- jags.model (file = textConnection(spongy_disturb),
