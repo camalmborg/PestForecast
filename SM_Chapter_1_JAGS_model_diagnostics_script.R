@@ -16,7 +16,10 @@ jagmod = j.pests
 niter = 100000
 jthin = 1
 # variable names object
-jagvars <- c("beta0", "tau_obs", "pa0")#, "R")
+jagvars <- c("beta0", "alpha0",
+             "beta[1]", "alpha[1]",
+             "R",
+             "pa0")
 
 # run from model in SM_JAGS_Model_script
 jpout<-coda.samples(jagmod,
