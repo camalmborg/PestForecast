@@ -123,15 +123,14 @@ for (s in 1:ns){
 ## priors and data inputs list: ----
 # tau_obs[s] =  precisions from GEE condition score sd's
 # b0 = matrix of betas (disturbance magnitude covariate intercepts)
-# Vb = matrix of beta precisions <- need to ask Mike about how to make this
+# Vb = matrix of beta precisions <- uninformative <- use solve(diag())
 # a0 = matrix of alphas (disturbance prob covariate intercepts)
-# Va = matrix of alpha precisions <- need to ask Mike 
+# Va = matrix of alpha precisions <- uninformative 
 # rmean = informative R prior from arima modeling
 # rprec = informative R prior from arima modeling
-# x_ic = previous time step condition score
-# tau_ic = previous time step precision
-# R mean prior - from arima
-# R sd prior - from arima
+# x_ic[s] = previous time step condition score
+# tau_ic[s] = previous time step precision
+# covs <- matrices of covariates
 
 ### 3/11/2024 DRAFT:
 spdist_mm <- "model{
@@ -140,27 +139,30 @@ spdist_mm <- "model{
 for (s in 1:ns){
 
   #### Data Model:
-  y[s] ~ dnorm(mu[s], tau_obs[s])     ## fill in tau_obs[s] with precisions from GEE sd's
+  y[s] ~ dnorm(mu[s], tau_obs[s]) 
   
   #### Process Model:
-  muN[s] <- R * x[s]                  ##step 3: dealing with modeling R (Chap 2 - RECOV)
-  muD[s] ~ dnorm(mu0[s], pa0)         ##step 1: process model on mu0 (MAG)
+  muN[s] ~ dnorm(mun, pan)            
+  muD[s] ~ dnorm(mu0[s], pa0)                     ##step 1: process model on mu0 (MAG)
   
   logit(D[s]) <- alpha0 + inprod(alpha[], x[s,])  ##step 2: adding process model here (PROB)
     
   mu[s] <- D[s] * muD[s] + (1-D[s]) * muN[s]
   mu0[s] <- beta0 + inprod(beta[], x[s,])
+  mun <- R * x[s]                                 ##step 3: dealing with modeling R (Chap 2 - RECOV)
 
-  x[s]~dnorm(x_ic, tau_ic)
+  x[s]~dnorm(x_ic[s], tau_ic[s])
   
 }#end loop over sites
   
   #### Priors
-  tau_obs ~ dgamma(t_obs, a_obs)     ##observation error (data model)
+  tau_obs ~ dgamma(t_obs, a_obs)      ##observation error (data model)
   ##tau_add ~ dgamma(a_add ,t_add)    ##process error (process model)
-  R ~ dnorm(rmean, rprec)            ##rho paramter (recovery rate)  ## going to put an informative prior here
-  beta0 ~ dnorm(-5,1) #param for calculating mean of disturbed state
-  pa0 ~ dgamma(1,1) #precision of disturbed state
+  R ~ dnorm(rmean, rprec)             ##rho paramter (recovery rate)  ## going to put an informative prior here
+  beta0 ~ dnorm(-5,1)                 ##param for calculating mean of disturbed state
+  alpha0 ~ dnorm(0,0.001)
+  pa0 ~ dgamma(1,1)                   ##precision of disturbed state
+  pan ~ dgamma(1,1)                   ##precision of undisturbed state
   
   ## covariate matrix:
   beta ~ dmnorm(b0, Vb)   ## for disturbance magnitude
