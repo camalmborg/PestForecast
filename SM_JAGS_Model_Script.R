@@ -251,7 +251,7 @@ for (s in 1:ns){
   mu[s] <- D[s] * muD[s] + (1-D[s]) * muN[s]
   mu0[s] <- beta0 + (beta[1] * v[s]) ##+ (beta[2] * va[s]) + (beta[3] * vb[s])
 
-  x[s] ~ dnorm(x_ic, tau_ic) ##3/1 - this is where you would put previous timepoint
+  x[s] ~ dnorm(x_ic[s], tau_ic[s]) ##3/1 - this is where you would put previous timepoint
   
 }#end loop over sites
   
@@ -301,7 +301,8 @@ dpalpha <- dpls[[1]][smpl,2]
 cs_prec_samp <- cs_precs[smpl]
 
 # previous time point sample
-xic <- ptmestp[smpl]
+xic <- ptime[smpl]
+xic[which(is.na(xic))] <- 0
 tic <- prev_precs[smpl]
 
 
@@ -333,15 +334,15 @@ data = list(y = cs_samp_dist, ns = nsites,
 ### RUN THE MODEL
 j.pests <- jags.model (file = textConnection(spongy_disturb),
                        data = data,
-                       inits = init,
+                       #inits = init,
                        n.chains = 3)
 
 
-# running on 2/27/2024 for dist mag param convergence check with covariate(s) added
+# running on 3/15/2024 for dist mag param convergence check with covariate(s) added
 jpout<-coda.samples(j.pests,
                     variable.names = c("beta0", "alpha0",
                                        "beta[1]", "alpha[1]",
-                                       "tau_obs",
+                                       "R",
                                        "pa0"),
                     n.iter = 100000,
                     thin=2)
