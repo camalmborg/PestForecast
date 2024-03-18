@@ -151,7 +151,7 @@ for (s in 1:ns){
   mu0[s] <- beta0 + inprod(beta[], x[s,])
   mun <- R * x[s]                                 ##step 3: dealing with modeling R (Chap 2 - RECOV)
 
-  x[s]~dnorm(x_ic[s], tau_ic[s])
+  x[s] ~ dnorm(x_ic[s], tau_ic[s])
   
 }#end loop over sites
   
