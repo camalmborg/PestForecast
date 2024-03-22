@@ -171,6 +171,7 @@ R_mean <- mean(cors, na.rm = T)
 Rvar <- var(cors, na.rm = T)
 R_prec <- 1/(sd(cors, na.rm = T)^2)
 
+#rm(prevsds,prevtime,sds,stan_devs,scores)
 
 # # covariate data - for parameterizations
 # # the environmental variables
@@ -183,13 +184,13 @@ R_prec <- 1/(sd(cors, na.rm = T)^2)
 # # environmental data without missing sites
 # magvars <- magvars[dmr$X,]
 # probvars <- probvars[dmr$X,]
-
-# load disturbance magnitude and disturbance probability covariates
+# 
+# # load disturbance magnitude and disturbance probability covariates
 # # disturbance magnitude
-# load("Chapter_1/2024_02_JAGS_modls/magsls.RData")
+# load("Chapter_1/2024_02_JAGS_models/magls.RData")
 # # disturbance probability
 # load("Chapter_1/2024_02_JAGS_models/probls.RData")
-
+# 
 # # making covariate data with anomalies rather than raw
 # # function:
 # anomfx<-function(x){
@@ -211,8 +212,8 @@ R_prec <- 1/(sd(cors, na.rm = T)^2)
 # # new empty list to populate with anomaly versions
 # anomls <- list()
 # # list being converted CHOOSE magls for disturbance magnitude/probls for disturbance probability
-# #covls <- magls
 # covls <- probls
+# #covls <- probls
 # # loop for conversion
 # for (i in 1:length(covls)){
 #   # run cov members through the anomaly machine
@@ -241,7 +242,7 @@ for (s in 1:ns){
   y[s] ~ dnorm(mu[s], tau_obs[s])             ##3/1 - when adding precisions >> tau_obs[s]
   
   #### Process Model:
-  muN[s] ~ dnorm(mun, pan)                    ##step 3: dealing with modeling R (Chap 2 - RECOV)
+  muN[s] ~ dnorm(mun[s], pan)                    ##step 3: dealing with modeling R (Chap 2 - RECOV)
   ##x[s] ~ dnorm(mu[s], tau_add)
   muD[s] ~ dnorm(mu0[s], pa0)                 ##step 1: process model on mu0 (MAG)
     
@@ -250,7 +251,7 @@ for (s in 1:ns){
     
   mu[s] <- D[s] * muD[s] + (1-D[s]) * muN[s]
   mu0[s] <- beta0 + (beta[1] * v[s]) ##+ (beta[2] * va[s]) + (beta[3] * vb[s])
-  mun <- R * x[s]
+  mun[s] <- R * x[s]
 
   x[s] ~ dnorm(x_ic[s], tau_ic[s])            ##x[s] as distribution of prior timepoint and prior timepoint precision
   
@@ -262,7 +263,7 @@ for (s in 1:ns){
   ##p ~ dunif(0,1)                     ##disturbance probability
   R ~ dnorm(rmean, rprec)              ##rho paramter (recovery rate)
   pa0 ~ dgamma(1,1)                    ##precision of disturbed state
-  pan ~ dgamma(0,0.001)                ##precision of undisturbed state
+  pan ~ dgamma(1,1)                ##precision of undisturbed state
   beta0 ~ dnorm(-5,1)                  ##param for dist mag intercept
   alpha0 ~ dnorm(0, 0.0001)            ##param for dist prob intercept
 
@@ -272,7 +273,7 @@ for (s in 1:ns){
   #beta[2] ~ dnorm(0, 0.0001)
   #beta[3] ~ dnorm(0, 0.0001)
   
-  alpha[1] ~ dnorm(0.0, 0.0001)
+  alpha[1] ~ dnorm(1, 0.0001)
   
   ## covariate matrix: ADD WHEN READY FOR MODEL RUNS - 3/6/24
   ##beta ~ dmnorm(b0, Vb)   ## for disturbance magnitude
@@ -310,12 +311,16 @@ tic <- prev_precs[smpl]
 
 
 ### initial state of model parameters:
-# init<-list()
-# nchain <- 3
-# for(j in 1:nchain){
-#   samp<- sample(!is.na(cs_samp),length(cs_samp),replace=TRUE)
-#   init[[j]]<-list(tau_add=1/var(diff(samp)),tau_obs=1/var(samp))
-# }
+beta.init = lm(y ~ v,data = data)
+dist = as.numeric(data$y < -1)
+alpha.init = glm(dist ~ data$z,family = binomial(link="logit"))
+init<-list(R = R_mean,
+           beta0 = coef(beta.init)[1],
+           beta = coef(beta.init)[-1],
+           alpha0 = coef(alpha.init)[1],
+           alpha = coef(alpha.init)[-1]
+           )
+
 
 
 ### MODEL INPUTS
@@ -337,16 +342,19 @@ data = list(y = cs_samp_dist, ns = nsites,
 ### RUN THE MODEL
 j.pests <- jags.model (file = textConnection(spongy_disturb),
                        data = data,
-                       #inits = init,
+                       inits = init,
                        n.chains = 3)
 
 
-# running on 3/15/2024 for dist mag param convergence check with covariate(s) added
+# running on 3/20/2024 for dist mag param convergence check with covariate(s) added
 jpout<-coda.samples(j.pests,
                     variable.names = c("beta0", "alpha0",
                                        "beta[1]", "alpha[1]",
                                        "R",
                                        "pa0"),
-                    n.iter = 100000,
+                    n.iter = 150000,
                     thin=2)
 
+jpthin = window(jpout,start=5000,thin=50)
+out = as.matrix(jpthin)
+pairs(out)
