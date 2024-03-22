@@ -6,7 +6,7 @@ library(dplyr)
 library(rjags)
 library(coda)
 library(MCMCvis)
-#library(ecoforecastR)
+library(ecoforecastR)
 
 
 ### OUT object:
@@ -67,3 +67,23 @@ cor(out)
 # DIC
 DIC <- dic.samples(j.pests, n,iter = 10000)
 sum <- sum(DIC$deviance, DIC$penalty)
+
+
+
+### JAGS Output Figure Code ###
+# For when it is time to make figures
+# getting proper names for mcmc outputs
+##' @param w mcmc object containing matrix outputs
+##' @param pre prefix (variable name) for the matrix variable to be extracted
+##' @param numeric boolean, whether to coerce class to numeric
+parse.MatrixNames <- function(w, pre = "x", numeric = FALSE) {
+  w <- sub(pre, "", w)
+  w <- sub("[", "", w, fixed = TRUE)
+  w <- sub("]", "", w, fixed = TRUE)
+  w <- matrix(unlist(strsplit(w, ",")), nrow = length(w), byrow = TRUE)
+  if (numeric) {
+    class(w) <- "numeric"
+  }
+  colnames(w) <- c("row", "col")
+  return(as.data.frame(w))
+}
