@@ -23,8 +23,8 @@ magvars <- magvars[dmr$X,]
 probvars <- probvars[dmr$X,]
 
 ### Load model list data frame:
-#modfile <- "CHAPTER_1/2024_02_JAGS_models/2024_02_20_Dist_Mag_Models.csv"
-modfile <- "CHAPTER_1/2024_02_JAGS_models/2024_02_22_Dist_Prob_Models.csv"
+modfile <- "CHAPTER_1/2024_02_JAGS_models/2024_02_20_Dist_Mag_Models.csv"
+#modfile <- "CHAPTER_1/2024_02_JAGS_models/2024_02_22_Dist_Prob_Models.csv"
 # disturbance mag/prob model file
 modeldf <- read.csv(modfile, header = F)
 
@@ -33,8 +33,8 @@ modeldf <- read.csv(modfile, header = F)
 # empty list
 covls <- list()
 # mag (magvars) or prob (probvars)
-#covs <- magvars
-covs <- probvars
+covs <- magvars
+#covs <- probvars
 # loop over models
 for (i in 1:nrow(modeldf)){
   # grab column numbers from model table
@@ -51,7 +51,7 @@ for (i in 1:nrow(modeldf)){
 
 # for saving result
 magls <- covls
-probls <- covls
+#probls <- covls
 
 
 ## informative R prior ("complicated version" 3/13)
