@@ -247,10 +247,10 @@ for (s in 1:ns){
   muD[s] ~ dnorm(mu0[s], pa0)                 ##step 1: process model on mu0 (MAG)
     
   ##D[s] ~ dbern(p)                           ##step 2: adding process model here (PROB)
-  logit(D[s]) <- alpha0 + (alpha[1]*z[s])
+  logit(D[s]) <- alpha0 #+ (alpha[1]*z[s])
     
   mu[s] <- D[s] * muD[s] + (1-D[s]) * muN[s]
-  mu0[s] <- beta0 + (beta[1] * v[s]) ##+ (beta[2] * va[s]) + (beta[3] * vb[s])
+  mu0[s] <- beta0 + (beta[1] * v[s]) + (beta[2] * va[s]) ##+ (beta[3] * vb[s])
   mun[s] <- R * x[s]
 
   x[s] ~ dnorm(x_ic[s], tau_ic[s])            ##x[s] as distribution of prior timepoint and prior timepoint precision
@@ -263,17 +263,17 @@ for (s in 1:ns){
   ##p ~ dunif(0,1)                     ##disturbance probability
   R ~ dnorm(rmean, rprec)              ##rho paramter (recovery rate)
   pa0 ~ dgamma(1,1)                    ##precision of disturbed state
-  pan ~ dgamma(1,1)                ##precision of undisturbed state
+  pan ~ dgamma(1,1)                    ##precision of undisturbed state
   beta0 ~ dnorm(-5,1)                  ##param for dist mag intercept
   alpha0 ~ dnorm(0, 0.0001)            ##param for dist prob intercept
 
   
   ## COVARIATES WILL BE ADDED HERE
   beta[1] ~ dnorm(0, 0.0001)  
-  #beta[2] ~ dnorm(0, 0.0001)
+  beta[2] ~ dnorm(0, 0.0001)
   #beta[3] ~ dnorm(0, 0.0001)
   
-  alpha[1] ~ dnorm(1, 0.0001)
+  #alpha[1] ~ dnorm(1, 0.0001)
   
   ## covariate matrix: ADD WHEN READY FOR MODEL RUNS - 3/6/24
   ##beta ~ dmnorm(b0, Vb)   ## for disturbance magnitude
@@ -285,7 +285,7 @@ for (s in 1:ns){
 
 ### SELECT SITES:
 # random selection of sites for testing (before using full sample)
-smpl <- sample(nrow(cs), 50)
+smpl <- sample(nrow(cs), 500)
 # make sample
 cs_samp <- cs[smpl,]
 # number of sites of sample
@@ -297,9 +297,9 @@ cs_samp_dist <- cs_dists[as.numeric(rownames(cs_samp))]
 
 # make same sample of covariate data for testing individual beta[] parameters 2/27/24
 # disturbance magnitude
-dmbeta <- dmls[[1]][smpl,2]
+dmbeta <- dmls[[1]][smpl,2:3]
 # disturbance probability
-dpalpha <- dpls[[1]][smpl,2]
+dpalpha <- dpls[[2]][smpl,4]
 
 # precisions samples
 cs_prec_samp <- cs_precs[smpl]
@@ -310,15 +310,31 @@ xic[which(is.na(xic))] <- 0
 tic <- prev_precs[smpl]
 
 
+# draft data object for model runs
+data = list(y = cs_samp_dist, ns = nsites,
+            x_ic = xic, tau_ic = tic,
+            tau_obs = cs_prec_samp,
+            v = dmbeta[,1], #z = dpalpha,
+            va = dmbeta[,2],
+            rmean = R_mean, rprec = R_prec)
+
+
 ### initial state of model parameters:
-beta.init = lm(y ~ v,data = data)
+# beta intercept initial condition
+beta.init = list(lm(y ~ v, data = data),
+                 lm(y ~ va, data = data))
+# alpha intercept initial condition
+# get disturbance binary data
 dist = as.numeric(data$y < -1)
-alpha.init = glm(dist ~ data$z,family = binomial(link="logit"))
+# glm analysis with binomial logit 
+# alpha.init = glm(dist ~ data$z, family = binomial(link="logit"))
+# add to init list
 init<-list(R = R_mean,
-           beta0 = coef(beta.init)[1],
-           beta = coef(beta.init)[-1],
-           alpha0 = coef(alpha.init)[1],
-           alpha = coef(alpha.init)[-1]
+           beta0 = coef(beta.init[[1]])[1],
+           beta = c(coef(beta.init[[1]])[-1],
+                    coef(beta.init[[2]])[-1]),
+           alpha0 = coef(alpha.init)[1]#,
+           #alpha = coef(alpha.init)[-1]
            )
 
 
@@ -332,12 +348,6 @@ init<-list(R = R_mean,
 #               rmean = 0, rprec = 0.00001,
 #               v = dmbeta, z = dpalpha)  #dmbeta is sample covariate data for testing convergence with individual covs 2/27/24
 
-# draft data object for runs with 
-data = list(y = cs_samp_dist, ns = nsites,
-            x_ic = xic, tau_ic = tic,
-            tau_obs = cs_prec_samp,
-            v = dmbeta, z = dpalpha,
-            rmean = R_mean, rprec = R_prec)
 
 ### RUN THE MODEL
 j.pests <- jags.model (file = textConnection(spongy_disturb),
@@ -349,11 +359,11 @@ j.pests <- jags.model (file = textConnection(spongy_disturb),
 # running on 3/20/2024 for dist mag param convergence check with covariate(s) added
 jpout<-coda.samples(j.pests,
                     variable.names = c("beta0", "alpha0",
-                                       "beta[1]", "alpha[1]",
+                                       "beta[1]", "beta[2]",
                                        "R",
                                        "pa0"),
-                    n.iter = 150000,
-                    thin=2)
+                    n.iter = 300000,
+                    thin=10)
 
 jpthin = window(jpout,start=5000,thin=50)
 out = as.matrix(jpthin)
