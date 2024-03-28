@@ -81,44 +81,6 @@ for (i in 1:nrow(cs)){
 
 
 ### MATRIX MULTIPLICATION MODEL ### -----
-spdist_mm <- "model{
-
-###Loop over individual sites
-for (s in 1:ns){
-
-  #### Data Model:
-  y[s] ~ dnorm(mu[s], tau_obs[s])     ## fill in tau_obs[s] with precisions from GEE sd's
-  
-  #### Process Model:
-  muN[s] <- R * x[s]                  ##step 3: dealing with modeling R (Chap 2 - RECOV)
-     ##x[s] ~ dnorm(mu[s], tau_add)
-  muD[s] ~ dnorm(mu0[s], pa0)         ##step 1: process model on mu0 (MAG)
-    
-     ## D[s] ~ dbern(p)                     ##step 2: adding process model here (PROB)
-  logit(D[s]) <- alpha[1] + alpha[2]*z[s]
-  ##alpha[1] ~ dnorm(0.0, 0.0001)
-    
-  mu[s] <- D[s] * muD[s] + (1-D[s]) * muN[s]
-  mu0[s] <- beta0 + inprod(beta[], x[s,])
-
-  x[s]~dnorm(x_ic, tau_ic)
-  
-}#end loop over sites
-  
-  #### Priors
-  tau_obs ~ dgamma(t_obs, a_obs)     ##observation error (data model)
-  ##tau_add ~ dgamma(a_add ,t_add)    ##process error (process model)
-  R ~ dnorm(rmean, rprec)            ##rho paramter (recovery rate)  ## going to put an informative prior here
-  ## p ~ dunif(0,1)  #disturbance probability
-  beta0 ~ dnorm(-5,1) #param for calculating mean of disturbed state
-  pa0 ~ dgamma(1,1) #precision of disturbed state
-  
-  ## covariate matrix:
-  beta ~ dmnorm(b0, Vb)   ## for disturbance magnitude
-  alpha ~ dmnorm(a0, Va)  ## for disturbance probability
-  
-}
-"
 
 ## priors and data inputs list: ----
 # tau_obs[s] =  precisions from GEE condition score sd's
@@ -132,6 +94,47 @@ for (s in 1:ns){
 # tau_ic[s] = previous time step precision
 # covs <- matrices of covariates
 
+### 3/28/2024 Initial Conditions Draft loops
+### initial state of model parameters:
+# beta intercept initial condition
+beta.init = list(lm(y ~ v, data = data),
+                 lm(y ~ va, data = data))
+
+# 3/28/2014 ---
+# test the dmls matrix list 
+test <- dmls
+# make empty list to fill in magnitude covariates
+beta.init <- list()
+# make a loop to fill in inits for each model run
+for (i in 1:length(test)){
+  # make list for lms
+  init.ls <- list()
+  for (j in 2:ncol(test[[i]])){
+    # run lm for each covariate in that set
+    init.ls[[j-1]] <- lm(y ~ test[[i]][,j], data = data)
+  }
+  beta.init[[i]] <- init.ls 
+  rm(init.ls)
+}
+
+#formula(covm, form)
+
+# alpha intercept initial condition
+# get disturbance binary data
+dist = as.numeric(data$y < -1)
+# glm analysis with binomial logit 
+# alpha.init = glm(dist ~ data$z, family = binomial(link="logit"))
+# add to init list
+init<-list(R = R_mean,
+           beta0 = coef(beta.init[[1]])[1],
+           beta = c(coef(beta.init[[1]])[-1],
+                    coef(beta.init[[2]])[-1]),
+           alpha0 = coef(alpha.init)[1]#,
+           #alpha = coef(alpha.init)[-1]
+)
+
+
+
 ### 3/11/2024 DRAFT:
 spdist_mm <- "model{
 
@@ -143,13 +146,13 @@ for (s in 1:ns){
   
   #### Process Model:
   muN[s] ~ dnorm(mun, pan)            
-  muD[s] ~ dnorm(mu0[s], pa0)                     ##step 1: process model on mu0 (MAG)
+  muD[s] ~ dnorm(mu0[s], pa0)                     ##step 1: process model on mu0 (MAG) - b = covariates
   
-  logit(D[s]) <- alpha0 + inprod(alpha[], x[s,])  ##step 2: adding process model here (PROB)
+  logit(D[s]) <- alpha0 + inprod(alpha[], a[s,])  ##step 2: adding process model here (PROB) - a = covariates
     
   mu[s] <- D[s] * muD[s] + (1-D[s]) * muN[s]
-  mu0[s] <- beta0 + inprod(beta[], x[s,])
-  mun <- R * x[s]                                 ##step 3: dealing with modeling R (Chap 2 - RECOV)
+  mu0[s] <- inprod(beta[], b[s,])
+  mun <- R * x[s]                                 ##step 3: dealing with modeling R (Chap 2 - RECOV) 
 
   x[s] ~ dnorm(x_ic[s], tau_ic[s])
   
@@ -159,8 +162,8 @@ for (s in 1:ns){
   tau_obs ~ dgamma(t_obs, a_obs)      ##observation error (data model)
   ##tau_add ~ dgamma(a_add ,t_add)    ##process error (process model)
   R ~ dnorm(rmean, rprec)             ##rho paramter (recovery rate)  ## going to put an informative prior here
-  beta0 ~ dnorm(-5,1)                 ##param for calculating mean of disturbed state
-  alpha0 ~ dnorm(0,0.001)
+  ##beta0 ~ dnorm(-5,1)                 ##param for calculating mean of disturbed state
+  ##alpha0 ~ dnorm(0,0.001)
   pa0 ~ dgamma(1,1)                   ##precision of disturbed state
   pan ~ dgamma(1,1)                   ##precision of undisturbed state
   
