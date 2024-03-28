@@ -327,7 +327,7 @@ beta.init = list(lm(y ~ v, data = data),
 # get disturbance binary data
 dist = as.numeric(data$y < -1)
 # glm analysis with binomial logit 
-# alpha.init = glm(dist ~ data$z, family = binomial(link="logit"))
+alpha.init = glm(dist ~ data$z, family = binomial(link="logit"))
 # add to init list
 init<-list(R = R_mean,
            beta0 = coef(beta.init[[1]])[1], # ask Mike about beta 0 init...
