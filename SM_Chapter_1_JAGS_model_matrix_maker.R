@@ -171,12 +171,14 @@ initer <- function(model.run, param){
 
 # from the JAGS script (template):
 # add to init list
-init<-list(R = R_mean,
-           beta0 = coef(beta.init[[1]])[1],
-           beta = c(coef(beta.init[[1]])[-1],
-                    coef(beta.init[[2]])[-1]),
-           alpha0 = coef(alpha.init)[1]#,
+init.test<-list(R = R_mean,
+           #beta0 = coef(beta.init[[1]])[1],
+           #beta = c(coef(beta.init[[1]])[-1],
+                    #coef(beta.init[[2]])[-1]),
+           #alpha0 = coef(alpha.init)[1]#,
            #alpha = coef(alpha.init)[-1]
+           beta = initer(1, "beta"),
+           alpha = initer(1, "alpha")
 )
 
 
@@ -195,9 +197,11 @@ for (s in 1:ns){
   muD[s] ~ dnorm(mu0[s], pa0)                     ##step 1: process model on mu0 (MAG) - b = covariates
   
   logit(D[s]) <- alpha0 + inprod(alpha[], a[s,])  ##step 2: adding process model here (PROB) - a = covariates
+  ## is it : logit(D[s]) <- inprod(alpha[], a[s,])
     
   mu[s] <- D[s] * muD[s] + (1-D[s]) * muN[s]
-  mu0[s] <- inprod(beta[], b[s,])
+  mu0[s] <- beta0 + inprod(beta[], b[s,])
+  ## is it : mu0[s] <- inprod(beta[], b[s,])
   mun <- R * x[s]                                 ##step 3: dealing with modeling R (Chap 2 - RECOV) 
 
   x[s] ~ dnorm(x_ic[s], tau_ic[s])
