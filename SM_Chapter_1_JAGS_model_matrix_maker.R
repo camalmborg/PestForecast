@@ -95,14 +95,15 @@ for (i in 1:nrow(cs)){
 # covs <- matrices of covariates
 
 ### 3/28/2024 Initial Conditions Draft loops
-### initial state of model parameters:
-# beta intercept initial condition
-beta.init = list(lm(y ~ v, data = data),
-                 lm(y ~ va, data = data))
 
-# 3/28/2014 ---
+### beta version
 # test the dmls matrix list 
 test <- dmls
+# test data object
+data <- list(y = cs_dists,
+             dist = as.numeric(cs_dists < -1),
+             test = test)
+
 # make empty list to fill in magnitude covariates
 beta.init <- list()
 # make a loop to fill in inits for each model run
@@ -117,13 +118,58 @@ for (i in 1:length(test)){
   rm(init.ls)
 }
 
-#formula(covm, form)
 
-# alpha intercept initial condition
-# get disturbance binary data
-dist = as.numeric(data$y < -1)
-# glm analysis with binomial logit 
-# alpha.init = glm(dist ~ data$z, family = binomial(link="logit"))
+### alpha version
+# test object of covariates
+test <- dpls
+# make test data object
+data <- list(y = cs_dists,
+             dist = as.numeric(cs_dists < -1),
+             test = test)
+
+alpha.init <- list()
+# make a loop to fill in inits for each model run
+for (i in 1:length(test)){
+  # make a list for glm w logit
+  init.ls <- list()
+  for (j in 2:ncol(test[[i]])){
+    init.ls[[j-1]] <- glm(dist ~ test[[i]][,j],
+                          data = data,
+                          family = binomial(link="logit"))
+  }
+  alpha.init[[i]] <- init.ls 
+  rm(init.ls)
+}
+
+# figure out how to call them when you need them:
+# model.run = 1
+# p.aram = "beta"
+# # make the param object to call the right list (alpha, beta...)
+# param.obj = paste0(p.aram, ".init")
+# # make an empty vector to grab param inits
+# param.init <- vector()
+# for (i in 1:length(get(param.obj)[[model.run]])){
+#   param.init[i] <- coef(coeftest[[i]])[-1]
+# }
+
+# model.run = numeric, which model are you running?
+# param = character, either "alpha" or "beta" for probs/mags param
+initer <- function(model.run, param){
+  # make the param object to call the right list (alpha, beta...)
+  param.obj = paste0(param, ".init")
+  # make an empty vector to grab param inits
+  param.init <- vector()
+  # set first param init
+  param.init[1] <- coef(get(param.obj)[[model.run]][[1]])[1]
+  # set the rest
+  for (i in 1:length(get(param.obj)[[model.run]])){
+    param.init[i+1] <- coef(get(param.obj)[[model.run]][[i]])[-1]
+  }
+  return(param.init)
+}
+
+
+# from the JAGS script (template):
 # add to init list
 init<-list(R = R_mean,
            beta0 = coef(beta.init[[1]])[1],
