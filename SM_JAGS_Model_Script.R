@@ -330,7 +330,7 @@ dist = as.numeric(data$y < -1)
 # alpha.init = glm(dist ~ data$z, family = binomial(link="logit"))
 # add to init list
 init<-list(R = R_mean,
-           beta0 = coef(beta.init[[1]])[1],
+           beta0 = coef(beta.init[[1]])[1], # ask Mike about beta 0 init...
            beta = c(coef(beta.init[[1]])[-1],
                     coef(beta.init[[2]])[-1]),
            alpha0 = coef(alpha.init)[1]#,
