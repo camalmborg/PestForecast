@@ -108,8 +108,6 @@ data <- list(y = cs_dists,
 beta.init <- list()
 # make a loop to fill in inits for each model run
 for (i in 1:length(test)){
-  # make list for lms
-  init.ls <- list()
   # object for each covariate column for multivariate lm
   v <- c()
   for (j in 2:ncol(test[[i]])){
@@ -135,15 +133,19 @@ data <- list(y = cs_dists,
 alpha.init <- list()
 # make a loop to fill in inits for each model run
 for (i in 1:length(test)){
-  # make a list for glm w logit
-  init.ls <- list()
+  # object for each covariate column for multivariate lm
+  v <- c()
   for (j in 2:ncol(test[[i]])){
-    init.ls[[j-1]] <- glm(dist ~ test[[i]][,j],
-                          data = data,
-                          family = binomial(link="logit"))
+    # make multivariate lm call
+    v[j-1] <- paste0('test[[i]][,',j,']')
   }
-  alpha.init[[i]] <- init.ls 
-  rm(init.ls)
+  # make lm call
+  glm_formula <- as.formula(paste("dist ~ ",
+                                 paste(v, collapse='+')))
+  # run lm
+  alpha.init[[i]] <- glm(glm_formula, data = data,
+                         family = binomial(link = "logit"))
+  
 }
 
 # figure out how to call them when you need them:
