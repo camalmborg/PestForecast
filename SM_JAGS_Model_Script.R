@@ -320,22 +320,88 @@ data = list(y = cs_samp_dist, ns = nsites,
 
 
 ### initial state of model parameters:
-# beta intercept initial condition
-beta.init = list(lm(y ~ v, data = data),
-                 lm(y ~ va, data = data))
-# alpha intercept initial condition
-# get disturbance binary data
-dist = as.numeric(data$y < -1)
-# glm analysis with binomial logit 
-alpha.init = glm(dist ~ data$z, family = binomial(link="logit"))
-# add to init list
-init<-list(R = R_mean,
-           beta0 = coef(beta.init[[1]])[1], # ask Mike about beta 0 init...
-           beta = c(coef(beta.init[[1]])[-1],
-                    coef(beta.init[[2]])[-1]),
-           alpha0 = coef(alpha.init)[1]#,
-           #alpha = coef(alpha.init)[-1]
-           )
+### beta version
+# test the dmls matrix list 
+test <- dmls
+# test data object
+data <- list(y = cs_dists,
+             dist = as.numeric(cs_dists < -1),
+             test = test)
+
+# make empty list to fill in magnitude covariates
+beta.init <- list()
+# make a loop to fill in inits for each model run
+for (i in 1:length(test)){
+  # object for each covariate column for multivariate lm
+  v <- c()
+  for (j in 2:ncol(test[[i]])){
+    # make multivariate lm call
+    v[j-1] <- paste0('test[[i]][,',j,']')
+  }
+  # make lm call
+  lm_formula <- as.formula(paste("y ~ ",
+                                 paste(v, collapse='+')))
+  # run lm
+  beta.init[[i]] <- lm(lm_formula, data = data)
+}
+
+
+### alpha version
+# test object of covariates
+test <- dpls
+# make test data object
+data <- list(y = cs_dists,
+             dist = as.numeric(cs_dists < -1),
+             test = test)
+
+alpha.init <- list()
+# make a loop to fill in inits for each model run
+for (i in 1:length(test)){
+  # object for each covariate column for multivariate lm
+  v <- c()
+  for (j in 2:ncol(test[[i]])){
+    # make multivariate lm call
+    v[j-1] <- paste0('test[[i]][,',j,']')
+  }
+  # make lm call
+  glm_formula <- as.formula(paste("dist ~ ",
+                                  paste(v, collapse='+')))
+  # run lm
+  alpha.init[[i]] <- glm(glm_formula, data = data,
+                         family = binomial(link = "logit"))
+  
+}
+
+# SET INITIAL CONDITIONS
+# model.run = numeric, which model are you running?
+# param = character, either "alpha" or "beta" for probs/mags param
+initer <- function(model.run, param){
+  # make the param object to call the right list (alpha, beta...)
+  param.obj = paste0(param, ".init")
+  # intercept term
+  int <- coef(get(param.obj)[[model.run]])[1]
+  # params for the rest of the params
+  param.inits <- coef(get(param.obj)[[model.run]])[-1]
+  # combine them
+  param.init <- c(int, param.inits)
+  return(param.init)
+}
+
+# beta.init = list(lm(y ~ v + va, data = data))
+#                  #lm(y ~ va, data = data))
+# # alpha intercept initial condition
+# # get disturbance binary data
+# dist = as.numeric(data$y < -1)
+# # glm analysis with binomial logit 
+# alpha.init = glm(dist ~ data$z, family = binomial(link="logit"))
+# # add to init list
+# init<-list(R = R_mean,
+#            beta0 = coef(beta.init[[1]])[1], # ask Mike about beta 0 init...
+#            beta = coef(beta.init[[1]])[-1],
+#                     #coef(beta.init[[2]])[-1]),
+#            alpha0 = coef(alpha.init)[1]#,
+#            #alpha = coef(alpha.init)[-1]
+#            )
 
 
 
