@@ -79,6 +79,58 @@ for (i in 1:nrow(cs)){
 ## ^^ re-did this the "less complicated way" in JAGS model script ^^
 
 
+### MAKING ANOMALY COVARIATE DATA
+# # covariate data - for parameterizations
+# # the environmental variables
+# # for disturbance magnitude parameters
+# varfile_m <- "CHAPTER_1/DATA/MV_2023_12_DATA_distmag.csv"
+# magvars <- read.csv(varfile_m)[,-1]
+# # for disturbance probability parameters
+# varfile_p <- "CHAPTER_1/DATA/MV_2023_12_DATA_distprob.csv"
+# probvars <- read.csv(varfile_p)[,-1]
+# # environmental data without missing sites
+# magvars <- magvars[dmr$X,]
+# probvars <- probvars[dmr$X,]
+# 
+# # load disturbance magnitude and disturbance probability covariates
+# # disturbance magnitude
+# load("Chapter_1/2024_02_JAGS_models/magls.RData")
+# # disturbance probability
+# load("Chapter_1/2024_02_JAGS_models/probls.RData")
+# 
+# # making covariate data with anomalies rather than raw
+# # function:
+# anomfx<-function(x){
+#   # get mean values for each column
+#   means <- apply(x, 2, mean, na.rm=T)
+#   # make anomaly matrix
+#   anom <- matrix(NA,nrow=nrow(x), ncol=ncol(x))
+#   # for each row, fill in covariate anomaly
+#   for (i in 1:nrow(x)){
+#     for (j in 1:ncol(x)){
+#       anom[i,j] <- x[i,j] - means[j] # fill in anomalies for beta[] terms
+#     }
+#     anom[i,1] <- 1 # make first column 1s for beta0 term
+#   }
+#   return(anom)
+# }
+# 
+# # converting covariate lists to anomaly
+# # new empty list to populate with anomaly versions
+# anomls <- list()
+# # list being converted CHOOSE magls for disturbance magnitude/probls for disturbance probability
+# covls <- probls
+# #covls <- probls
+# # loop for conversion
+# for (i in 1:length(covls)){
+#   # run cov members through the anomaly machine
+#   anomls[[i]] <- anomfx(covls[[i]])
+# }
+# # disturbance magnitude saving anomaly version
+# #dmls <- anomls
+# # disturbance probability saving anomaly version
+# dpls <- anomls
+
 
 ### MATRIX MULTIPLICATION MODEL ### -----
 
@@ -159,6 +211,23 @@ for (i in 1:length(test)){
 #   param.init[i] <- coef(coeftest[[i]])[-1]
 # }
 
+# beta.init = list(lm(y ~ v + va, data = data))
+#                  #lm(y ~ va, data = data))
+# # alpha intercept initial condition
+# # get disturbance binary data
+# dist = as.numeric(data$y < -1)
+# # glm analysis with binomial logit 
+# alpha.init = glm(dist ~ data$z, family = binomial(link="logit"))
+# # add to init list
+# init<-list(R = R_mean,
+#            beta0 = coef(beta.init[[1]])[1], # ask Mike about beta 0 init...
+#            beta = coef(beta.init[[1]])[-1],
+#                     #coef(beta.init[[2]])[-1]),
+#            alpha0 = coef(alpha.init)[1]#,
+#            #alpha = coef(alpha.init)[-1]
+#            )
+
+
 # model.run = numeric, which model are you running?
 # param = character, either "alpha" or "beta" for probs/mags param
 initer <- function(model.run, param){
@@ -217,13 +286,13 @@ for (s in 1:ns){
   ##tau_add ~ dgamma(a_add ,t_add)    ##process error (process model)
   R ~ dnorm(rmean, rprec)             ##rho paramter (recovery rate)  ## going to put an informative prior here
   ##beta0 ~ dnorm(-5,1)                 ##param for calculating mean of disturbed state
-  ##alpha0 ~ dnorm(0,0.001)
+  alpha0 ~ dnorm(0,0.001)
   pa0 ~ dgamma(1,1)                   ##precision of disturbed state
   pan ~ dgamma(1,1)                   ##precision of undisturbed state
   
   ## covariate matrix:
   beta ~ dmnorm(b0, Vb)   ## for disturbance magnitude
-  alpha ~ dmnorm(a0, Va)  ## for disturbance probability
+  #alpha ~ dmnorm(a0, Va)  ## for disturbance probability
   
 }
 "
