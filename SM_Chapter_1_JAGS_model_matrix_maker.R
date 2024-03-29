@@ -164,14 +164,12 @@ for (i in 1:length(test)){
 initer <- function(model.run, param){
   # make the param object to call the right list (alpha, beta...)
   param.obj = paste0(param, ".init")
-  # make an empty vector to grab param inits
-  param.init <- vector()
-  # set first param init
-  param.init[1] <- coef(get(param.obj)[[model.run]][[1]])[1]
-  # set the rest
-  for (i in 1:length(get(param.obj)[[model.run]])){
-    param.init[i+1] <- coef(get(param.obj)[[model.run]][[i]])[-1]
-  }
+  # intercept term
+  int <- coef(get(param.obj)[[model.run]])[1]
+  # params for the rest of the params
+  param.inits <- coef(get(param.obj)[[model.run]])[-1]
+  # combine them
+  param.init <- c(int, param.inits)
   return(param.init)
 }
 
