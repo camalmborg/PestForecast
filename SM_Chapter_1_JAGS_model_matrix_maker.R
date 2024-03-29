@@ -110,12 +110,17 @@ beta.init <- list()
 for (i in 1:length(test)){
   # make list for lms
   init.ls <- list()
+  # object for each covariate column for multivariate lm
+  v <- c()
   for (j in 2:ncol(test[[i]])){
-    # run lm for each covariate in that set
-    init.ls[[j-1]] <- lm(y ~ test[[i]][,j], data = data)
+    # make multivariate lm call
+    v[j-1] <- paste0('test[[i]][,',j,']')
   }
-  beta.init[[i]] <- init.ls 
-  rm(init.ls)
+  # make lm call
+  lm_formula <- as.formula(paste("y ~ ",
+                                   paste(v, collapse='+')))
+  # run lm
+  beta.init[[i]] <- lm(lm_formula, data = data)
 }
 
 
@@ -196,12 +201,11 @@ for (s in 1:ns){
   muN[s] ~ dnorm(mun, pan)            
   muD[s] ~ dnorm(mu0[s], pa0)                     ##step 1: process model on mu0 (MAG) - b = covariates
   
-  logit(D[s]) <- alpha0 + inprod(alpha[], a[s,])  ##step 2: adding process model here (PROB) - a = covariates
+  logit(D[s]) <- alpha0 ##+ inprod(alpha[], a[s,])  ##step 2: adding process model here (PROB) - a = covariates
   ## is it : logit(D[s]) <- inprod(alpha[], a[s,])
     
   mu[s] <- D[s] * muD[s] + (1-D[s]) * muN[s]
-  mu0[s] <- beta0 + inprod(beta[], b[s,])
-  ## is it : mu0[s] <- inprod(beta[], b[s,])
+  mu0[s] <- inprod(beta[], b[s,])
   mun <- R * x[s]                                 ##step 3: dealing with modeling R (Chap 2 - RECOV) 
 
   x[s] ~ dnorm(x_ic[s], tau_ic[s])
