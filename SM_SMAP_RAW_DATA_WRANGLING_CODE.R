@@ -23,7 +23,7 @@ sites <- read.csv(sitesfile)
 #get rid of ] from smap data, make numeric:
 SMAPvalues <- SMAP.GEE[,"smp."]
 SMAPvalues <- gsub("\\[|\\]", "", SMAPvalues)
-SMAPvalues <- gsub("null","NA",SMAPvalues)
+SMAPvalues <- gsub(" null","NA",SMAPvalues)
 SMAPvalues <- as.numeric(SMAPvalues)
 
 #re-make SMAP.GEE object with just lat/long/smap:
@@ -77,6 +77,9 @@ sortSMAP <- SMAPsmap[order(SMAPsmap[,1]),]
 #removing correct missing values:
 #sortSMAP <- sortSMAP[-missing,]
 
+# 4/2/2024 - missing SMAP values
+missingSMAP <- SMAPsmap[which(is.na(SMAPsmap[,4])),]
+missingSMAPcoords <- missingSMAP[,2:3]
 
 #make new data frame:
 #SMAPmags <- cbind(magsdat, sortSMAP[,4:ncol(sortSMAP)])
