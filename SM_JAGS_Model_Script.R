@@ -286,7 +286,7 @@ for (s in 1:ns){
 
 ### SELECT SITES:
 # random selection of sites for testing (before using full sample)
-smpl <- sample(nrow(cs), 25)
+smpl <- sample(nrow(cs), 100)
 # make sample
 cs_samp <- cs[smpl,]
 # number of sites of sample
@@ -413,8 +413,8 @@ data = list(y = cs_samp_dist, ns = nsites,
             x_ic = xic, tau_ic = tic,
             tau_obs = cs_prec_samp,
             b = dmbeta[smpl,],
-            b0 = initer(1,"beta"),
-            Vb = solve(diag(initer(1,"beta"))),
+            b0 = rep(0,4),
+            Vb = solve(diag(rep(1,4))),
             #v = dmbeta[,1], #z = dpalpha,
             #va = dmbeta[,2],
             rmean = R_mean, rprec = R_prec)
@@ -433,7 +433,7 @@ jpout<-coda.samples(j.pests,
                     variable.names = c("beta", "alpha0",
                                        "R",
                                        "pa0"),
-                    n.iter = 300000,
+                    n.iter = 200000,
                     thin=10)
 
 jpthin = window(jpout,start=5000,thin=50)
