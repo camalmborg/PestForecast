@@ -286,7 +286,7 @@ for (s in 1:ns){
 
 ### SELECT SITES:
 # random selection of sites for testing (before using full sample)
-smpl <- sample(nrow(cs), 100)
+smpl <- sample(nrow(cs), 1000)
 # make sample
 cs_samp <- cs[smpl,]
 # number of sites of sample
@@ -436,6 +436,6 @@ jpout<-coda.samples(j.pests,
                     n.iter = 200000,
                     thin=10)
 
-jpthin = window(jpout,start=5000,thin=50)
+jpthin = window(jpout,start=10000,thin=50)
 out = as.matrix(jpthin)
 pairs(out)
