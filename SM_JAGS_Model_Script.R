@@ -35,8 +35,8 @@ prevtime <- scores %>%
   dplyr::rename_with(~ str_replace_all(., c("X|_score_mean|_cs_mean" = "", 
                                             "\\." = "-")))
 
-# # number of sites
-# nsites = nrow(cs)
+# number of sites
+nsites = nrow(cs)
 
 # disturbance year data
 dmr_file <- "CHAPTER_1/DATA/2023_12_DMR_DATA_TCG.csv"
@@ -288,7 +288,7 @@ for (s in 1:ns){
 # random selection of sites for testing (before using full sample)
 smpl <- sample(nrow(cs), 1000)
 # make sample
-cs_samp <- cs[smpl,]
+cs_samp <- cs_all[smpl,]
 # number of sites of sample
 nsites = nrow(cs_samp)
 # get dist years for cs_samp group
@@ -376,25 +376,28 @@ for (i in 1:length(test)){
 # SET INITIAL CONDITIONS:
 # model.run = numeric, which model are you running?
 # param = character, either "alpha" or "beta" for probs/mags param
-# initer <- function(model.run, param){
-#   # make the param object to call the right list (alpha, beta...)
-#   param.obj = paste0(param, ".init")
-#   # intercept term
-#   int <- coef(get(param.obj)[[model.run]])[1]
-#   # params for the rest of the params
-#   param.inits <- coef(get(param.obj)[[model.run]])[-1]
-#   # combine them
-#   param.init <- c(int, param.inits)
-#   return(param.init)
-# }
+initer <- function(model.run, param){
+  # make the param object to call the right list (alpha, beta...)
+  param.obj = paste0(param, ".init")
+  # intercept term
+  int <- coef(get(param.obj)[[model.run]])[1]
+  # params for the rest of the params
+  param.inits <- coef(get(param.obj)[[model.run]])[-1]
+  # combine them
+  param.init <- c(int, param.inits)
+  return(param.init)
+}
+
+#model to run:
+modelrun = 1
 
 # make inits object for model input: 3/29 - without alphas
 init <- list(R = R_mean,
-             beta = initer(1, "beta"),
-             alpha0 = initer(1, "alpha")[1])
+             beta = initer(modelrun, "beta"),
+             alpha0 = initer(modelrun, "alpha")[1])
 # disturbance magnitude and probability covariates going in the model
 # mag covariates
-dmbeta <- dmls[[1]]
+dmbeta <- dmls[[modelrun]]
 # prob covariates
 #dpalpha <- dpls[[1]]
 
