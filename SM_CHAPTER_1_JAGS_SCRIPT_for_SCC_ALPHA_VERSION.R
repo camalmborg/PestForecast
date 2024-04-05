@@ -302,10 +302,12 @@ init <- list(R = R_mean,
 # prob covariates
 dpalpha <- dpls[[modelrun]]
 
+# condition score disturbance year onset data
+cs_model <- cs[grep(paste0("^", distyear, sep = ""), names(cs))]
 
 ### MODEL INPUTS
 # data object for model runs
-data = list(y = cs_dists, ns = nsites,
+data = list(y = cs_model, ns = nsites,
             x_ic = xic, tau_ic = tic,
             tau_obs = cs_precs,
             a = dmalpha,
