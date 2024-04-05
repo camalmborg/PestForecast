@@ -288,13 +288,13 @@ for (s in 1:ns){
 # random selection of sites for testing (before using full sample)
 smpl <- sample(nrow(cs), 1000)
 # make sample
-cs_samp <- cs_all[smpl,]
+cs_samp <- cs[smpl,]
 # number of sites of sample
 nsites = nrow(cs_samp)
 # get dist years for cs_samp group
 dist_samp <- dists[as.numeric(rownames(cs_samp))]
 # make the single timestep data for each site
-cs_samp_dist <- cs_dists[as.numeric(rownames(cs_samp))]
+#cs_samp_dist <- cs_dists[as.numeric(rownames(cs_samp))]
 
 # make same sample of covariate data for testing individual beta[] parameters 2/27/24
 # disturbance magnitude
@@ -412,7 +412,7 @@ dmbeta <- dmls[[modelrun]]
 #               v = dmbeta, z = dpalpha)  #dmbeta is sample covariate data for testing convergence with individual covs 2/27/24
 
 # data object for test runs
-data = list(y = cs_samp_dist, ns = nsites,
+data = list(y = cs_samp, ns = nsites,
             x_ic = xic, tau_ic = tic,
             tau_obs = cs_prec_samp,
             b = dmbeta[smpl,],
