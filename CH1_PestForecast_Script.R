@@ -331,10 +331,12 @@ spongy_jags <- function(scores, distyr, dmr, stan_devs,
   metadata <- list(modelnum, model, cov)
   # model selection
   dic <- list(DIC, sum)
+  # raw jags output
+  jags <- jpout
   # model output
   out <- as.matrix(jpout)
   # combine output
-  output <- list(metadata, dic, out)
+  output <- list(metadata, dic, jags, out)
   
   return(output)
 }
