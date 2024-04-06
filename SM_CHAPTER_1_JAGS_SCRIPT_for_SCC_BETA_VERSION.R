@@ -303,7 +303,7 @@ dmbeta <- dmls[[modelrun]]
 #dpalpha <- dpls[[modelrun]]
 
 # condition score disturbance year onset data
-cs_model <- cs[grep(paste0("^", distyear, sep = ""), names(cs))]
+cs_model <- cs[grep(paste0("^", as.character(distyear)), names(cs))]
 
 ### MODEL INPUTS
 # data object for model runs
