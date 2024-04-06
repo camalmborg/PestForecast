@@ -22,9 +22,23 @@ spongy_disturb_a <- read_file("2024_04_06_Ch1_JAGS_MODEL_ALPHA_VERSION.txt")
 spongy_disturb_b <- read_file("2024_04_06_Ch1_JAGS_MODEL_BETA_VERSION.txt")
 
 ### Function for model runs:
+##' @param scores forest condition score data >> .csv
+##' @param distyr disturbance year >> numeric
+##' @param dmr disturbance prob/mag/recov dataset from calculator >> .csv
+##' @param stan_devs forest condition score standard deviations >> .csv
+##' @param dmls disturbance magnitude covariate list >> .RData list
+##' @param dpls disturbance probability covariate list >> .RData list
+##' @param modelrun which model is being run >> numeric
+##' @param model spongy_disturb version to use >> either alpha _a version or beta _b version
+##' @param cov 1 = alpha, not 1 = beta >> numeric
+##' @param vars variables for JAGS model >> vector of strings 
+##' @param iters number of iterations for JAGS run >> numeric
+##' @param thin thin used on JAGS run >> numeric
+##' @param diters number of iterations for DIC sampler >> numeric
+
 spongy_jags <- function(scores, distyr, dmr, stan_devs, 
                         dmls, dpls, modelrun, model, 
-                        cov, vars, iters, thin){
+                        cov, vars, iters, thin, diters){
   cs <- scores %>%
     # Drop unwanted columns
     dplyr::select(dplyr::starts_with("X")) %>%
@@ -309,7 +323,7 @@ spongy_jags <- function(scores, distyr, dmr, stan_devs,
                       thin = thin)
   
   # run DIC
-  DIC <- dic.samples(j.pests, n,iter = 10000)
+  DIC <- dic.samples(j.pests, n.iter = diters)
   sum <- sum(DIC$deviance, DIC$penalty)
   
   ### Make output list
@@ -325,3 +339,11 @@ spongy_jags <- function(scores, distyr, dmr, stan_devs,
   return(output)
 }
 
+
+### Function for saving model output:
+##' @param jagsmodel output from spongy_jags call
+model_save <- function(jagsmodel){
+  # choose file path
+  # make file name
+  # save to folder
+}
