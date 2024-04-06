@@ -288,9 +288,9 @@ for (s in 1:ns){
 # random selection of sites for testing (before using full sample)
 smpl <- sample(nrow(cs), 1000)
 # make sample
-cs_samp <- cs[smpl,]
+cs_samp <- cs[smpl, grep(paste0("^", as.character(distyear)), names(cs))]
 # number of sites of sample
-nsites = nrow(cs_samp)
+nsites = length(cs_samp)
 # get dist years for cs_samp group
 dist_samp <- dists[as.numeric(rownames(cs_samp))]
 # make the single timestep data for each site
@@ -309,15 +309,6 @@ cs_prec_samp <- cs_precs[smpl]
 xic <- ptime[smpl]
 xic[which(is.na(xic))] <- 0
 tic <- prev_precs[smpl]
-
-
-# # draft data object for model runs
-# data = list(y = cs_samp_dist, ns = nsites,
-#             x_ic = xic, tau_ic = tic,
-#             tau_obs = cs_prec_samp,
-#             v = dmbeta[,1], #z = dpalpha,
-#             va = dmbeta[,2],
-#             rmean = R_mean, rprec = R_prec)
 
 
 ### initial state of model parameters:
