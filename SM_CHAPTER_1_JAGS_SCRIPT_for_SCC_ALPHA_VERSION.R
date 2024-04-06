@@ -11,7 +11,7 @@ library(ecoforecastR)
 
 ### THE DATA:
 # condition scores inputs
-cfile <- "Ch1_PestForecast/data/condition_scores.csv" #1995-2020, original grab
+cfile <- "Ch1_PestForecast/data/condition_scores.csv"  #1995-2020, original grab
 scores <- read.csv(cfile)
 # isolate data we want
 cs <- scores %>%
