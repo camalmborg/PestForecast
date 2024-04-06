@@ -11,7 +11,7 @@ library(ecoforecastR)
 
 ### THE DATA:
 # condition scores inputs
-cfile <- "data/condition_scores.csv" #1995-2020, original grab
+cfile <- "Ch1_PestForecast/data/condition_scores.csv" #1995-2020, original grab
 scores <- read.csv(cfile)
 # isolate data we want
 cs <- scores %>%
@@ -38,7 +38,7 @@ prevtime <- scores %>%
 nsites = nrow(cs)
 
 # disturbance year data
-dmr_file <- "data/DMR_data.csv"
+dmr_file <- "Ch1_PestForecast/data/DMR_data.csv"
 dmr <- read.csv(dmr_file)
 
 # choose disturbance onset year
@@ -73,7 +73,7 @@ xic[which(is.na(xic))] <- 0
 
 
 ### standard deviations for precisions
-sdfile <- "data/score_std_devs.csv"
+sdfile <- "Ch1_PestForecast/data/score_std_devs.csv"
 stan_devs <- read.csv(sdfile)
 sds <- stan_devs %>%
   # Drop unwanted columns
@@ -181,9 +181,9 @@ R_prec <- 1/(sd(cors, na.rm = T)^2)
 
 ## Loading calculated anomaly versions of covariate data
 # disturbance magnitude
-load("data/dmls.RData")
+load("Ch1_PestForecast/data/dmls.RData")
 # disturbance probability
-load("data/dpls.RData")
+load("Ch1_PestForecast/data/dpls.RData")
 
 
 ### THE MODEL:
