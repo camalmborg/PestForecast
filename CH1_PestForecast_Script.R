@@ -57,9 +57,6 @@ spongy_jags <- function(scores, distyr, dmr, stan_devs,
     # rename with date, without extra characters
     dplyr::rename_with(~ str_replace_all(., c("X|_score_mean|_cs_mean" = "", 
                                               "\\." = "-")))
-  
-  # number of sites
-  nsites = nrow(cs)
   # disturbance year
   distyear = distyr
   # condition score disturbance year onset data
@@ -188,6 +185,9 @@ spongy_jags <- function(scores, distyr, dmr, stan_devs,
                                               "\\." = "-")))
   #remove missing value columns
   cs_all <- cs_all[dmr$X,]
+  cs_model <- cs_model[dmr$X,]
+  # number of sites
+  nsites = nrow(cs_all)
   # months of time series using for cors (5 years)
   mos <- 25
   # correlations compute
@@ -202,11 +202,11 @@ spongy_jags <- function(scores, distyr, dmr, stan_devs,
   ### initial state of model parameters:
   ### beta version for disturbance magnitude
   # dmls matrix list 
-  magslist <- dmls
+  covls <- dmls
   # test data object
   dat <- list(y = cs_dists,
               dist = as.numeric(cs_dists < -1),
-              covls = magslist)
+              covls = covls)
   
   # make empty list to fill in magnitude covariates
   beta.init <- list()
@@ -228,11 +228,11 @@ spongy_jags <- function(scores, distyr, dmr, stan_devs,
   
   ### alpha version for disturbance probability
   # test object of covariates
-  probls <- dpls
+  covls <- dpls
   # make test data object
   dat <- list(y = cs_dists,
               dist = as.numeric(cs_dists < -1),
-              covls = probls)
+              covls = covls)
   
   alpha.init <- list()
   # make a loop to fill in inits for each model run
@@ -328,15 +328,15 @@ spongy_jags <- function(scores, distyr, dmr, stan_devs,
   
   ### Make output list
   # track metadata
-  metadata <- list(modelnum, model, cov)
+  metadata <- tibble::lst(modelnum, modelrun, model, cov, data)
   # model selection
   dic <- list(DIC, sum)
   # raw jags output
-  jags <- jpout
+  # jags <- jpout
   # model output
   out <- as.matrix(jpout)
   # combine output
-  output <- list(metadata, dic, jags, out)
+  output <- tibble::lst(metadata, dic, out)
   
   return(output)
 }
@@ -346,6 +346,16 @@ spongy_jags <- function(scores, distyr, dmr, stan_devs,
 ##' @param jagsmodel output from spongy_jags call
 model_save <- function(jagsmodel){
   # choose file path
+  filepath <- "Ch1_model_outputs/"
+  # date
+  date <- as.character(Sys.Date())
   # make file name
+  filename <- paste0(filepath, 
+                     date, "_", 
+                     #as.character(jagsmodel$metadata[[1]]),
+                     "modelnum_", as.character(output$metadata$modelnum), "_",
+                     "modelrun_", as.character(output$metadata$modelrun),
+                     ".RData")
   # save to folder
+  save(jagsmodel, file = filename)
 }
