@@ -336,7 +336,7 @@ spongy_jags <- function(scores, distyr, dmr, stan_devs,
   # model output
   out <- as.matrix(jpout)
   # combine output
-  output <- tibble::lst(metadata, dic, out)
+  output <- tibble::lst(metadata, dic, jpout, out)
   
   return(output)
 }
@@ -346,16 +346,24 @@ spongy_jags <- function(scores, distyr, dmr, stan_devs,
 ##' @param jagsmodel output from spongy_jags call
 model_save <- function(jagsmodel){
   # choose file path
-  filepath <- "Ch1_model_outputs/"
+  filepath_outputs <- "Ch1_PestForecast/model_outputs/"
+  filepath_runs <- "Ch1_PestForecast/model_runs/"
   # date
   date <- as.character(Sys.Date())
   # make file name
-  filename <- paste0(filepath, 
-                     date, "_", 
+  filename_outputs <- paste0(filepath, 
+                     date, 
                      #as.character(jagsmodel$metadata[[1]]),
-                     "modelnum_", as.character(output$metadata$modelnum), "_",
-                     "modelrun_", as.character(output$metadata$modelrun),
-                     ".RData")
+                     "_modelnum", as.character(output$metadata$modelnum),
+                     "_modelrun", as.character(output$metadata$modelrun),
+                     "_output",".RData")
+  filename_runs <- paste0(filepath,
+                          date,
+                          "_modelnum", as.character(output$metadata$modelnum),
+                          "_modelrun", as.character(output$metadata$modelrun),
+                          "_data",".RData")
+  
   # save to folder
-  save(jagsmodel, file = filename)
+  save(jagsmodel$out, file = filename_outputs)
+  save(jagsmodel[c('jpout','dic','metadata')], file = filename_runs)
 }
