@@ -23,8 +23,9 @@ magvars <- magvars[dmr$X,]
 probvars <- probvars[dmr$X,]
 
 ### Load model list data frame:
-modfile <- "CHAPTER_1/2024_02_JAGS_models/2024_02_20_Dist_Mag_Models.csv"
-#modfile <- "CHAPTER_1/2024_02_JAGS_models/2024_02_22_Dist_Prob_Models.csv"
+#modfile <- "CHAPTER_1/2024_JAGS_models/2024_02_20_Dist_Mag_Models.csv"
+#modfile <- "CHAPTER_1/2024_JAGS_models/2024_02_22_Dist_Prob_Models.csv"
+modfile <- "CHAPTER_1/2024_JAGS_models/2024_04_04_Dist_Mag_Models.csv"
 # disturbance mag/prob model file
 modeldf <- read.csv(modfile, header = F)
 
@@ -296,3 +297,10 @@ for (s in 1:ns){
   
 }
 "
+
+
+# ## output saving test
+# savetest <- function(test){
+#   filepath <- paste0("CHAPTER_1/", "test", ".RData")
+#   save(test, file = filepath)
+# }
