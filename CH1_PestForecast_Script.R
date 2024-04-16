@@ -40,7 +40,7 @@ spongy_disturb_b <- read_file("Ch1_PestForecast/JAGS_models/2024_04_06_Ch1_JAGS_
 ##' @param dpls disturbance probability covariate list >> .RData list
 ##' @param modelrun which model is being run >> numeric
 ##' @param model spongy_disturb version to use >> either alpha _a version or beta _b version
-##' @param cov 1 = alpha, not 1 = beta >> numeric
+##' @param covs 1 = alpha, not 1 = beta >> numeric
 ##' @param vars variables for JAGS model >> vector of strings 
 ##' @param iters number of iterations for JAGS run >> numeric
 ##' @param thin thin used on JAGS run >> numeric
@@ -48,7 +48,7 @@ spongy_disturb_b <- read_file("Ch1_PestForecast/JAGS_models/2024_04_06_Ch1_JAGS_
 
 spongy_jags <- function(scores, distyr, dmr, stan_devs, 
                         dmls, dpls, modelrun, model, 
-                        cov, vars, iters, thin, diters){
+                        covs, vars, iters, thin, diters){
   cs <- scores %>%
     # Drop unwanted columns
     dplyr::select(dplyr::starts_with("X")) %>%
@@ -282,10 +282,10 @@ spongy_jags <- function(scores, distyr, dmr, stan_devs,
   # choose model for JAGS feed
   model = model
   #set either alpha or beta for filling in data lists and inits
-  cov = cov
+  covs = covs
   
   ## inits for either alpha run or beta run:
-  if (cov == 1){
+  if (covs == 1){
     # make inits object for model input 
     init <- list(R = R_mean,
                  beta0 = initer(modelrun, "beta")[1],
@@ -298,8 +298,8 @@ spongy_jags <- function(scores, distyr, dmr, stan_devs,
                 x_ic = xic, tau_ic = tic,
                 tau_obs = cs_precs,
                 a = dmalpha,
-                a0 = rep(0,4),
-                Va = solve(diag(rep(1,4))),
+                a0 = rep(0,ncol(dmalpha)),
+                Va = solve(diag(rep(1,ncol(dmalpha)))),
                 rmean = R_mean, rprec = R_prec)
     
   } else { # if model = b
@@ -315,8 +315,8 @@ spongy_jags <- function(scores, distyr, dmr, stan_devs,
                 x_ic = xic, tau_ic = tic,
                 tau_obs = cs_precs,
                 b = dmbeta,
-                b0 = rep(0,4),
-                Vb = solve(diag(rep(1,4))),
+                b0 = rep(0,ncol(dmbeta)),
+                Vb = solve(diag(rep(1,ncol(dmbeta)))),
                 rmean = R_mean, rprec = R_prec)
   }
   
