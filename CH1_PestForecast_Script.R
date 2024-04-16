@@ -328,7 +328,7 @@ spongy_jags <- function(scores, distyr, dmr, stan_devs,
   
   ### Make output list
   # track metadata
-  metadata <- tibble::lst(modelnum, modelrun, model, cov, data)
+  metadata <- tibble::lst(modelrun, model, cov, data)
   # model selection
   dic <- list(DIC, sum)
   # raw jags output
@@ -352,14 +352,12 @@ model_save <- function(jagsmodel){
   date <- as.character(Sys.Date())
   # make file name
   filename_outputs <- paste0(filepath, 
-                     date, 
-                     #as.character(jagsmodel$metadata[[1]]),
-                     "_modelnum", as.character(output$metadata$modelnum),
-                     "_modelrun", as.character(output$metadata$modelrun),
-                     "_output",".RData")
+                             date, 
+                             #as.character(jagsmodel$metadata[[1]]),
+                             "_modelrun", as.character(output$metadata$modelrun),
+                             "_output",".RData")
   filename_runs <- paste0(filepath,
                           date,
-                          "_modelnum", as.character(output$metadata$modelnum),
                           "_modelrun", as.character(output$metadata$modelrun),
                           "_data",".RData")
   
