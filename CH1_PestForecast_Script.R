@@ -10,16 +10,26 @@ library(coda)
 library(MCMCvis)
 library(ecoforecastR)
 
+### Set wd - for SCC runs:
+setwd("/projectnb/dietzelab/malmborg/")
+
 ### Load data:
-conditionscores <- read.csv("2022_08_31_DATAGRAB/2022_12_7_sample_score_mean_5k.csv")
-score_sds <- read.csv("2022_08_31_DATAGRAB/2022_12_7_sample_score_stddev_5k.csv")
-dmr_data <- read.csv("CHAPTER_1/DATA/2023_12_DMR_DATA_TCG.csv")
-load("Chapter_1/2024_02_JAGS_models/dmls.RData")
-load("Chapter_1/2024_02_JAGS_models/dpls.RData")
+# conditionscores <- read.csv("2022_08_31_DATAGRAB/2022_12_7_sample_score_mean_5k.csv")
+# score_sds <- read.csv("2022_08_31_DATAGRAB/2022_12_7_sample_score_stddev_5k.csv")
+# dmr_data <- read.csv("CHAPTER_1/DATA/2023_12_DMR_DATA_TCG.csv")
+# load("Chapter_1/2024_02_JAGS_models/dmls.RData")
+# load("Chapter_1/2024_02_JAGS_models/dpls.RData")
+conditionscores <- read.csv("Ch1_PestForecast/data/condition_scores.csv")
+score_sds <- read.csv("Ch1_PestForecast/data/score_std_devs.csv")
+dmr_data <- read.csv("Ch1_PestForecast/data/DMR_data.csv")
+load("Ch1_PestForecast/data/2024_04_magls.RData")
+load("Ch1_PestForecast/data/dpls.RData")
 
 ### JAGS models:
-spongy_disturb_a <- read_file("2024_04_06_Ch1_JAGS_MODEL_ALPHA_VERSION.txt")
-spongy_disturb_b <- read_file("2024_04_06_Ch1_JAGS_MODEL_BETA_VERSION.txt")
+# spongy_disturb_a <- read_file("2024_04_06_Ch1_JAGS_MODEL_ALPHA_VERSION.txt")
+# spongy_disturb_b <- read_file("2024_04_06_Ch1_JAGS_MODEL_BETA_VERSION.txt")
+spongy_disturb_a <- read_file("Ch1_PestForecast/JAGS_models/2024_04_06_Ch1_JAGS_MODEL_ALPHA_VERSION.txt")
+spongy_disturb_b <- read_file("Ch1_PestForecast/JAGS_models/2024_04_06_Ch1_JAGS_MODEL_BETA_VERSION.txt")
 
 ### Function for model runs:
 ##' @param scores forest condition score data >> .csv
