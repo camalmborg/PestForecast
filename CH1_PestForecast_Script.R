@@ -361,31 +361,32 @@ model_save <- function(jagsmodel){
   # date
   date <- as.character(Sys.Date())
   # make file name
-  filename_outputs <- paste0(filepath, 
+  filename_outputs <- paste0(filepath_outputs, 
                              date, 
-                             #as.character(jagsmodel$metadata[[1]]),
-                             "_modelrun", as.character(output$metadata$modelrun),
-                             "_output",".RData")
-  filename_runs <- paste0(filepath,
+                             "_modelrun_", as.character(jagsmodel$metadata$modelrun),
+                             "_output",".csv")
+  filename_runs <- paste0(filepath_runs,
                           date,
-                          "_modelrun", as.character(output$metadata$modelrun),
+                          "_modelrun_", as.character(jagsmodel$metadata$modelrun),
                           "_data",".RData")
   
-  # save to folder
-  save(jagsmodel$out, file = filename_outputs)
-  save(jagsmodel[c('jpout','dic','metadata')], file = filename_runs)
+  # save outputs to folder
+  write.csv(jagsmodel$out, file = filename_outputs)
+  # save model selection and metadata to folder
+  model_info <- jagsmodel[c('jpout','dic','metadata')]
+  save(model_info, file = filename_runs)
 }
 
 
 ### Model Runs ###
 
-# variables want in outputs from jags model
-vars <- c("beta", "alpha", "R", "pa0")
-iters = 200000
-thin = 10
-diters = 20000
-
-# 2024-04-16
-beta_model_1 <- spongy_jags(condition_scores, 2016, dmr_data, score_sds, dmls, dpls,
-                            1, spongy_disturb_b, 2, vars, iters, thin, diters)
-model_save(beta_model_run)
+# # variables want in outputs from jags model
+# vars <- c("beta", "alpha0", "R", "pa0")
+# iters = 200000
+# thin = 10
+# diters = 20000
+# 
+# # 2024-04-16
+# beta_model_1 <- spongy_jags(condition_scores, 2016, dmr_data, score_sds, dmls, dpls,
+#                             1, spongy_disturb_b, 2, vars, iters, thin, diters)
+# model_save(beta_model_run)
