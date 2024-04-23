@@ -59,47 +59,11 @@ SMAPdata <- as.data.frame(cbind("site_id" = coords[,"site_id"],
                                 "lat" = coords[,"lat"],
                                 SMAPvalues))
 
+# for finding missing values:
+missingSMAP <- SMAPdata[!complete.cases(SMAPvalues), 1:3]
+# save CSV
+write.csv(missingSMAP, file = "SMAP_Data/2024_04_23_missing_SMAP_values.csv")
 
-
-#how many sites:
-nsites=nrow(sites)
-#loop for organizing SMAP data into monthly columns 2015-2017:
-SMAPorg <- matrix(data=NA, nrow=nsites, ncol=15) #15= 3 years X 5 months
-for (i in 1:15){
-  rows<-seq(i, nrow(SMAPdata), by=15)
-  SMAPorg[,i]<-SMAPdata[rows,3]
-}
-
-
-####matching SMAP lat/lon to mags lat/lon
-#make data frame with coords and mags:
-#magsdat <- as.data.frame(cbind(coords[-missing,],mags))
-#magscoords <- magsdat[order(magsdat[,1]),]
-
-sortcoords <- as.data.frame(coords[order(coords[,2]),]) #with full 5000
-
-#remove duplicate values in SMAP lat/lon:
-SMAPlonlat <- as.data.frame(unique(SMAPdata[,1:2]))
-
-#make data frame with SMAP coords and SMAP data:
-SMAPall <- as.data.frame(cbind(SMAPlonlat,SMAPorg))
-SMAPcoords <- SMAPall[order(SMAPall[,1]),]
-SMAPsmap <- cbind(sortcoords$site_id,SMAPcoords)
-sortSMAP <- SMAPsmap[order(SMAPsmap[,1]),]
-#removing correct missing values:
-#sortSMAP <- sortSMAP[-missing,]
-
-# 4/2/2024 - missing SMAP values
-missingSMAP <- SMAPsmap[which(is.na(SMAPsmap[,4])),]
-missingSMAPcoords <- missingSMAP[,2:3]
-
-#make new data frame:
-#SMAPmags <- cbind(magsdat, sortSMAP[,4:ncol(sortSMAP)])
-#smap<-SMAPmags[,5:ncol(SMAPmags)]
-SMAPdat <- sortSMAP[,4:ncol(sortSMAP)]
-#save data:
-write.csv(SMAPdat, file = "2023_06_26_SMAP_data_sorted.csv")
-save(SMAPdat, file = "SMAP_data.Rdata")
 
 #####-------------------ANALYSES------------------#####################
 
@@ -235,3 +199,43 @@ SMAProcs <- smap_ROC(dmvars,dmrdat,1,22)
 # # colnames(coords)<-c("lon","lat","site_id")
 # coords <- cbind(c(1:5000),sites[,2],sites[,1])
 # colnames(coords)<-c("site_id","lon","lat")
+
+# #how many sites:
+# nsites=nrow(sites)
+# #loop for organizing SMAP data into monthly columns 2015-2017:
+# SMAPorg <- matrix(data=NA, nrow=nsites, ncol=15) #15= 3 years X 5 months
+# for (i in 1:15){
+#   rows<-seq(i, nrow(SMAPdata), by=15)
+#   SMAPorg[,i]<-SMAPdata[rows,3]
+# }
+
+
+# ####matching SMAP lat/lon to mags lat/lon
+# #make data frame with coords and mags:
+# #magsdat <- as.data.frame(cbind(coords[-missing,],mags))
+# #magscoords <- magsdat[order(magsdat[,1]),]
+# 
+# sortcoords <- as.data.frame(coords[order(coords[,2]),]) #with full 5000
+# 
+# #remove duplicate values in SMAP lat/lon:
+# SMAPlonlat <- as.data.frame(unique(SMAPdata[,1:2]))
+# 
+# #make data frame with SMAP coords and SMAP data:
+# SMAPall <- as.data.frame(cbind(SMAPlonlat,SMAPorg))
+# SMAPcoords <- SMAPall[order(SMAPall[,1]),]
+# SMAPsmap <- cbind(sortcoords$site_id,SMAPcoords)
+# sortSMAP <- SMAPsmap[order(SMAPsmap[,1]),]
+#removing correct missing values:
+#sortSMAP <- sortSMAP[-missing,]
+
+# # 4/2/2024 - missing SMAP values
+# missingSMAP <- SMAPsmap[which(is.na(SMAPsmap[,4])),]
+# missingSMAPcoords <- missingSMAP[,2:3]
+# 
+# #make new data frame:
+# #SMAPmags <- cbind(magsdat, sortSMAP[,4:ncol(sortSMAP)])
+# #smap<-SMAPmags[,5:ncol(SMAPmags)]
+# SMAPdat <- sortSMAP[,4:ncol(sortSMAP)]
+# #save data:
+# write.csv(SMAPdat, file = "2023_06_26_SMAP_data_sorted.csv")
+# save(SMAPdat, file = "SMAP_data.Rdata")
