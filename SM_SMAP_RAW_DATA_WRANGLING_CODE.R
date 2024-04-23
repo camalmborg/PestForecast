@@ -6,13 +6,16 @@
 
 #load libraries
 library(mgcv)
+library(dplyr)
+library(tidyverse)
 library(tidyr)
 library(stringr)
 
 #load data
 #file<-"2022_08_31_DATAGRAB/2022_12_7_sample_tcg_mean_5k.csv"
 #cfile <- cfile<-"2022_08_31_DATAGRAB/2022_12_7_sample_score_mean_5k.csv"
-sfile <- "SMAP_Data/SMAP_04_08_2015_2017_try3.txt"
+#sfile <- "SMAP_Data/SMAP_04_08_2015_2017_try3.txt"
+sfile <- "SMAP_Data/2024_04_23_SMAP_04_08_2015_2017_5000sites.csv"
 SMAP.GEE <- read.table(sfile, header=T, sep=",")
 #load lat long data from sampling points:
 sitesfile <- "2022_03_22_5000sites_lat_long_points_for_GEE_asset.csv"
@@ -21,33 +24,42 @@ sites <- read.csv(sitesfile)
 
 
 #get rid of ] from smap data, make numeric:
-SMAPvalues <- SMAP.GEE[,"smp."]
-SMAPvalues <- gsub("\\[|\\]", "", SMAPvalues)
-SMAPvalues <- gsub(" null","NA",SMAPvalues)
-SMAPvalues <- as.numeric(SMAPvalues)
+SMAPvalues <- SMAP.GEE %>%
+  # Drop unwanted columns
+  dplyr::select(dplyr::starts_with("X")) %>%
+  # remove X from dates
+  dplyr::rename_with(~ str_replace_all(., c("X" = ""))) %>%
+  # put in order
+  dplyr::rename_with(~ str_replace_all(., c(".*_" = "")))
+# remove . in date and replace with -
+colnames(SMAPvalues) <- gsub("\\.", "-0", colnames(SMAPvalues))
+# make into dates
+colnames(SMAPvalues) <- as.Date(paste0(names(SMAPvalues), "-01", format = '%d %m %Y'))
+# sort by date
+SMAPvalues <- SMAPvalues[,sort(names(SMAPvalues))]
 
 #re-make SMAP.GEE object with just lat/long/smap:
-SMAPdata <- as.data.frame(cbind(SMAP.GEE[,"longitude"],
-                                SMAP.GEE[,"latitude"],
+geo<-as.data.frame(SMAP.GEE[,".geo"])
+#make lat and lon columns from .geo:
+coords<-matrix(nrow=nrow(geo),ncol=3)
+for (i in 1:nrow(geo)){
+  #longitudes:
+  lon<-str_extract(geo[i,], "\\d+\\.*\\d*")
+  coords[i,1]<-as.numeric(lon)*-1
+  
+  #latitudes:
+  extlon<-sub(lon,"",geo[i,])
+  coords[i,2]<-as.numeric(str_extract(extlon, "\\d+\\.*\\d*"))
+  coords[i,3]<-i
+}
+colnames(coords)<-c("lon","lat","site_id")
+# combine with SMAPvalues
+SMAPdata <- as.data.frame(cbind("site_id" = coords[,"site_id"],
+                                "lon" = coords[,"lon"],
+                                "lat" = coords[,"lat"],
                                 SMAPvalues))
 
-#make coords object:
-# geo<-as.data.frame(cond.scores[,".geo"])
-# #make lat and lon columns from .geo data:
-# coords<-matrix(nrow=nrow(geo),ncol=3)
-# for (i in 1:nrow(geo)){
-#   #longitudes:
-#   lon<-str_extract(geo[i,], "\\d+\\.*\\d*")
-#   coords[i,1]<-as.numeric(lon)*-1
-#   
-#   #latitudes:
-#   extlon<-sub(lon,"",geo[i,])
-#   coords[i,2]<-as.numeric(str_extract(extlon, "\\d+\\.*\\d*"))
-#   coords[i,3]<-i
-# }
-# colnames(coords)<-c("lon","lat","site_id")
-coords <- cbind(c(1:5000),sites[,2],sites[,1])
-colnames(coords)<-c("site_id","lon","lat")
+
 
 #how many sites:
 nsites=nrow(sites)
@@ -192,3 +204,34 @@ smap_ROC <- function(dmvars,dmrdat,yr,coln){
 }
 
 SMAProcs <- smap_ROC(dmvars,dmrdat,1,22)
+
+
+### ARCHIVE:
+#gsub(".", "-", colnames(SMAPvalues))  
+#dplyr::rename_with(~ str_replace_all(., c(".." = "-")))
+# # rename with date, without extra characters
+# dplyr::rename_with(~ str_replace_all(., c("X|_score_mean|_cs_mean" = "",
+#                                           "\\." = "-")))
+#SMAPvalues <- SMAP.GEE[,"smp."]
+#SMAPvalues <- SMAP.GEE[,(grep("^X",colnames(SMAP.GEE)))]
+#SMAPvalues <- gsub("\\[|\\]", "", SMAPvalues)
+#SMAPvalues <- gsub(" null","NA",SMAPvalues)
+#SMAPvalues <- as.numeric(SMAPvalues)
+
+#make coords object:
+# geo<-as.data.frame(cond.scores[,".geo"])
+# #make lat and lon columns from .geo data:
+# coords<-matrix(nrow=nrow(geo),ncol=3)
+# for (i in 1:nrow(geo)){
+#   #longitudes:
+#   lon<-str_extract(geo[i,], "\\d+\\.*\\d*")
+#   coords[i,1]<-as.numeric(lon)*-1
+#   
+#   #latitudes:
+#   extlon<-sub(lon,"",geo[i,])
+#   coords[i,2]<-as.numeric(str_extract(extlon, "\\d+\\.*\\d*"))
+#   coords[i,3]<-i
+# }
+# # colnames(coords)<-c("lon","lat","site_id")
+# coords <- cbind(c(1:5000),sites[,2],sites[,1])
+# colnames(coords)<-c("site_id","lon","lat")
