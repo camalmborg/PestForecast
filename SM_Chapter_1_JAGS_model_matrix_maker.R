@@ -25,7 +25,7 @@ probvars <- probvars[dmr$X,]
 ### Load model list data frame:
 #modfile <- "CHAPTER_1/2024_JAGS_models/2024_02_20_Dist_Mag_Models.csv"
 #modfile <- "CHAPTER_1/2024_JAGS_models/2024_02_22_Dist_Prob_Models.csv"
-#modfile <- "CHAPTER_1/2024_JAGS_models/2024_04_04_Dist_Mag_Models.csv"
+modfile <- "CHAPTER_1/2024_JAGS_models/2024_04_04_Dist_Mag_Models.csv"
 modfile <- "CHAPTER_1/2024_JAGS_models/2024_04_17_Dist_Prob_Models.csv"
 # disturbance mag/prob model file
 modeldf <- read.csv(modfile, header = F)
@@ -56,7 +56,7 @@ for (i in 1:nrow(modeldf)){
 dpls <- covls
 
 # save
-save(dmls, file = "CHAPTER_1/2024_JAGS_models/2024_04_dmls.RData")
+#save(dmls, file = "CHAPTER_1/2024_JAGS_models/2024_04_dmls.RData")
 save(dpls, file = "CHAPTER_1/2024_JAGS_models/2024_04_dpls.RData")
 
 ## informative R prior ("complicated version" 3/13)
