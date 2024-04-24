@@ -64,7 +64,19 @@ missingSMAP <- SMAPdata[!complete.cases(SMAPvalues), 1:3]
 # save CSV
 write.csv(missingSMAP, file = "SMAP_Data/2024_04_23_missing_SMAP_values.csv")
 
+# grab SMAP data for April and May 2016:
+SMAP <- SMAPvalues[,7:8]
+# save(SMAP, file = "SMAP_data/2024_04_SMAP.RData")
 
+# replacing with new SMAP data 4/24/24
+dmvars_mags <- read.csv("CHAPTER_1/DATA/MV_2023_12_DATA_distmag.csv")[,-1]  #dist mag
+dmvars_prob <- read.csv("CHAPTER_1/DATA/MV_2023_12_DATA_distprob.csv")[,-1] #dist prob
+
+dmvars_mags[,8] <- SMAP[,1]
+dmvars_prob[,6] <- SMAP[,2]
+
+write.csv(dmvars_mags, file = "CHAPTER_1/DATA/MV_2023_12_DATA_distmag.csv")
+write.csv(dmvars_prob, file = "CHAPTER_1/DATA/MV_2023_12_DATA_distprob.csv")
 #####-------------------ANALYSES------------------#####################
 
 #function for univariate analyses:
