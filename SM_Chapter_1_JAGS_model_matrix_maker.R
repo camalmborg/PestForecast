@@ -56,7 +56,8 @@ for (i in 1:nrow(modeldf)){
 dpls <- covls
 
 # save
-save(dpls, file = "CHAPTER_1/2024_JAGS_models/2024_dpls.RData")
+save(dmls, file = "CHAPTER_1/2024_JAGS_models/2024_04_dmls.RData")
+save(dpls, file = "CHAPTER_1/2024_JAGS_models/2024_04_dpls.RData")
 
 ## informative R prior ("complicated version" 3/13)
 # time series 1 object
