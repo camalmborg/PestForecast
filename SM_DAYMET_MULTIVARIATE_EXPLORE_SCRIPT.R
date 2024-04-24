@@ -23,7 +23,9 @@ load("DMVARS_SEAS.RData")
 # load("MJJ_precip.RData") #cols 4,5 for 2014, 2015
 # load("MJ_precip.RData") #cols 4,5 for 2014, 2015
 # load("SON_precip.RData") # col 4 for 2014
-load("SMAP_data.RData") # col 1-4 for Apr-July 2015 soil moisture
+# load("SMAP_data.RData") # col 1-4 for Apr-July 2015 soil moisture
+# SMAPdata <- read.csv("SMAP_Data/2024_04_SMAPdata.csv")
+load("SMAP_Data/2024_04_SMAP.RData")
 load("site_DEM_slope_aspect_TWI_data.RData") # col 1 for DEM data
 #load("viirs_annual_averages_data.RData") #not included
 # 
