@@ -30,6 +30,7 @@ load("Ch1_PestForecast/data/dpls.RData")
 # spongy_disturb_b <- read_file("2024_04_06_Ch1_JAGS_MODEL_BETA_VERSION.txt")
 spongy_disturb_a <- read_file("Ch1_PestForecast/JAGS_models/2024_04_06_Ch1_JAGS_MODEL_ALPHA_VERSION.txt")
 spongy_disturb_b <- read_file("Ch1_PestForecast/JAGS_models/2024_04_06_Ch1_JAGS_MODEL_BETA_VERSION.txt")
+#spongy_disturb_joint <- read_file("")
 
 ### Function for model runs:
 ##' @param scores forest condition score data >> .csv
@@ -38,16 +39,17 @@ spongy_disturb_b <- read_file("Ch1_PestForecast/JAGS_models/2024_04_06_Ch1_JAGS_
 ##' @param stan_devs forest condition score standard deviations >> .csv
 ##' @param dmls disturbance magnitude covariate list >> .RData list
 ##' @param dpls disturbance probability covariate list >> .RData list
-##' @param modelrun which model is being run >> numeric
+##' @param modelrun_a which model is being run for dist prob >> numeric
+##' @param modelrun_b which model is being run for dist mag >> numeric
 ##' @param model spongy_disturb version to use >> either alpha _a version or beta _b version
-##' @param covs 1 = alpha, not 1 = beta >> numeric
+##' @param covs 1 = alpha, 2 = beta, 3 = joint >> numeric
 ##' @param vars variables for JAGS model >> vector of strings 
 ##' @param iters number of iterations for JAGS run >> numeric
 ##' @param thin thin used on JAGS run >> numeric
 ##' @param diters number of iterations for DIC sampler >> numeric
 
 spongy_jags <- function(scores, distyr, dmr, stan_devs, 
-                        dmls, dpls, modelrun, model, 
+                        dmls, dpls, modelrun_a, modelrun_b, model, 
                         covs, vars, iters, thin, diters){
   cs <- scores %>%
     # Drop unwanted columns
@@ -277,8 +279,10 @@ spongy_jags <- function(scores, distyr, dmr, stan_devs,
     return(param.init)
   }
   
-  # set model number
-  modelrun = modelrun
+  # set model number for dist prob
+  modelrun_a = modelrun_a
+  # set model number for dist mag
+  modelrun_b = modelrun_b
   # choose model for JAGS feed
   model = model
   #set either alpha or beta for filling in data lists and inits
@@ -288,33 +292,61 @@ spongy_jags <- function(scores, distyr, dmr, stan_devs,
   if (covs == 1){
     # make inits object for model input 
     init <- list(R = R_mean,
-                 beta0 = initer(modelrun, "beta")[1],
-                 alpha = initer(modelrun, "alpha"))
+                 beta0 = initer(1, "beta")[1],
+                 alpha = initer(modelrun_a, "alpha"))
     # prob covariates
-    dpalpha <- dpls[[modelrun]]
+    dpalpha <- dpls[[modelrun_a]]
+    # missing data in covariates
+    missing_a <- as.numeric(rownames(dpalpha[!complete.cases(dpalpha),]))
     
     # set data object
-    data = list(y = cs_model, ns = nsites,
-                x_ic = xic, tau_ic = tic,
-                tau_obs = cs_precs,
-                a = dmalpha,
-                a0 = rep(0,ncol(dmalpha)),
-                Va = solve(diag(rep(1,ncol(dmalpha)))),
+    data = list(y = cs_model[-missing_a], ns = nsites[-missing_a],
+                x_ic = xic[-missing_a], tau_ic = tic[-missing_a],
+                tau_obs = cs_precs[-missing_a],
+                a = dpalpha[-missing_a,],
+                a0 = rep(0,ncol(dpalpha)),
+                Va = solve(diag(rep(1,ncol(dpalpha)))),
                 rmean = R_mean, rprec = R_prec)
     
-  } else { # if model = b
+  } else if (covs == 2) { # if model = b
     # make inits object for model input
     init <- list(R = R_mean,
-                 beta = initer(modelrun, "beta"),
-                 alpha0 = initer(modelrun, "alpha")[1])
+                 beta = initer(modelrun_b, "beta"),
+                 alpha0 = initer(1, "alpha")[1])
     # mag covariates
-    dmbeta <- dmls[[modelrun]]
+    dmbeta <- dmls[[modelrun_b]]
+    # missing data in covariates
+    missing_b <- as.numeric(rownames(dmbeta[!complete.cases(dmbeta),]))
     
     # set data object
-    data = list(y = cs_model, ns = nsites,
-                x_ic = xic, tau_ic = tic,
-                tau_obs = cs_precs,
-                b = dmbeta,
+    data = list(y = cs_model[-missing_b], ns = nsites[-missing_b],
+                x_ic = xic[-missing_b], tau_ic = tic[-missing_b],
+                tau_obs = cs_precs[-missing_b],
+                b = dmbeta[-missing_b,],
+                b0 = rep(0,ncol(dmbeta)),
+                Vb = solve(diag(rep(1,ncol(dmbeta)))),
+                rmean = R_mean, rprec = R_prec)
+    
+  } else if (covs == 3) {
+    init <- list(R = R_mean,
+                 alpha = initer(modelrun_a, "alpha"),
+                 beta = initer(modelrun_b, "beta"))
+    # prob and mag covariates
+    dpalpha <- dpls[[modelrun_a]]
+    dmbeta <- dmls[[modelrun_b]]
+    # missing data in covariates
+    missing_a <- as.numeric(rownames(dpalpha[!complete.cases(dpalpha),]))
+    missing_b <- as.numeric(rownames(dmbeta[!complete.cases(dmbeta),]))
+    missing <- union(missing_a, missing_b)
+    
+    # set data object
+    data = list(y = cs_model[-missing], ns = nsites[-missing],
+                x_ic = xic[-missing], tau_ic = tic[-missing],
+                tau_obs = cs_precs[-missing],
+                a = dpalpha[-missing,],
+                b = dmbeta[-missing,],
+                a0 = rep(0, ncol(dpalpha)),
+                Va = solve(diag(rep(1,ncol(dpalpha)))),
                 b0 = rep(0,ncol(dmbeta)),
                 Vb = solve(diag(rep(1,ncol(dmbeta)))),
                 rmean = R_mean, rprec = R_prec)
@@ -338,7 +370,7 @@ spongy_jags <- function(scores, distyr, dmr, stan_devs,
   
   ### Make output list
   # track metadata
-  metadata <- tibble::lst(modelrun, model, cov, data)
+  metadata <- tibble::lst(modelrun_a, modelrun_b, model, covs, data)
   # model selection
   dic <- list(DIC, sum)
   # raw jags output
@@ -354,20 +386,25 @@ spongy_jags <- function(scores, distyr, dmr, stan_devs,
 
 ### Function for saving model output:
 ##' @param jagsmodel output from spongy_jags call
-model_save <- function(jagsmodel){
+model_save <- function(jagsmodel, vartype){
   # choose file path
   filepath_outputs <- "Ch1_PestForecast/model_outputs/"
   filepath_runs <- "Ch1_PestForecast/model_runs/"
+  filepath_var <- c("beta_", "alpha_", "joint_")
   # date
   date <- as.character(Sys.Date())
   # make file name
   filename_outputs <- paste0(filepath_outputs, 
                              date, 
-                             "_modelrun_", as.character(jagsmodel$metadata$modelrun),
+                             "_modelrun_", filepath_var[vartype],
+                             "a_", as.character(jagsmodel$metadata$modelrun_a),
+                             "b_", as.character(jagsmodel$metadata$modelrun_b),
                              "_output",".csv")
   filename_runs <- paste0(filepath_runs,
                           date,
-                          "_modelrun_", as.character(jagsmodel$metadata$modelrun),
+                          "_modelrun_", filepath_var[vartype],
+                          "a_", as.character(jagsmodel$metadata$modelrun_a),
+                          "b_", as.character(jagsmodel$metadata$modelrun_b),
                           "_data",".RData")
   
   # save outputs to folder
