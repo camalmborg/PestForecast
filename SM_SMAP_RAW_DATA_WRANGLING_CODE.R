@@ -75,6 +75,16 @@ dmvars_prob <- read.csv("CHAPTER_1/DATA/MV_2023_12_DATA_distprob.csv")[,-1] #dis
 dmvars_mags[,8] <- SMAP[,1]
 dmvars_prob[,6] <- SMAP[,2]
 
+colnames(dmvars_mags) <- c("mintemp_summ_2014", "mintemp_spr_2015", 
+                           "precip_Apr_2016", "precip_summ_2014",
+                           "precip_fall_2015", "VPD_summ_2014",
+                           "VPD_fall_2014", "SMAP_Apr_2016")
+
+colnames(dmvars_prob) <- c("mintemp_wint_2016", "precip_Apr_2016",
+                           "VPD_spr_2015", "VPD_summ_2015",
+                           "VPD_fall_2015", "SMAP_May_2016",
+                           "DEM")
+
 write.csv(dmvars_mags, file = "CHAPTER_1/DATA/MV_2023_12_DATA_distmag.csv")
 write.csv(dmvars_prob, file = "CHAPTER_1/DATA/MV_2023_12_DATA_distprob.csv")
 #####-------------------ANALYSES------------------#####################
