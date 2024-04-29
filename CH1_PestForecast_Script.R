@@ -19,11 +19,19 @@ setwd("/projectnb/dietzelab/malmborg/")
 # dmr_data <- read.csv("CHAPTER_1/DATA/2023_12_DMR_DATA_TCG.csv")
 # load("Chapter_1/2024_02_JAGS_models/dmls.RData")
 # load("Chapter_1/2024_02_JAGS_models/dpls.RData")
+load("Ch1_PestForecast/data/2024_04_dmls.RData")
+load("Ch1_PestForecast/data/2024_04_dpls.RData")
+# MANUAL: remove SMAP missing values 4/29/2024
+# choose model with SMAP
+find_miss <- last(dmls)
+missing <- as.numeric(rownames(find_miss[!complete.cases(find_miss),]))
+rm(find_miss)
+# load rest of data:
 conditionscores <- read.csv("Ch1_PestForecast/data/condition_scores.csv")
-score_sds <- read.csv("Ch1_PestForecast/data/score_std_devs.csv")
+scores_sds <- read.csv("Ch1_PestForecast/data/score_std_devs.csv")
 dmr_data <- read.csv("Ch1_PestForecast/data/DMR_data.csv")
-load("Ch1_PestForecast/data/2024_04_magls.RData")
-load("Ch1_PestForecast/data/dpls.RData")
+# dmls <- magls ## adding this here for now to get it to run - 4/16/2024
+# rm(magls) 
 
 ### JAGS models:
 # spongy_disturb_a <- read_file("2024_04_06_Ch1_JAGS_MODEL_ALPHA_VERSION.txt")
@@ -50,7 +58,7 @@ spongy_disturb_b <- read_file("Ch1_PestForecast/JAGS_models/2024_04_06_Ch1_JAGS_
 
 spongy_jags <- function(scores, distyr, dmr, stan_devs, 
                         dmls, dpls, modelrun_a, modelrun_b, model, 
-                        covs, vars, iters, thin, diters){
+                        covs, vars, iters, thin, diters, missing){
   cs <- scores %>%
     # Drop unwanted columns
     dplyr::select(dplyr::starts_with("X")) %>%
@@ -199,7 +207,8 @@ spongy_jags <- function(scores, distyr, dmr, stan_devs,
   cs_all <- cs_all[dmr$X,]
   cs_model <- cs_model[dmr$X,]
   # number of sites
-  nsites = nrow(cs_all)
+  missing = missing
+  nsites = nrow(cs_all) - length(missing)
   # months of time series using for cors (5 years)
   mos <- 25
   # correlations compute
@@ -297,13 +306,13 @@ spongy_jags <- function(scores, distyr, dmr, stan_devs,
     # prob covariates
     dpalpha <- dpls[[modelrun_a]]
     # missing data in covariates
-    missing_a <- as.numeric(rownames(dpalpha[!complete.cases(dpalpha),]))
+    #missing_a <- as.numeric(rownames(dpalpha[!complete.cases(dpalpha),]))
     
     # set data object
-    data = list(y = cs_model[-missing_a], ns = nsites[-missing_a],
-                x_ic = xic[-missing_a], tau_ic = tic[-missing_a],
-                tau_obs = cs_precs[-missing_a],
-                a = dpalpha[-missing_a,],
+    data = list(y = cs_model[-missing], ns = nsites,
+                x_ic = xic[-missing], tau_ic = tic[-missing],
+                tau_obs = cs_precs[-missing],
+                a = dpalpha[-missing,],
                 a0 = rep(0,ncol(dpalpha)),
                 Va = solve(diag(rep(1,ncol(dpalpha)))),
                 rmean = R_mean, rprec = R_prec)
@@ -316,13 +325,13 @@ spongy_jags <- function(scores, distyr, dmr, stan_devs,
     # mag covariates
     dmbeta <- dmls[[modelrun_b]]
     # missing data in covariates
-    missing_b <- as.numeric(rownames(dmbeta[!complete.cases(dmbeta),]))
+    #missing_b <- as.numeric(rownames(dmbeta[!complete.cases(dmbeta),]))
     
     # set data object
-    data = list(y = cs_model[-missing_b], ns = nsites[-missing_b],
-                x_ic = xic[-missing_b], tau_ic = tic[-missing_b],
-                tau_obs = cs_precs[-missing_b],
-                b = dmbeta[-missing_b,],
+    data = list(y = cs_model[-missing], ns = nsites,
+                x_ic = xic[-missing], tau_ic = tic[-missing],
+                tau_obs = cs_precs[-missing],
+                b = dmbeta[-missing,],
                 b0 = rep(0,ncol(dmbeta)),
                 Vb = solve(diag(rep(1,ncol(dmbeta)))),
                 rmean = R_mean, rprec = R_prec)
@@ -335,12 +344,12 @@ spongy_jags <- function(scores, distyr, dmr, stan_devs,
     dpalpha <- dpls[[modelrun_a]]
     dmbeta <- dmls[[modelrun_b]]
     # missing data in covariates
-    missing_a <- as.numeric(rownames(dpalpha[!complete.cases(dpalpha),]))
-    missing_b <- as.numeric(rownames(dmbeta[!complete.cases(dmbeta),]))
-    missing <- union(missing_a, missing_b)
+    # missing_a <- as.numeric(rownames(dpalpha[!complete.cases(dpalpha),]))
+    # missing_b <- as.numeric(rownames(dmbeta[!complete.cases(dmbeta),]))
+    # missing <- union(missing_a, missing_b)
     
     # set data object
-    data = list(y = cs_model[-missing], ns = nsites[-missing],
+    data = list(y = cs_model[-missing], ns = nsites,
                 x_ic = xic[-missing], tau_ic = tic[-missing],
                 tau_obs = cs_precs[-missing],
                 a = dpalpha[-missing,],
@@ -386,11 +395,12 @@ spongy_jags <- function(scores, distyr, dmr, stan_devs,
 
 ### Function for saving model output:
 ##' @param jagsmodel output from spongy_jags call
+##' @param vartype 1. alpha - dist prob, 2. beta - dist mag, 3. joint - both >> numeric
 model_save <- function(jagsmodel, vartype){
   # choose file path
   filepath_outputs <- "Ch1_PestForecast/model_outputs/"
   filepath_runs <- "Ch1_PestForecast/model_runs/"
-  filepath_var <- c("beta_", "alpha_", "joint_")
+  filepath_var <- c("alpha_", "beta_", "joint_")
   # date
   date <- as.character(Sys.Date())
   # make file name
@@ -417,13 +427,65 @@ model_save <- function(jagsmodel, vartype){
 
 ### Model Runs ###
 
-# # variables want in outputs from jags model
+# variables want in outputs from jags model
 # vars <- c("beta", "alpha0", "R", "pa0")
 # iters = 200000
-# thin = 10
-# diters = 20000
-# 
+# thin = 20
+# diters = 10000
+
 # # 2024-04-16
-# beta_model_1 <- spongy_jags(condition_scores, 2016, dmr_data, score_sds, dmls, dpls,
+# # run model:
+# beta_model_4 <- spongy_jags(conditionscores, 2016, dmr_data, scores_sds, dmls, dpls,
 #                             1, spongy_disturb_b, 2, vars, iters, thin, diters)
-# model_save(beta_model_run)
+# #save:
+# model_save(beta_model_4)
+
+
+# # 2024-04-16
+# # writing loop to run multiple models in a row:
+# for (i in 2:4){
+#   model <- spongy_jags(conditionscores, 2016, dmr_data, scores_sds, dmls, dpls,
+#                        i, spongy_disturb_b, 2, vars, iters, thin, diters)
+#   model_save(model)
+#   rm(model)
+# }
+
+# # 2024-04-18
+# # writing loop to run multiple models in a row:
+# for (i in 7:8){
+#   model <- spongy_jags(conditionscores, 2016, dmr_data, scores_sds, dmls, dpls,
+#                        i, spongy_disturb_b, 2, vars, iters, thin, diters)
+#   model_save(model)
+#   rm(model)
+# }
+
+
+# 2024-04-22 
+# running alpha models
+
+# variables want in outputs from jags model
+vars <- c("beta0", "alpha", "R", "pa0")
+iters = 200000
+thin = 20
+diters = 10000
+
+# loop for re-running beta models: 4/29/2024
+for (i in 1:2){
+  model <- spongy_jags(scores = conditionscores, 
+                       distyr = 2016, 
+                       dmr = dmr_data, 
+                       stan_devs = scores_sds, 
+                       dmls = dmls, 
+                       dpls = dpls,
+                       modelrun_a = 1, 
+                       modelrun_b = i, 
+                       model = spongy_disturb_b, 
+                       covs = 2, 
+                       vars = vars, 
+                       iters = iters, 
+                       thin = thin, 
+                       diters = diters, 
+                       missing = missing)
+  model_save(model, 2)
+  rm(model)
+}
