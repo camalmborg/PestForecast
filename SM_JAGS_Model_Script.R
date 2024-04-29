@@ -173,52 +173,59 @@ R_prec <- 1/(sd(cors, na.rm = T)^2)
 
 #rm(prevsds,prevtime,sds,stan_devs,scores)
 
-# # covariate data - for parameterizations
-# # the environmental variables
-# # for disturbance magnitude parameters
-# varfile_m <- "CHAPTER_1/DATA/MV_2023_12_DATA_distmag.csv"
-# magvars <- read.csv(varfile_m)[,-1]
-# # for disturbance probability parameters
-# varfile_p <- "CHAPTER_1/DATA/MV_2023_12_DATA_distprob.csv"
-# probvars <- read.csv(varfile_p)[,-1]
-# # environmental data without missing sites
-# magvars <- magvars[dmr$X,]
-# probvars <- probvars[dmr$X,]
+# covariate data - for parameterizations
+# the environmental variables
+# for disturbance magnitude parameters
+varfile_m <- "CHAPTER_1/DATA/MV_2023_12_DATA_distmag.csv"
+magvars <- read.csv(varfile_m)[,-1]
+# for disturbance probability parameters
+varfile_p <- "CHAPTER_1/DATA/MV_2023_12_DATA_distprob.csv"
+probvars <- read.csv(varfile_p)[,-1]
+# environmental data without missing sites
+magvars <- magvars[dmr$X,]
+probvars <- probvars[dmr$X,]
 # 
 # # load disturbance magnitude and disturbance probability covariates
 # # disturbance magnitude
-# load("Chapter_1/2024_02_JAGS_models/magls.RData")
+#load("Chapter_1/2024_JAGS_models/magls.RData")
 # # disturbance probability
 # load("Chapter_1/2024_02_JAGS_models/probls.RData")
 # 
-# # making covariate data with anomalies rather than raw
-# # function:
-# anomfx<-function(x){
-#   # get mean values for each column
-#   means <- apply(x, 2, mean, na.rm=T)
-#   # make anomaly matrix
-#   anom <- matrix(NA,nrow=nrow(x), ncol=ncol(x))
-#   # for each row, fill in covariate anomaly
-#   for (i in 1:nrow(x)){
-#     for (j in 1:ncol(x)){
-#       anom[i,j] <- x[i,j] - means[j] # fill in anomalies for beta[] terms
-#     }
-#     anom[i,1] <- 1 # make first column 1s for beta0 term
-#   }
-#   return(anom)
-# }
-# 
-# # converting covariate lists to anomaly
-# # new empty list to populate with anomaly versions
-# anomls <- list()
-# # list being converted CHOOSE magls for disturbance magnitude/probls for disturbance probability
-# covls <- probls
-# #covls <- probls
-# # loop for conversion
-# for (i in 1:length(covls)){
-#   # run cov members through the anomaly machine
-#   anomls[[i]] <- anomfx(covls[[i]])
-# }
+# making covariate data with anomalies rather than raw
+# function:
+anomfx<-function(x){
+  # get mean values for each column
+  means <- apply(x, 2, mean, na.rm=T)
+  # make anomaly matrix
+  anom <- matrix(NA,nrow=nrow(x), ncol=ncol(x))
+  colnames(anom) <- colnames(x)
+  # for each row, fill in covariate anomaly
+  for (i in 1:nrow(x)){
+    for (j in 1:ncol(x)){
+      anom[i,j] <- x[i,j] - means[j] # fill in anomalies for beta[] terms
+    }
+    #anom[i,1] <- 1 # make first column 1s for beta0 term
+  }
+  return(anom)
+}
+
+#magcovs <- anom   #manually made these 4/29/24
+#probcovs <- anom
+#write.csv(magcovs, file = "CHAPTER_1/2024_JAGS_models/2024_04_magvars.csv")
+#write.csv(probcovs, file = "CHAPTER_1/2024_JAGS_models/2024_04_probvars.csv")
+
+
+# converting covariate lists to anomaly
+# new empty list to populate with anomaly versions
+anomls <- list()
+# list being converted CHOOSE magls for disturbance magnitude/probls for disturbance probability
+#covls <- magsls
+#covls <- probls
+# loop for conversion
+for (i in 1:length(covls)){
+  # run cov members through the anomaly machine
+  anomls[[i]] <- anomfx(covls[[i]])
+}
 # # disturbance magnitude saving anomaly version
 # #dmls <- anomls
 # # disturbance probability saving anomaly version
