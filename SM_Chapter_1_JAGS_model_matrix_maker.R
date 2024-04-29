@@ -23,8 +23,8 @@ library(dplyr)
 # probvars <- probvars[dmr$X,]
 
 # Loaded from 4/29/2024 making new anomaly data with new SMAP data
-#magvars <- read.csv("CHAPTER_1/2024_JAGS_models/2024_04_magvars.csv")
-probvars <- read.csv("CHAPTER_1/2024_JAGS_models/2024_04_probvars.csv")
+magvars <- read.csv("CHAPTER_1/2024_JAGS_models/2024_04_magvars.csv")[,-1]
+probvars <- read.csv("CHAPTER_1/2024_JAGS_models/2024_04_probvars.csv")[,-1]
 
 ### Load model list data frame:
 #modfile <- "CHAPTER_1/2024_JAGS_models/2024_02_20_Dist_Mag_Models.csv"
