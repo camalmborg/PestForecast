@@ -196,13 +196,14 @@ probvars <- probvars[dmr$X,]
 anomfx<-function(x){
   # get mean values for each column
   means <- apply(x, 2, mean, na.rm=T)
+  sds <- apply(x, 2, sd, na.rm=T)
   # make anomaly matrix
   anom <- matrix(NA,nrow=nrow(x), ncol=ncol(x))
   colnames(anom) <- colnames(x)
   # for each row, fill in covariate anomaly
   for (i in 1:nrow(x)){
     for (j in 1:ncol(x)){
-      anom[i,j] <- x[i,j] - means[j] # fill in anomalies for beta[] terms
+      anom[i,j] <- (x[i,j] - means[j])/sds[j] # fill in anomalies for beta[] terms
     }
     #anom[i,1] <- 1 # make first column 1s for beta0 term
   }
@@ -210,9 +211,9 @@ anomfx<-function(x){
 }
 
 #magcovs <- anom   #manually made these 4/29/24
-#probcovs <- anom
+probcovs <- anom
 #write.csv(magcovs, file = "CHAPTER_1/2024_JAGS_models/2024_04_magvars.csv")
-#write.csv(probcovs, file = "CHAPTER_1/2024_JAGS_models/2024_04_probvars.csv")
+write.csv(probcovs, file = "CHAPTER_1/2024_JAGS_models/2024_04_probvars.csv")
 
 
 # converting covariate lists to anomaly
