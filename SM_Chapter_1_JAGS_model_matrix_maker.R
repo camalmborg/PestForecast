@@ -8,24 +8,28 @@ library(dplyr)
 
 
 ### LOAD DATA:
-# the environmental variables
-# for disturbance magnitude parameters
-varfile_m <- "CHAPTER_1/DATA/MV_2023_12_DATA_distmag.csv"
-magvars <- read.csv(varfile_m)[,-1]
-# for disturbance probability parameters
-varfile_p <- "CHAPTER_1/DATA/MV_2023_12_DATA_distprob.csv"
-probvars <- read.csv(varfile_p)[,-1]
-# load data for dmr to remove missing sites from environmental data
-dmr_file <- "CHAPTER_1/DATA/2023_12_DMR_DATA_TCG.csv"
-dmr <- read.csv(dmr_file)
-# environmental data without missing sites
-magvars <- magvars[dmr$X,]
-probvars <- probvars[dmr$X,]
+# # the environmental variables
+# # for disturbance magnitude parameters
+# varfile_m <- "CHAPTER_1/DATA/MV_2023_12_DATA_distmag.csv"
+# magvars <- read.csv(varfile_m)[,-1]
+# # for disturbance probability parameters
+# varfile_p <- "CHAPTER_1/DATA/MV_2023_12_DATA_distprob.csv"
+# probvars <- read.csv(varfile_p)[,-1]
+# # load data for dmr to remove missing sites from environmental data
+# dmr_file <- "CHAPTER_1/DATA/2023_12_DMR_DATA_TCG.csv"
+# dmr <- read.csv(dmr_file)
+# # environmental data without missing sites
+# magvars <- magvars[dmr$X,]
+# probvars <- probvars[dmr$X,]
+
+# Loaded from 4/29/2024 making new anomaly data with new SMAP data
+#magvars <- read.csv("CHAPTER_1/2024_JAGS_models/2024_04_magvars.csv")
+probvars <- read.csv("CHAPTER_1/2024_JAGS_models/2024_04_probvars.csv")
 
 ### Load model list data frame:
 #modfile <- "CHAPTER_1/2024_JAGS_models/2024_02_20_Dist_Mag_Models.csv"
 #modfile <- "CHAPTER_1/2024_JAGS_models/2024_02_22_Dist_Prob_Models.csv"
-modfile <- "CHAPTER_1/2024_JAGS_models/2024_04_04_Dist_Mag_Models.csv"
+#modfile <- "CHAPTER_1/2024_JAGS_models/2024_04_04_Dist_Mag_Models.csv"
 modfile <- "CHAPTER_1/2024_JAGS_models/2024_04_17_Dist_Prob_Models.csv"
 # disturbance mag/prob model file
 modeldf <- read.csv(modfile, header = F)
@@ -56,7 +60,7 @@ for (i in 1:nrow(modeldf)){
 dpls <- covls
 
 # save
-#save(dmls, file = "CHAPTER_1/2024_JAGS_models/2024_04_dmls.RData")
+save(dmls, file = "CHAPTER_1/2024_JAGS_models/2024_04_dmls.RData")
 save(dpls, file = "CHAPTER_1/2024_JAGS_models/2024_04_dpls.RData")
 
 ## informative R prior ("complicated version" 3/13)
