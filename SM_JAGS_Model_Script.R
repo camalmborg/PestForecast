@@ -213,7 +213,7 @@ anomfx<-function(x){
 #magcovs <- anom   #manually made these 4/29/24
 probcovs <- anom
 #write.csv(magcovs, file = "CHAPTER_1/2024_JAGS_models/2024_04_magvars.csv")
-write.csv(probcovs, file = "CHAPTER_1/2024_JAGS_models/2024_04_probvars.csv")
+#write.csv(probcovs, file = "CHAPTER_1/2024_JAGS_models/2024_04_probvars.csv")
 
 
 # converting covariate lists to anomaly
