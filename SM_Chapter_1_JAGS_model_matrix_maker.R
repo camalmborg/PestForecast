@@ -16,8 +16,8 @@ library(dplyr)
 # varfile_p <- "CHAPTER_1/DATA/MV_2023_12_DATA_distprob.csv"
 # probvars <- read.csv(varfile_p)[,-1]
 # # load data for dmr to remove missing sites from environmental data
-# dmr_file <- "CHAPTER_1/DATA/2023_12_DMR_DATA_TCG.csv"
-# dmr <- read.csv(dmr_file)
+dmr_file <- "CHAPTER_1/DATA/2023_12_DMR_DATA_TCG.csv"
+dmr <- read.csv(dmr_file)
 # # environmental data without missing sites
 # magvars <- magvars[dmr$X,]
 # probvars <- probvars[dmr$X,]
@@ -34,6 +34,12 @@ modfile <- "CHAPTER_1/2024_JAGS_models/2024_04_17_Dist_Prob_Models.csv"
 # disturbance mag/prob model file
 modeldf <- read.csv(modfile, header = F)
 
+# 5/12/2024 making 3 more alpha models to run w 6 vars
+dp1 <- c(1,2,4,5,6,7,NA)
+dp2 <- c(1,2,3,4,5,7,NA)
+dp3 <- c(1,2,3,4,6,7,NA)
+dps <- rbind(dp1, dp2, dp3)
+modeldf <- dps
 
 ### Making list of data for models:
 # empty list
@@ -61,7 +67,7 @@ dpls <- covls
 
 # save
 save(dmls, file = "CHAPTER_1/2024_JAGS_models/2024_04_dmls.RData")
-save(dpls, file = "CHAPTER_1/2024_JAGS_models/2024_04_dpls.RData")
+save(dpls, file = "CHAPTER_1/2024_JAGS_models/2024_05_dp3s.RData")
 
 ## informative R prior ("complicated version" 3/13)
 # time series 1 object
