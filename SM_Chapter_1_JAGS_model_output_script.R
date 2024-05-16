@@ -20,15 +20,12 @@ library(knitr)
 runpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_runs/"
 outpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_outputs/"
 # model data
-# runfile <- "A_best_alpha/2024-05-10_modelrun_alpha_a_10_b_1_data.RData"
-# run <- load(paste0(runpath, runfile))
+runfile <- "A_best_alpha/2024-05-10_modelrun_alpha_a_10_b_1_data.RData"
+run <- load(paste0(runpath, runfile))
 # model output
 outfile <- "A_best_alpha/2024-05-10_modelrun_alpha_a_10_b_1_output.csv"
 out <- read.csv(paste0(outpath, outfile))
 
-# number of samples
-niter = nrow(out)
-nsite = nrow(env)
 # data from model inputs for computing mu
 data <- model_info$metadata$data
 # covariates
@@ -61,7 +58,11 @@ env <- data$b
 # predicted intercept and slopes means
 preds <- apply(out, 2, mean)
 
+#Ex <- dnorm(nrow(env), mean = mean(data$x_ic), sd = mean(data$tau_ic))
+#Emun <- dnorm(nrow(env), data$rmean, data$rprec)
+
 Emu0 <- as.matrix(env) %*% as.matrix(preds[4:(length(preds)-1)])
+
 #Emu <- 
 # muN[s] ~ dnorm(mun[s], pan)
 # muD[s] ~ dnorm(mu0[s], pa0) 
