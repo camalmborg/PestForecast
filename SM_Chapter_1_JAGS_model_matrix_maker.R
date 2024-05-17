@@ -30,16 +30,19 @@ probvars <- read.csv("CHAPTER_1/2024_JAGS_models/2024_04_probvars.csv")[,-1]
 #modfile <- "CHAPTER_1/2024_JAGS_models/2024_02_20_Dist_Mag_Models.csv"
 #modfile <- "CHAPTER_1/2024_JAGS_models/2024_02_22_Dist_Prob_Models.csv"
 #modfile <- "CHAPTER_1/2024_JAGS_models/2024_04_04_Dist_Mag_Models.csv"
-modfile <- "CHAPTER_1/2024_JAGS_models/2024_04_17_Dist_Prob_Models.csv"
+#modfile <- "CHAPTER_1/2024_JAGS_models/2024_04_17_Dist_Prob_Models.csv"
+#modfile <- "CHAPTER_1/2024_JAGS_models/2024_05_best_dist_mag_JAGS_models.csv"
+modfile <- "CHAPTER_1/2024_JAGS_models/2024_05_best_dist_prob_JAGS_models.csv"
+
 # disturbance mag/prob model file
 modeldf <- read.csv(modfile, header = F)
 
 # 5/12/2024 making 3 more alpha models to run w 6 vars
-dp1 <- c(1,2,4,5,6,7,NA)
-dp2 <- c(1,2,3,4,5,7,NA)
-dp3 <- c(1,2,3,4,6,7,NA)
-dps <- rbind(dp1, dp2, dp3)
-modeldf <- dps
+# dp1 <- c(1,2,4,5,6,7,NA)
+# dp2 <- c(1,2,3,4,5,7,NA)
+# dp3 <- c(1,2,3,4,6,7,NA)
+# dps <- rbind(dp1, dp2, dp3)
+# modeldf <- dps
 
 ### Making list of data for models:
 # empty list
@@ -66,32 +69,32 @@ for (i in 1:nrow(modeldf)){
 dpls <- covls
 
 # save
-save(dmls, file = "CHAPTER_1/2024_JAGS_models/2024_04_dmls.RData")
-save(dpls, file = "CHAPTER_1/2024_JAGS_models/2024_05_dp3s.RData")
+save(dmls, file = "CHAPTER_1/2024_JAGS_models/2024_05_dmls.RData")
+save(dpls, file = "CHAPTER_1/2024_JAGS_models/2024_05_dpls.RData")
 
-## informative R prior ("complicated version" 3/13)
-# time series 1 object
-ts1 <- matrix(data = NA, nrow = nrow(cs), ncol = yrs)
-# time series 2 object
-ts2 <- matrix(data = NA, nrow = nrow(cs), ncol = yrs)
-# make cors vector
-cors <- vector()
-# make vectors of "before" and "after"
-for (i in 1:nrow(cs)){
-  # pick out disturbance date for each site
-  td <- which(colnames(cs) == dists[i])
-  # make vector of each row values:
-  v <- cs[i, (td-yrs):(td-1)]
-  v2 <- cs[i, (td-yrs+1):td]
-  # fill in matrices of values for t-1 (ts1) and t (ts2)
-  for (j in 1:ncol(v)){
-    ts1[i,j] <- v[,j]
-    ts2[i,j] <- v2[,j]
-  }
-  #correlation between two time series at each site:
-  cors[i] <- cor(ts1[i,], ts2[i,], use = "complete.obs")
-}
-## ^^ re-did this the "less complicated way" in JAGS model script ^^
+# ## informative R prior ("complicated version" 3/13)
+# # time series 1 object
+# ts1 <- matrix(data = NA, nrow = nrow(cs), ncol = yrs)
+# # time series 2 object
+# ts2 <- matrix(data = NA, nrow = nrow(cs), ncol = yrs)
+# # make cors vector
+# cors <- vector()
+# # make vectors of "before" and "after"
+# for (i in 1:nrow(cs)){
+#   # pick out disturbance date for each site
+#   td <- which(colnames(cs) == dists[i])
+#   # make vector of each row values:
+#   v <- cs[i, (td-yrs):(td-1)]
+#   v2 <- cs[i, (td-yrs+1):td]
+#   # fill in matrices of values for t-1 (ts1) and t (ts2)
+#   for (j in 1:ncol(v)){
+#     ts1[i,j] <- v[,j]
+#     ts2[i,j] <- v2[,j]
+#   }
+#   #correlation between two time series at each site:
+#   cors[i] <- cor(ts1[i,], ts2[i,], use = "complete.obs")
+# }
+# ## ^^ re-did this the "less complicated way" in JAGS model script ^^
 
 
 ### MAKING ANOMALY COVARIATE DATA
