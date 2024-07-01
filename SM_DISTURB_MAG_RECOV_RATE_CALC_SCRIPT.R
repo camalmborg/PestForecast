@@ -140,8 +140,8 @@ spongy_mpr<-function(tcg,cs,distyr,monthnum,seqnum){
   return(tcg.m)
 }
 
-testfx<-spongy_mpr(tcg.values,cond.scores, 2016, 3, 5)
-testfx2 <- spongy_mpr(cond.scores, cond.scores, 2016, 3, 5)
+testfx<-spongy_mpr(tcg.values,cond.scores, 2016, 2, 5)
+testfx2 <- spongy_mpr(cond.scores, cond.scores, 2016, 2, 5)
 
 #hf_mags_2 <- spongy_mpr(tcg.values, cond.scores, 2016)
 #once again I am a beautiful genius!!!!
