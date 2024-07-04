@@ -201,9 +201,58 @@ write.csv(joint_pd_obs, "Maps/Chapter_1/Data/joint_pred_obs.csv")
 
 
 ### Example time series for conceptual figure ---------------------------
-just_scores <- scores %>%
+# get the condition scores for time series examples
+# using just june months for smoothing
+just_scores <- scores %>% 
+  # Drop unwanted columns
+  dplyr::select(dplyr::starts_with("X")) %>%
+  # Select just June averages for best disturbance visual without seasonality
+  dplyr::select(dplyr::contains(".06.")) %>%
+  # site column for flipping longer
+  mutate(sites = as.factor(1:nrow(x = .)), .before = dplyr::everything()) %>%
+  # flip
+  tidyr:: pivot_longer(cols = starts_with("X")) %>%
+  # rename with date, without extra characters
+  dplyr::mutate(date_char = str_replace_all(string = name,
+                                            c("X|_score_mean|_cs_mean" = "", 
+                                            "\\." = "-"))) %>%
+  # year and month info
+  dplyr:: mutate(
+    year = as.numeric(stringr::str_sub(string = date_char, start = 1, end = 4)),
+    month = as.numeric(stringr::str_sub(string = date_char, start = 6, end = 7))) %>%
+  # Get a real date column
+  dplyr::mutate(date = as.Date(date_char)) %>%
+  # filter time amount
+  filter(date > as.Date("1994-06-01")) %>%
+  # select columns
+  select(sites, date, value)
+
+# example site number
+# running some samples:
+eg <- which(dmr_cs$mags > 8 & dmr_cs$mags < 8.3 & dmr_cs$colnum == 22)
+#site_num <- 3080
+site_num = eg[24]
+# filter for just site number
+eg_site <- just_scores[just_scores$sites == site_num,]
   
 
+# make a nice looking plot
+time_series <- ggplot(data = eg_site, aes(x = date, y = value)) +
+  # add background color for disturbance years:
+  geom_rect(data = NULL, aes(xmin = as.Date("2016-05-01"), xmax = as.Date("2020-07-01"),
+                             ymin = -Inf, ymax = Inf), alpha = 0.2, show.legend = FALSE,
+            fill = "light grey", color = NA) +
+  # add line
+  geom_line() +
+  # add points
+  geom_point(pch = 16, size = 2, color = "black",
+             alpha = 0.8, position = position_dodge(width = 0.2)) +
+  # add dashes connecting missing bits
+  geom_line(data = filter(eg_site, !is.na(value)),
+            linetype = "dashed", linewidth = 0.3, show.legend = FALSE,
+            position = position_dodge(width = 0.2))
+print(time_series)
+  
 ##### ARCHIVE ##### -----------------------------------------------------
 ### PLOTTING AND TABLE STUFF FOR EFI CONFERENCE
 
