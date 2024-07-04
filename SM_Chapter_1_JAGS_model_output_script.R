@@ -34,6 +34,30 @@ rm(find_miss)
 dmr_tcg <- read.csv("CHAPTER_1/DATA/2023_12_DMR_DATA_TCG.csv")[-missing,]
 # cs dist-mag-recov object:
 dmr_cs <- read.csv("CHAPTER_1/DATA/2023_12_DMR_DATA_CS.csv")[-missing,]
+# Landsat product data:
+scores <- read.csv("CHAPTER_1/DATA/2022_12_7_sample_score_mean_5k.csv")[dmr_cs$X,]
+# getting geographic data for mapping
+# isolate geographic data from Landsat product
+geo <- as.data.frame(scores$.geo)
+#make lat and lon columns from .geo:
+coords<-matrix(nrow=nrow(geo),ncol=3)
+for (i in 1:nrow(geo)){
+  #longitudes:
+  lon<-str_extract(geo[i,], "\\d+\\.*\\d*")
+  coords[i,1]<-as.numeric(lon)*-1
+  #latitudes:
+  extlon<-sub(lon,"",geo[i,])
+  coords[i,2]<-as.numeric(str_extract(extlon, "\\d+\\.*\\d*"))
+  coords[i,3]<-i
+}
+# site data
+sites <- cbind(id = 1:nrow(scores),
+               sys = scores$system.index,
+               lon = coords[,1],
+               lat = coords[,2])
+colnames(coords) <- c("lon", "lat", "site")
+rm(geo)
+#write.csv(coords, "CHAPTER_1/DATA/site_coordinates.csv")
 
 
 ### ALPHA MODELS --- using output for computing disturbance predictions:
@@ -55,13 +79,36 @@ data <- model_info$metadata$data
 
 # covariates
 env <- data$a
-# predicted intercept and slope means
+# predicted intercept and slope means:
 preds <- apply(out, 2, mean)
 # get probabilities
 # which outputs are alpha covariates
 ps <- grep("^alpha", names(preds))
 # predicted disturbances
 Ed <- inv.logit(as.matrix(env) %*% as.matrix(preds[ps]))
+# observed disturbances:
+# dist16 <- dmr_cs$dpy1
+# dist17 <- dmr_cs$dpy2
+# make empty matrix to fill with 2016 and 2017 disturbance data
+obsdist <- c(rep(NA, nrow(dmr_cs)))
+# add 1s for disturbances in each year:
+dists <- c(which(dmr_cs$dpy1 == 1), 
+           which(dmr_cs$dpy2 == 1))
+obsdist[dists] <- 1
+obsdist[is.na(obsdist)] <- 0
+
+# percentage of observed disturbances:
+oD <- sum(dist16 + dist17) / nrow(dmr_cs) * 100
+oD16 <- sum(dist16) / nrow(dmr_cs) * 100
+# percentage of predicted disturbance:
+pD <- length(which(Ed > 0.95)) / nrow(dmr_cs) * 100
+
+# save data for maps:
+# add coordinates
+probs_pd_obs <- cbind(coords[,'lon'], coords[,'lat'],
+                     obsdist, Ed)
+colnames(probs_pd_obs) <- c("lon", "lat", "obs", "pred")
+write.csv(probs_pd_obs, "Maps/Chapter_1/Data/probs_pred_obs.csv")
 
   
 ### BETA MODELS --- using output for computing disturbance magnitudes:
@@ -86,10 +133,19 @@ preds <- apply(out, 2, mean)
 ps <- grep("^beta", names(preds))
 # predicted magnitudes
 Emu0 <- as.matrix(env) %*% as.matrix(preds[ps])
+# observed minimum values from disturbance
+obsdist <- dmr_cs$mins
 # prior timestep value
 prior <- data$x_ic
-# observed value - magnitude = disturbance
-obsdist <- prior - dmr_cs$mags
+# predicted score value - magnitude = disturbance
+preddist <- prior - Emu0
+
+# save data for maps:
+# add coordinates
+mags_pd_obs <- cbind(coords[,'lon'], coords[,'lat'],
+                     obsdist, preddist)
+colnames(mags_pd_obs) <- c("lon", "lat", "obs", "pred")
+write.csv(mags_pd_obs, "Maps/Chapter_1/Data/mags_pred_obs.csv")
 
 
 ### JOINT MODELS --- using output from best joint model:
@@ -97,10 +153,10 @@ obsdist <- prior - dmr_cs$mags
 runpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_runs/"
 outpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_outputs/"
 
-runfile <- "A_best_joint/.RData"
+runfile <- "A_best_joint/2024-06-21_modelrun_joint_a_4_b_2_data.RData"
 run <- load(paste0(runpath, runfile))
 # model output
-outfile <- "A_best_joint/.csv"
+outfile <- "A_best_joint/2024-06-21_modelrun_joint_a_4_b_2_output.csv"
 out <- read.csv(paste0(outpath, outfile))
 
 # data from model inputs for computing dist prob and dist mag pred/obs
@@ -115,12 +171,38 @@ preds <- apply(out, 2, mean)
 # which outputs are alpha covariates
 psa <- grep("^alpha", names(preds))
 psb <- grep("^beta", names(preds))
-# predicted disturbances
-Ed <- inv.logit(as.matrix(env) %*% as.matrix(preds[psa]))
-# predicted magnitudes
-Emu0 <- as.matrix(env) %*% as.matrix(preds[psb])
+# predicted disturbances:
+Ed <- inv.logit(as.matrix(enva) %*% as.matrix(preds[psa]))
+# observed values:
+# make empty matrix to fill with 2016 and 2017 disturbance data
+obsdist_p <- c(rep(NA, nrow(dmr_cs)))
+# add 1s for disturbances in each year:
+dists <- c(which(dmr_cs$dpy1 == 1), 
+           which(dmr_cs$dpy2 == 1))
+obsdist_p[dists] <- 1
+obsdist_p[is.na(obsdist_p)] <- 0
+# predicted magnitudes:
+Emu0 <- as.matrix(envb) %*% as.matrix(preds[psb])
+# observed values:
+# observed minimum values from disturbance
+obsdist_m <- dmr_cs$mins
+# prior timestep value
+prior <- data$x_ic
+# predicted score value - magnitude = disturbance
+preddist_m <- prior - Emu0
+
+# save data for maps:
+# add coordinates
+joint_pd_obs <- cbind(coords[,'lon'], coords[,'lat'],
+                      obsdist_p, Ed,
+                      obsdist_m, preddist_m)
+colnames(joint_pd_obs) <- c("lon", "lat", "a_obs", "a_pred", "b_obs", "b_pred")
+write.csv(joint_pd_obs, "Maps/Chapter_1/Data/joint_pred_obs.csv")
 
 
+### Example time series for conceptual figure ---------------------------
+just_scores <- scores %>%
+  
 
 ##### ARCHIVE ##### -----------------------------------------------------
 ### PLOTTING AND TABLE STUFF FOR EFI CONFERENCE
