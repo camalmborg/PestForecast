@@ -138,7 +138,7 @@ obsdist <- dmr_cs$mins
 # prior timestep value
 prior <- data$x_ic
 # predicted score value - magnitude = disturbance
-preddist <- prior - Emu0
+preddist <- prior + Emu0
 
 # save data for maps:
 # add coordinates
@@ -189,7 +189,7 @@ obsdist_m <- dmr_cs$mins
 # prior timestep value
 prior <- data$x_ic
 # predicted score value - magnitude = disturbance
-preddist_m <- prior - Emu0
+preddist_m <- prior + Emu0
 
 # save data for maps:
 # add coordinates
