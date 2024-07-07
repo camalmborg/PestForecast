@@ -105,10 +105,10 @@ pD <- length(which(Ed > 0.95)) / nrow(dmr_cs) * 100
 
 # save data for maps:
 # add coordinates
-probs_pd_obs <- cbind(coords[,'lon'], coords[,'lat'],
+probs_pd_obs <- cbind.data.frame(coords[,'lon'], coords[,'lat'],
                      obsdist, Ed)
 colnames(probs_pd_obs) <- c("lon", "lat", "obs", "pred")
-write.csv(probs_pd_obs, "Maps/Chapter_1/Data/probs_pred_obs.csv")
+#write.csv(probs_pd_obs, "Maps/Chapter_1/Data/probs_pred_obs.csv")
 
   
 ### BETA MODELS --- using output for computing disturbance magnitudes:
@@ -145,7 +145,7 @@ preddist <- prior - Emu0
 mags_pd_obs <- cbind(coords[,'lon'], coords[,'lat'],
                      obsdist, preddist)
 colnames(mags_pd_obs) <- c("lon", "lat", "obs", "pred")
-write.csv(mags_pd_obs, "Maps/Chapter_1/Data/mags_pred_obs.csv")
+#write.csv(mags_pd_obs, "Maps/Chapter_1/Data/mags_pred_obs.csv")
 
 
 ### JOINT MODELS --- using output from best joint model:
@@ -197,7 +197,7 @@ joint_pd_obs <- cbind(coords[,'lon'], coords[,'lat'],
                       obsdist_p, Ed,
                       obsdist_m, preddist_m)
 colnames(joint_pd_obs) <- c("lon", "lat", "a_obs", "a_pred", "b_obs", "b_pred")
-write.csv(joint_pd_obs, "Maps/Chapter_1/Data/joint_pred_obs.csv")
+#write.csv(joint_pd_obs, "Maps/Chapter_1/Data/joint_pred_obs.csv")
 
 
 ### Example time series for conceptual figure ---------------------------
@@ -253,6 +253,52 @@ time_series <- ggplot(data = eg_site, aes(x = date, y = value)) +
             position = position_dodge(width = 0.2))
 print(time_series)
   
+##### TABLES ##### ------------------------------------------------------
+# #prep table
+# identify the model:
+meta <- model_info$metadata
+#alph = 1  # for alpha model
+#bet = 1   # for beta model
+alph <- meta$modelrun_a
+bet <- meta$modelrun_b
+# covariate names:
+cov_names_a <- names(dpls[[alph]])
+cov_names_b <- names(dmls[[bet]]) 
+# summary - param means:
+summ = summary(model_info$jpout)
+means = formatC(summ$statistics[,"Mean"], 
+                digits = 3,
+                format = 'f')
+# make alpha param table:
+alpha_means <- as.data.frame(matrix(NA, length(cov_names_a), 1))
+rownames(alpha_means) <- c("Intercept",
+                           cov_names_a[-1])
+colnames(alpha_means) <- "Disturbance Probability Parameter Means"
+
+# make beta param table:
+beta_means <- as.data.frame(matrix(NA, length(cov_names_b), 1))
+rownames(beta_means) <- c("Intercept",
+                          cov_names_b[-1])
+colnames(beta_means) <- "Disturbance Magnitude Parameter Means"
+
+# error param table:
+error_mean <- as.data.frame(matrix(NA, 1, 1))
+rownames(error_mean) <- c("p")
+colnames(error_mean) <- c("Process Error")
+
+# compile final results:
+alpha_means[,1] <- means[grep("^alpha", names(means))]
+beta_means[,1] <- means[grep("^beta", names(means))]
+error_mean[,1] <- means[grep("^p", names(means))]
+
+# make them pretty:
+kbl(alpha_means) %>%
+  kable_styling()
+
+# kbl(alpha_table) %>%
+#   kable_styling()
+# #save_kable(alpha_table, "Chapter_1/2024_06_alpha_table.png")
+
 ##### ARCHIVE ##### -----------------------------------------------------
 ### PLOTTING AND TABLE STUFF FOR EFI CONFERENCE
 
