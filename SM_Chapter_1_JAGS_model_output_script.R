@@ -223,35 +223,61 @@ just_scores <- scores %>%
   # Get a real date column
   dplyr::mutate(date = as.Date(date_char)) %>%
   # filter time amount
-  filter(date > as.Date("1994-06-01")) %>%
+  filter(date > as.Date("2004-06-01")) %>%
   # select columns
   select(sites, date, value)
 
 # example site number
 # running some samples:
 eg <- which(dmr_cs$mags > 8 & dmr_cs$mags < 8.3 & dmr_cs$colnum == 22)
-#site_num <- 3080
-site_num = eg[24]
+#site_num <- 3080   
+site_num = eg[16]   
 # filter for just site number
 eg_site <- just_scores[just_scores$sites == site_num,]
-  
+
 
 # make a nice looking plot
 time_series <- ggplot(data = eg_site, aes(x = date, y = value)) +
   # add background color for disturbance years:
   geom_rect(data = NULL, aes(xmin = as.Date("2016-05-01"), xmax = as.Date("2020-07-01"),
-                             ymin = -Inf, ymax = Inf), alpha = 0.2, show.legend = FALSE,
-            fill = "light grey", color = NA) +
+                             ymin = -Inf, ymax = Inf), alpha = 0.1, show.legend = FALSE,
+            fill = "rosybrown1", color = NA) +
   # add line
   geom_line() +
   # add points
-  geom_point(pch = 16, size = 2, color = "black",
+  geom_point(pch = 16, size = 1.5, color = "black",
              alpha = 0.8, position = position_dodge(width = 0.2)) +
   # add dashes connecting missing bits
   geom_line(data = filter(eg_site, !is.na(value)),
-            linetype = "dashed", linewidth = 0.3, show.legend = FALSE,
-            position = position_dodge(width = 0.2))
+            #linetype = "dashed", 
+            #linewidth = 0.3, 
+            show.legend = FALSE,
+            position = position_dodge(width = 0.2)) +
+  # axis titles
+  xlab("Date") +
+  ylab("Condition Score") +
+  # change plot theme
+  theme(
+    # remove grid
+    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+    # remove background
+    panel.background = element_blank(), 
+    # remove sides
+    axis.line = element_line(colour = "black"),
+    # axis title x and y
+    axis.title = element_text(color = "black")
+  )
 print(time_series)
+# save plot
+ggsave(
+  filename = "2024_07_07_forest_condition_eg_plot.png",
+  plot = time_series,
+  device = "png",
+  width = 6,
+  height = 2.5,
+  units = "in",#c("in", "in"),
+  dpi = 300 #"print"
+)
   
 ##### TABLES ##### ------------------------------------------------------
 # #prep table

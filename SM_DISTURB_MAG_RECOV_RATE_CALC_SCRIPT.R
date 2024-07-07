@@ -24,7 +24,7 @@ cond.scores<-read.csv(cfile)
 #cs = condition score GEE data for all sites
 #distyr = year of outbreak (2016)
 #monthnum = 3 if tcg and condscore data include April, 2 if data does not include April
-#seqnum = number of growing season months in tcg/cs data (April-Aug = 5, April-Sep = 6, etc.)
+#seqnum = number of growing season months in tcg/cs data (April-Aug = 5, May-Sep = 5, April-Sep = 6, etc.)
 spongy_mpr<-function(tcg,cs,distyr,monthnum,seqnum){
   #get just the tcg values from data frame:
   tcgs<-tcg[,c(grep("^X",colnames(tcg)))]
@@ -119,7 +119,7 @@ spongy_mpr<-function(tcg,cs,distyr,monthnum,seqnum){
   dmpr<-cbind(tcg.m,csj)
   #LOOP FOR DISTURBANCE PROBABILITY:
   distprob<-matrix(NA,nrow=nrow(dmpr),ncol=2)
-  d = quantile(dmpr[,grep(as.character(distyr-6),colnames(dmpr)):
+  d = quantile(dmpr[,grep(as.character(distyr-5),colnames(dmpr)):
                        grep(as.character(distyr-1),colnames(dmpr))],
                c(0.01),na.rm=T) #selecting dist sites 1% quant in prev 5 yr. 
   for (i in 1:nrow(dmpr)){
