@@ -280,50 +280,199 @@ ggsave(
 )
   
 ##### TABLES ##### ------------------------------------------------------
+### ALPHA best model PARAMS TABLE -----
 # #prep table
 # identify the model:
 meta <- model_info$metadata
-#alph = 1  # for alpha model
-#bet = 1   # for beta model
-alph <- meta$modelrun_a
-bet <- meta$modelrun_b
+alph = 1  # for alpha model
 # covariate names:
 cov_names_a <- names(dpls[[alph]])
-cov_names_b <- names(dmls[[bet]]) 
 # summary - param means:
 summ = summary(model_info$jpout)
 means = formatC(summ$statistics[,"Mean"], 
                 digits = 3,
                 format = 'f')
 # make alpha param table:
-alpha_means <- as.data.frame(matrix(NA, length(cov_names_a), 1))
-rownames(alpha_means) <- c("Intercept",
-                           cov_names_a[-1])
-colnames(alpha_means) <- "Disturbance Probability Parameter Means"
-
-# make beta param table:
-beta_means <- as.data.frame(matrix(NA, length(cov_names_b), 1))
-rownames(beta_means) <- c("Intercept",
-                          cov_names_b[-1])
-colnames(beta_means) <- "Disturbance Magnitude Parameter Means"
-
-# error param table:
-error_mean <- as.data.frame(matrix(NA, 1, 1))
-rownames(error_mean) <- c("p")
-colnames(error_mean) <- c("Process Error")
+alpha_means <- as.data.frame(matrix(NA, length(cov_names_a) + 2, 1))
+rownames(alpha_means) <- c("Dist Prob Intercept",
+                           cov_names_a[-1],
+                           "Dist Mag Intercept",
+                           "Process Error")
+colnames(alpha_means) <- "Disturbance Probability Model Parameter Means"
 
 # compile final results:
-alpha_means[,1] <- means[grep("^alpha", names(means))]
-beta_means[,1] <- means[grep("^beta", names(means))]
-error_mean[,1] <- means[grep("^p", names(means))]
+alpha_means[,1] <- c(means[grep("^alpha", names(means))],
+                     means[grep("^beta", names(means))],
+                     means[grep("^p", names(means))])
 
 # make them pretty:
 kbl(alpha_means) %>%
-  kable_styling()
+  kable_styling(bootstrap_options = "striped", 
+                full_width = T, 
+                position = "left")
 
-# kbl(alpha_table) %>%
-#   kable_styling()
-# #save_kable(alpha_table, "Chapter_1/2024_06_alpha_table.png")
+### BETA best model PARAMS TABLE -----
+# identify the model:
+meta <- model_info$metadata
+bet = 1  # for beta model
+# covariate names:
+cov_names_b <- names(dmls[[bet]])
+# summary - param means:
+summ = summary(model_info$jpout)
+means = formatC(summ$statistics[,"Mean"], 
+                digits = 3,
+                format = 'f')
+# make beta param table:
+beta_means <- as.data.frame(matrix(NA, length(cov_names_b) + 2, 1))
+rownames(beta_means) <- c("Dist Mag Intercept",
+                           cov_names_b[-1],
+                           "Dist Prob Intercept",
+                           "Process Error")
+colnames(beta_means) <- "Disturbance Magnitude Model Parameter Means"
+
+# compile final results:
+beta_means[,1] <- c(means[grep("^beta", names(means))],
+                     means[grep("^alpha", names(means))],
+                     means[grep("^p", names(means))])
+
+# make them pretty:
+kbl(beta_means) %>%
+  kable_styling(bootstrap_options = "striped", 
+                full_width = T, 
+                position = "left")
+
+
+### JOINT best model PARAMS TABLE -----
+# identify the model:
+meta <- model_info$metadata
+# get covariates
+alph <- meta$modelrun_a
+bet <- meta$modelrun_b
+# covariate names:
+cov_names_a <- names(dpls[[alph]])
+cov_names_b <- names(dmls[[bet]]) 
+# change one row name to not be duplicate for table
+nm <- intersect(cov_names_a, cov_names_b)
+cov_names_b[which(cov_names_b == nm[2])] <- paste0(nm[2],"_")
+# model summary
+summ = summary(model_info$jpout)
+means = formatC(summ$statistics[,"Mean"], 
+                digits = 3,
+                format = 'f')
+# make param table:
+joint_means <- as.data.frame(matrix(NA, length(cov_names_a) + length(cov_names_b) + 1, 1))
+rownames(joint_means) <- c("Dist Prob Intercept",
+                          cov_names_a[-1],
+                          "Dist Mag Intercept",
+                          cov_names_b[-1],
+                          "Process Error")
+colnames(joint_means) <- "Joint Model Parameter Means"
+
+# compile final results:
+joint_means[,1] <- c(means[grep("^alpha", names(means))],
+                    means[grep("^beta", names(means))],
+                    means[grep("^p", names(means))])
+# make table:
+kbl(joint_means) %>%
+  kable_styling(bootstrap_options = "striped", 
+                full_width = T, 
+                position = "left")
+
+
+
+### MULTIVAR ANALYSES tables ------
+# compiling a tables of Rs and AUCs and delAICs:
+# load results:
+alpha_mv_results <- read.csv("CHAPTER_1/2024_01_RESULTS/best_distprob16_models_tcg.csv")
+alpha_mv_results$dAIC <- min(alpha_mv_results$aics) - alpha_mv_results$aics
+beta_mv_results <- read.csv("CHAPTER_1/2024_01_RESULTS/best_distmag_models_tcg.csv")
+beta_mv_results$dAIC <- min(beta_mv_results$aics) - beta_mv_results$aics
+# order by delAIC
+alpha_mv_results <- alpha_mv_results[order(alpha_mv_results$dAIC, decreasing = TRUE),]
+beta_mv_results <- beta_mv_results[order(beta_mv_results$dAIC, decreasing = TRUE),]
+# covariate names:
+all_covs_a <- names(dpls[[2]][-1])
+all_covs_b <- names(dmls[[2]][-1])
+# set up tables:
+prob_mv_table <- as.data.frame(matrix(NA, 5, length(all_covs_a)+2))
+mags_mv_table <- as.data.frame(matrix(NA, 5, length(all_covs_b)+2))
+
+# fill in tables:
+# ALPHA
+rownames(prob_mv_table) <- as.character(c(1:5))
+colnames(prob_mv_table) <- c( paste0("\u394", "AIC"),
+                              "AUC",
+                              all_covs_a)
+prob_mv_table[,1] <- alpha_mv_results$dAIC[1:5]
+prob_mv_table[,2] <- alpha_mv_results$aucs[1:5]
+for (i in 1:5){
+  # extract data
+  vars <- alpha_mv_results$model_vars[i]
+  # convert to numeric
+  vn <- str_split(vars, ',') %>% unlist %>%
+    str_replace('\\D*(\\d*)\\D*', '\\1') %>%
+    as.numeric()
+  # fill in X's for params that were used in that model
+  for (j in 1:length(vn)){
+    prob_mv_table[i,vn[j] + 2] <- "X"
+  }
+}
+
+# BETA
+rownames(mags_mv_table) <- as.character(c(1:5))
+colnames(mags_mv_table) <- c("R sq", 
+                             paste0("\u394", "AIC"),
+                             all_covs_b)
+
+mags_mv_table[,1] <- beta_mv_results$dAIC[1:5]
+mags_mv_table[,2] <- beta_mv_results$r2s[1:5]
+for (i in 1:5){
+  # extract data
+  vars <- beta_mv_results$model_vars[i]
+  # convert to numeric
+  vn <- str_split(vars, ',') %>% unlist %>%
+    str_replace('\\D*(\\d*)\\D*', '\\1') %>%
+    as.numeric()
+  # fill in X's for params that were used in that model
+  for (j in 1:length(vn)){
+    mags_mv_table[i,vn[j] + 2] <- "X"
+  }
+}
+
+
+
+
+### JAGS MODEL ANALYSES tables
+# load results:
+JAGS_models <- read.csv("CHAPTER_1/2024_JAGS_models/2024_BEST_JAGS_MODELS_RESULTS.csv")
+JAGS_models <- JAGS_models %>% mutate_if(is.numeric, round, digits = 3)
+# make the table:
+# columns with params
+param_cols <- names(JAGS_models[,7:21])
+# assemble table
+best_jags <- kbl(JAGS_models)%>%
+  kable_styling()
+# column colors
+for (i in 7:21){
+  best_jags <- column_spec(best_jags, i,
+                           color = "white",
+                           background = spec_color(JAGS_models[,i]))
+}
+
+best_jags
+
+save_kable(best_jags, file = "best_jags.png", file_format = png)
+  
+  
+# kbl(JAGS_models)%>%
+  # # for every param column
+  # reduce(
+  #   which(names(JAGS_models) %in% param_cols),
+  #   ~ column_spec(.x, .y,
+  #                 color = "white",
+  #                 background = spec_color())
+  # )
+
 
 ##### ARCHIVE ##### -----------------------------------------------------
 ### PLOTTING AND TABLE STUFF FOR EFI CONFERENCE
