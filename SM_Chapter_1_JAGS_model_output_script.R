@@ -460,19 +460,47 @@ JAGS_params <- cbind(a1_int = JAGS_models$a1_int,
                      JAGS_models[,grep("^b_", colnames(JAGS_models))])
 # add row names and nicer-looking column names
 rownames(JAGS_params) <- c(paste0(JAGS_models$model_type," ", JAGS_models$model_rank))
-colnames(JAGS_params) <- c(gsub("\\.", replacement = " ", colnames(JAGS_params)),
-                           gsub("_", "-", colnames(JAGS_params)),
-                           gsub("a", "Alpha", colnames(JAGS_params[,grep("^a", colnames(JAGS_params))])))
+colnames(JAGS_params) <- c(gsub("\\.", replacement = " ", colnames(JAGS_params)))
+#colnames(JAGS_params) <- c(gsub("_", "-", colnames(JAGS_params)))
+
+# make values for NAs to be able to print numbers in table
+JAGS_params[is.na(JAGS_params)] <- 1000
+# make this dark grey:
+# all NAs/1000s
+JAGS_params.col <- JAGS_params > 999
+# set all values that satisfy the condition to color
+JAGS_params.col <- gsub("TRUE", "grey45", JAGS_params.col)
+# set all values that do not satisfy the condition to "black"
+JAGS_params.col <- gsub("FALSE", "black", JAGS_params.col)
+# convert to matrix
+JAGS_params.col <- matrix(JAGS_params.col, ncol = ncol(JAGS_params))
 
 # make heatmap:
+png("2024_JAGS_params_heatmap.png",
+    width = 10, height = 8, units = "in", res = 300)
 superheat(as.matrix(t(JAGS_params)), 
           scale = FALSE, # the scale normalizes to mean 0 SD 1
-          left.label.text.size = 3,
-          bottom.label.text.size = 3,
+          left.label.text.size = 4,
+          bottom.label.text.size = 4,
           bottom.label.text.angle = 90,
-          heat.pal = c("firebrick1", "white", "lightskyblue"),
-          legend.num.ticks = 7)
-          
+          heat.pal = c("lightskyblue", "white", "firebrick1"),
+          heat.pal.values = c(0, 0.5, 1),
+          heat.lim = c(-6,6),
+          legend.num.ticks = 8,
+          column.title = "Models",
+          row.title = "Parameters",
+          column.title.size = 4,
+          row.title.size = 4,
+          X.text = as.matrix(t(JAGS_params)),
+          X.text.col = t(JAGS_params.col),
+          heat.na.col = "grey45",
+          X.text.size = 3,
+          extreme.values.na = TRUE,
+          left.label.size = 0.3,
+          bottom.label.size = 0.15,
+          legend.vspace = 0.01)
+dev.off()
+
 # superheat(as.matrix(JAGS_params), 
 #           scale = FALSE, # the scale normalizes to mean 0 SD 1
 #           bottom.label.text.size = 2,
