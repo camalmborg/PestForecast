@@ -13,7 +13,9 @@ library(hrbrthemes)
 library(pROC)
 library(knitr)
 library(kableExtra)
-library(webshot)
+library(webshot2)
+library(superheat)
+library(RColorBrewer)
 
 
 ### load environmental data
@@ -446,22 +448,57 @@ for (i in 1:5){
 # load results:
 JAGS_models <- read.csv("CHAPTER_1/2024_JAGS_models/2024_BEST_JAGS_MODELS_RESULTS.csv")
 JAGS_models <- JAGS_models %>% mutate_if(is.numeric, round, digits = 3)
-# make the table:
-# columns with params
-param_cols <- names(JAGS_models[,7:21])
-# assemble table
-best_jags <- kbl(JAGS_models)%>%
-  kable_styling()
-# column colors
-for (i in 7:21){
-  best_jags <- column_spec(best_jags, i,
-                           color = "white",
-                           background = spec_color(JAGS_models[,i]))
-}
+JAGS_models$dDIC_all <- min(JAGS_models$DIC) - JAGS_models$DIC
+# sort by delDICs:
+JAGS_models <- JAGS_models[order(JAGS_models$dDIC_all, decreasing = T),]
 
-best_jags
+## heatmap figure
+# organize data into numeric-only columns:
+JAGS_params <- cbind(a1_int = JAGS_models$a1_int,
+                     JAGS_models[,grep("^a_", colnames(JAGS_models))],
+                     b1_int = JAGS_models$b1_int,
+                     JAGS_models[,grep("^b_", colnames(JAGS_models))])
+# add row names and nicer-looking column names
+rownames(JAGS_params) <- c(paste0(JAGS_models$model_type," ", JAGS_models$model_rank))
+colnames(JAGS_params) <- c(gsub("\\.", replacement = " ", colnames(JAGS_params)),
+                           gsub("_", "-", colnames(JAGS_params)),
+                           gsub("a", "Alpha", colnames(JAGS_params[,grep("^a", colnames(JAGS_params))])))
 
-save_kable(best_jags, file = "best_jags.png", file_format = png)
+# make heatmap:
+superheat(as.matrix(t(JAGS_params)), 
+          scale = FALSE, # the scale normalizes to mean 0 SD 1
+          left.label.text.size = 3,
+          bottom.label.text.size = 3,
+          bottom.label.text.angle = 90,
+          heat.pal = c("firebrick1", "white", "lightskyblue"),
+          legend.num.ticks = 7)
+          
+# superheat(as.matrix(JAGS_params), 
+#           scale = FALSE, # the scale normalizes to mean 0 SD 1
+#           bottom.label.text.size = 2,
+#           left.label.text.size = 3,
+#           bottom.label.text.angle = 90)
+
+## make the table:
+# # columns with params
+# param_cols <- names(JAGS_models[,7:21])
+# # assemble table
+# best_jags <- kbl(JAGS_models)%>%
+#   kable_styling(font_size = 8,
+#                 full_width = F)
+# # column colors
+# for (i in 7:21){
+#   best_jags <- column_spec(best_jags, i,
+#                            color = "white",
+#                            background = spec_color(JAGS_models[,i]))
+# }
+# 
+# best_jags
+
+
+
+
+#save_kable(best_jags, file = "best_jags.png")
   
   
 # kbl(JAGS_models)%>%
