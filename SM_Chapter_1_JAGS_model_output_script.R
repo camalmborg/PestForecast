@@ -18,7 +18,7 @@ library(superheat)
 library(RColorBrewer)
 
 
-### load environmental data
+### load environmental data-----
 # dmls object:
 load("CHAPTER_1/2024_JAGS_models/2024_05_dmls.RData")
 # dpls object:
@@ -62,7 +62,7 @@ rm(geo)
 #write.csv(coords, "CHAPTER_1/DATA/site_coordinates.csv")
 
 
-### ALPHA MODELS --- using output for computing disturbance predictions:
+### ALPHA MODELS using output for computing disturbance predictions: -----
 # prepare the predicted values:
 # load best alpha model outputs
 runpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_runs/"
@@ -113,7 +113,7 @@ colnames(probs_pd_obs) <- c("lon", "lat", "obs", "pred")
 #write.csv(probs_pd_obs, "Maps/Chapter_1/Data/probs_pred_obs.csv")
 
   
-### BETA MODELS --- using output for computing disturbance magnitudes:
+### BETA MODELS --- using output for computing disturbance magnitudes:-----
 # load model outputs
 runpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_runs/"
 outpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_outputs/"
@@ -150,7 +150,7 @@ colnames(mags_pd_obs) <- c("lon", "lat", "obs", "pred")
 #write.csv(mags_pd_obs, "Maps/Chapter_1/Data/mags_pred_obs.csv")
 
 
-### JOINT MODELS --- using output from best joint model:
+### JOINT MODELS --- using output from best joint model:-----
 # load model outputs
 runpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_runs/"
 outpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_outputs/"
@@ -383,7 +383,7 @@ kbl(joint_means) %>%
 
 
 ### MULTIVAR ANALYSES tables ------
-# compiling a tables of Rs and AUCs and delAICs:
+# compiling a tables of Rs and AUCs and delAICs:-----
 # load results:
 alpha_mv_results <- read.csv("CHAPTER_1/2024_01_RESULTS/best_distprob16_models_tcg.csv")
 alpha_mv_results$dAIC <- min(alpha_mv_results$aics) - alpha_mv_results$aics
@@ -444,7 +444,7 @@ for (i in 1:5){
 
 
 
-### JAGS MODEL ANALYSES tables
+### JAGS MODEL ANALYSES tables -----
 # load results:
 JAGS_models <- read.csv("CHAPTER_1/2024_JAGS_models/2024_BEST_JAGS_MODELS_RESULTS.csv")
 JAGS_models <- JAGS_models %>% mutate_if(is.numeric, round, digits = 3)
@@ -474,6 +474,44 @@ JAGS_params.col <- gsub("TRUE", "grey45", JAGS_params.col)
 JAGS_params.col <- gsub("FALSE", "black", JAGS_params.col)
 # convert to matrix
 JAGS_params.col <- matrix(JAGS_params.col, ncol = ncol(JAGS_params))
+# add row and column names to make broken-up figures:
+rownames(JAGS_params.col) <- rownames(JAGS_params)
+colnames(JAGS_params.col) <- colnames(JAGS_params)
+
+# separate alpha and betas to make multiple heatmaps:
+# JAGS_alpha <- JAGS_models[JAGS_models$model_type == 'alpha', 
+#                           -grep("^b", colnames(JAGS_models))]
+# JAGS_beta <- JAGS_models[JAGS_models$model_type == 'beta',]
+# JAGS_joint <- JAGS_models[JAGS_models$model_type == 'joint',]
+JAGS_alpha <- JAGS_params[grep("^a", rownames(JAGS_params)), 
+                          -grep("^b", colnames(JAGS_params))]
+JAGS_alpha.col <- JAGS_params.col[rownames(JAGS_alpha), colnames(JAGS_alpha)]
+
+JAGS_beta <- JAGS_params[grep("^b", rownames(JAGS_params)), 
+                          -grep("^a", colnames(JAGS_params))]
+JAGS_beta.col <- JAGS_params.col[rownames(JAGS_beta), colnames(JAGS_beta)]
+
+JAGS_joint <- JAGS_params[grep("^j", rownames(JAGS_params)),]
+JAGS_joint.col <- JAGS_params.col[rownames(JAGS_joint), colnames(JAGS_joint)]
+
+# rename columns
+# alpha
+JAGS_alpha <- JAGS_alpha %>%
+  rename(Intercept = a1_int)
+colnames(JAGS_alpha) <- c(gsub("\\.", " ", colnames(JAGS_alpha)))
+colnames(JAGS_alpha) <- c(gsub("a_", "", colnames(JAGS_alpha)))
+# beta
+JAGS_beta <- JAGS_beta %>%
+  rename(Intercept = b1_int)
+colnames(JAGS_beta) <- c(gsub("\\.", " ", colnames(JAGS_beta)))
+colnames(JAGS_beta) <- c(gsub("b_", "", colnames(JAGS_beta)))
+# joint
+JAGS_joint <- JAGS_joint %>%
+  rename('Alpha Intercept' = a1_int) %>%
+  rename('Beta Intercept' = b1_int)
+colnames(JAGS_joint) <- c(gsub("\\.", " ", colnames(JAGS_joint)))
+colnames(JAGS_joint) <- c(gsub("a_", "", colnames(JAGS_joint)))
+colnames(JAGS_joint) <- c(gsub("b_", "", colnames(JAGS_joint)))
 
 # make heatmap:
 png("2024_JAGS_params_heatmap.png",
@@ -483,8 +521,8 @@ superheat(as.matrix(t(JAGS_params)),
           left.label.text.size = 4,
           bottom.label.text.size = 4,
           bottom.label.text.angle = 90,
-          heat.pal = c("lightskyblue", "white", "firebrick1"),
-          heat.pal.values = c(0, 0.5, 1),
+          heat.pal = c("dodgerblue", "skyblue1", "white", "pink1","firebrick1"),
+          heat.pal.values = c(0, 0.45, 0.5, 0.55, 1),
           heat.lim = c(-6,6),
           legend.num.ticks = 8,
           column.title = "Models",
@@ -501,11 +539,82 @@ superheat(as.matrix(t(JAGS_params)),
           legend.vspace = 0.01)
 dev.off()
 
-# superheat(as.matrix(JAGS_params), 
-#           scale = FALSE, # the scale normalizes to mean 0 SD 1
-#           bottom.label.text.size = 2,
-#           left.label.text.size = 3,
-#           bottom.label.text.angle = 90)
+# three superheats for 3-part figure:
+# ALPHA
+png("2024_JAGS_alpha_heatmap1.png",
+    width = 6.5, height = 3.5, units = "in", res = 300)
+superheat(as.matrix(t(JAGS_alpha)), 
+          scale = FALSE, # the scale normalizes to mean 0 SD 1
+          left.label.text.size = 3,
+          bottom.label.text.size = 3,
+          #bottom.label.text.angle = 90,
+          heat.pal = c("dodgerblue", "skyblue1", "white", "pink1","firebrick1"),
+          heat.pal.values = c(0, 0.45, 0.5, 0.55, 1),
+          heat.lim = c(-6,6),
+          legend.num.ticks = 8,
+          column.title = "Alpha Models",
+          row.title = "Parameters",
+          column.title.size = 4,
+          row.title.size = 4,
+          X.text = as.matrix(t(JAGS_alpha)),
+          X.text.col = t(JAGS_alpha.col),
+          heat.na.col = "grey45",
+          X.text.size = 3,
+          extreme.values.na = TRUE,
+          left.label.size = 0.3,
+          bottom.label.size = 0.15,
+          legend = FALSE)
+dev.off()
+# BETA
+png("2024_JAGS_beta_heatmap1.png",
+    width = 7, height = 4, units = "in", res = 300)
+superheat(as.matrix(t(JAGS_beta)), 
+          scale = FALSE, # the scale normalizes to mean 0 SD 1
+          left.label.text.size = 3,
+          bottom.label.text.size = 3,
+          #bottom.label.text.angle = 90,
+          heat.pal = c("dodgerblue", "skyblue1", "white", "pink1","firebrick1"),
+          heat.pal.values = c(0, 0.45, 0.5, 0.55, 1),
+          heat.lim = c(-6,6),
+          legend.num.ticks = 8,
+          column.title = "Beta Models",
+          row.title = "Parameters",
+          column.title.size = 4,
+          row.title.size = 4,
+          X.text = as.matrix(t(JAGS_beta)),
+          X.text.col = t(JAGS_beta.col),
+          heat.na.col = "grey45",
+          X.text.size = 3,
+          extreme.values.na = TRUE,
+          left.label.size = 0.3,
+          bottom.label.size = 0.15,
+          legend = FALSE)
+dev.off()
+# JOINT
+png("2024_JAGS_joint_heatmap1.png",
+    width = 8, height = 8, units = "in", res = 300)
+superheat(as.matrix(t(JAGS_joint)), 
+          scale = FALSE, # the scale normalizes to mean 0 SD 1
+          left.label.text.size = 3,
+          bottom.label.text.size = 3,
+          #bottom.label.text.angle = 90,
+          heat.pal = c("dodgerblue", "skyblue1", "white", "pink1","firebrick1"),
+          heat.pal.values = c(0, 0.45, 0.5, 0.55, 1),
+          heat.lim = c(-6,6),
+          legend.num.ticks = 8,
+          column.title = "Models",
+          row.title = "Parameters",
+          column.title.size = 4,
+          row.title.size = 4,
+          X.text = as.matrix(t(JAGS_joint)),
+          X.text.col = t(JAGS_joint.col),
+          heat.na.col = "grey45",
+          X.text.size = 3,
+          extreme.values.na = TRUE,
+          left.label.size = 0.3,
+          bottom.label.size = 0.1,
+          legend.vspace = 0.01)
+dev.off()
 
 ## make the table:
 # # columns with params
