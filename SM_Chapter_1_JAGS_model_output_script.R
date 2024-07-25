@@ -247,21 +247,23 @@ sqrt(mean(plot_data_roc$roc_fit_m-plot_data_roc$Ed)^2)
 
 # DM: ------
 # data
+obsdist <- obsdist_m
+preddist <- preddist_m
 plot_data <- cbind.data.frame(obsdist, preddist)
 pred_obs_lm <- lm(plot_data$obsdist ~ plot_data$preddist, plot_data)
 summ = summary(pred_obs_lm)
 
-png("2024_07_distmag_pred_v_obs.png",
+png("2024_07_distmag_pred_v_obs_joint.png",
     width = 6, height = 4, units = "in", res = 300)
 mags_plot <- ggplot(plot_data, aes(x = plot_data[,2], y = plot_data[,1]),
-                    xlim = c(-15,5), ylim = c(-15,5)) +
+                    xlim(-20,10), ylim(-20,10)) +
   geom_point(color = "grey50", size = 1) +
   geom_abline(color = "firebrick", lwd = 1) +
   labs(x = "Forest Condition (Predicted Score)",
        y = "Forest Condition (Observed Score)",
        title = "Disturbance Magnitude Predicted vs Observed") +
   annotate("text",
-           x = 3.5, y = -12, 
+           x = 6, y = -12, 
            label = paste("R-squared:", round(summ$adj.r.squared, 3)),
            color = "navyblue", size = 3) +
   theme_classic()
@@ -269,7 +271,7 @@ mags_plot <- ggplot(plot_data, aes(x = plot_data[,2], y = plot_data[,1]),
 print(mags_plot)
 dev.off()
 
-sqrt(mean(plot_data$preddist-plot_data$obsdist, na.rm=T)^2)
+#sqrt(mean(plot_data$preddist-plot_data$obsdist, na.rm=T)^2)
 
 
 ### Example time series for conceptual figure ---------------------------
