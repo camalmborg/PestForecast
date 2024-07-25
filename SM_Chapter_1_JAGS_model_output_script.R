@@ -10,6 +10,7 @@ library(MCMCvis)
 library(ecoforecastR)
 library(ggplot2)
 library(hrbrthemes)
+library(mgcv)
 library(pROC)
 library(knitr)
 library(kableExtra)
@@ -89,8 +90,8 @@ ps <- grep("^alpha", names(preds))
 # predicted disturbances
 Ed <- inv.logit(as.matrix(env) %*% as.matrix(preds[ps]))
 # observed disturbances:
-# dist16 <- dmr_cs$dpy1
-# dist17 <- dmr_cs$dpy2
+dist16 <- dmr_cs$dpy1
+dist17 <- dmr_cs$dpy2
 # make empty matrix to fill with 2016 and 2017 disturbance data
 obsdist <- c(rep(NA, nrow(dmr_cs)))
 # add 1s for disturbances in each year:
@@ -147,6 +148,8 @@ preddist <- prior + Emu0
 mags_pd_obs <- cbind(coords[,'lon'], coords[,'lat'],
                      obsdist, preddist)
 colnames(mags_pd_obs) <- c("lon", "lat", "obs", "pred")
+
+#mags_map_dat <- cbind(coords[,'lon'], coords[,'lat'], Emu0)
 #write.csv(mags_pd_obs, "Maps/Chapter_1/Data/mags_pred_obs.csv")
 
 
@@ -200,6 +203,67 @@ joint_pd_obs <- cbind(coords[,'lon'], coords[,'lat'],
                       obsdist_m, preddist_m)
 colnames(joint_pd_obs) <- c("lon", "lat", "a_obs", "a_pred", "b_obs", "b_pred")
 #write.csv(joint_pd_obs, "Maps/Chapter_1/Data/joint_pred_obs.csv")
+
+
+### Predicted/Observed plots: -----
+# DP
+# get environmental data
+var <- env[,-1]
+nvars = ncol(var)
+# get disturbance probability data
+dists<-dmr_cs[,grep("^dp",colnames(dmr_cs))]
+yr = 1 # for 2016, 2 for 2017
+#make gam data frame:
+vardat <- as.data.frame(cbind(dists[,yr], var))
+
+#make gam explantory variables list
+ex_vars <- c()
+for (j in 1:nvars){
+  ex_vars[j] <- paste0('s(vardat[,', j+1, '])')
+}
+#make a single string:
+gam_formula <- as.formula(paste("vardat[,1] ~ ",
+                                paste(ex_vars, collapse='+')))
+#run gam with those data:
+mv_gam <- gam(gam_formula, data=vardat, family="binomial")
+mv_roc<-roc(mv_gam$y,mv_gam$fitted.values)
+roc_fit_m <- mv_gam$fitted.values
+
+# plot for ROC/AUC
+plot_data_roc = cbind.data.frame(roc_fit_m, Ed)
+plot_roc <- roc(plot_data_roc$Ed, plot_data_roc$roc_fit_m)
+plot_auc <- plot_roc$auc
+
+auc_plot <- ggplot(plot_data_roc, aes(y = plot_data_roc$roc_fit_m,
+                                      x = plot_data_roc$Ed)) +
+  geom_point(color = "grey37") +
+  #geom_smooth(se = F)
+  abline()
+print(auc_plot)
+
+# RMSE
+sqrt(mean(plot_data_roc$roc_fit_m-plot_data_roc$Ed)^2)
+
+
+# DM:
+# data
+plot_data <- cbind.data.frame(obsdist, preddist)
+
+png("2024_07_distmag_pred_v_obs.png",
+    width = 6, height = 4, units = "in", res = 300)
+mags_plot <- ggplot(plot_data, aes(x = plot_data[,2], y = plot_data[,1]),
+                    xlim = c(-15,5), ylim = c(-15,5)) +
+  geom_point(color = "grey50", size = 1) +
+  geom_abline(color = "firebrick", lwd = 1) +
+  labs(x = "Forest Condition (Predicted Score)",
+       y = "Forest Condition (Observed Score)",
+       title = "Disturbance Magnitude Predicted vs Observed") +
+  theme_classic()
+  #geom_smooth(method=lm , color="red", se=FALSE)
+print(mags_plot)
+dev.off()
+
+#sqrt(mean(plot_data$preddist-plot_data$obsdist, na.rm=T)^2)
 
 
 ### Example time series for conceptual figure ---------------------------
@@ -383,7 +447,7 @@ kbl(joint_means) %>%
 
 
 ### MULTIVAR ANALYSES tables ------
-# compiling a tables of Rs and AUCs and delAICs:-----
+# compiling a tables of Rs and AUCs and delAICs:
 # load results:
 alpha_mv_results <- read.csv("CHAPTER_1/2024_01_RESULTS/best_distprob16_models_tcg.csv")
 alpha_mv_results$dAIC <- min(alpha_mv_results$aics) - alpha_mv_results$aics
@@ -460,7 +524,13 @@ JAGS_params <- cbind(a1_int = JAGS_models$a1_int,
                      JAGS_models[,grep("^b_", colnames(JAGS_models))])
 # add row names and nicer-looking column names
 rownames(JAGS_params) <- c(paste0(JAGS_models$model_type," ", JAGS_models$model_rank))
+JAGS_params <- JAGS_params %>%
+  rename('Alpha Intercept' = a1_int) %>%
+  rename('Beta Intercept' = b1_int)
 colnames(JAGS_params) <- c(gsub("\\.", replacement = " ", colnames(JAGS_params)))
+colnames(JAGS_params) <- c(gsub("a_", "", colnames(JAGS_params)))
+colnames(JAGS_params) <- c(gsub("b_", "", colnames(JAGS_params)))
+
 #colnames(JAGS_params) <- c(gsub("_", "-", colnames(JAGS_params)))
 
 # make values for NAs to be able to print numbers in table
@@ -483,38 +553,38 @@ colnames(JAGS_params.col) <- colnames(JAGS_params)
 #                           -grep("^b", colnames(JAGS_models))]
 # JAGS_beta <- JAGS_models[JAGS_models$model_type == 'beta',]
 # JAGS_joint <- JAGS_models[JAGS_models$model_type == 'joint',]
-JAGS_alpha <- JAGS_params[grep("^a", rownames(JAGS_params)), 
-                          -grep("^b", colnames(JAGS_params))]
-JAGS_alpha.col <- JAGS_params.col[rownames(JAGS_alpha), colnames(JAGS_alpha)]
+# JAGS_alpha <- JAGS_params[grep("^a", rownames(JAGS_params)), 
+#                           -grep("^b", colnames(JAGS_params))]
+# JAGS_alpha.col <- JAGS_params.col[rownames(JAGS_alpha), colnames(JAGS_alpha)]
+# 
+# JAGS_beta <- JAGS_params[grep("^b", rownames(JAGS_params)), 
+#                           -grep("^a", colnames(JAGS_params))]
+# JAGS_beta.col <- JAGS_params.col[rownames(JAGS_beta), colnames(JAGS_beta)]
+# 
+# JAGS_joint <- JAGS_params[grep("^j", rownames(JAGS_params)),]
+# JAGS_joint.col <- JAGS_params.col[rownames(JAGS_joint), colnames(JAGS_joint)]
 
-JAGS_beta <- JAGS_params[grep("^b", rownames(JAGS_params)), 
-                          -grep("^a", colnames(JAGS_params))]
-JAGS_beta.col <- JAGS_params.col[rownames(JAGS_beta), colnames(JAGS_beta)]
-
-JAGS_joint <- JAGS_params[grep("^j", rownames(JAGS_params)),]
-JAGS_joint.col <- JAGS_params.col[rownames(JAGS_joint), colnames(JAGS_joint)]
-
-# rename columns
-# alpha
-JAGS_alpha <- JAGS_alpha %>%
-  rename(Intercept = a1_int)
-colnames(JAGS_alpha) <- c(gsub("\\.", " ", colnames(JAGS_alpha)))
-colnames(JAGS_alpha) <- c(gsub("a_", "", colnames(JAGS_alpha)))
-# beta
-JAGS_beta <- JAGS_beta %>%
-  rename(Intercept = b1_int)
-colnames(JAGS_beta) <- c(gsub("\\.", " ", colnames(JAGS_beta)))
-colnames(JAGS_beta) <- c(gsub("b_", "", colnames(JAGS_beta)))
-# joint
-JAGS_joint <- JAGS_joint %>%
-  rename('Alpha Intercept' = a1_int) %>%
-  rename('Beta Intercept' = b1_int)
-colnames(JAGS_joint) <- c(gsub("\\.", " ", colnames(JAGS_joint)))
-colnames(JAGS_joint) <- c(gsub("a_", "", colnames(JAGS_joint)))
-colnames(JAGS_joint) <- c(gsub("b_", "", colnames(JAGS_joint)))
+# # rename columns
+# # alpha
+# JAGS_alpha <- JAGS_alpha %>%
+#   rename(Intercept = a1_int)
+# colnames(JAGS_alpha) <- c(gsub("\\.", " ", colnames(JAGS_alpha)))
+# colnames(JAGS_alpha) <- c(gsub("a_", "", colnames(JAGS_alpha)))
+# # beta
+# JAGS_beta <- JAGS_beta %>%
+#   rename(Intercept = b1_int)
+# colnames(JAGS_beta) <- c(gsub("\\.", " ", colnames(JAGS_beta)))
+# colnames(JAGS_beta) <- c(gsub("b_", "", colnames(JAGS_beta)))
+# # joint
+# JAGS_joint <- JAGS_joint %>%
+#   rename('Alpha Intercept' = a1_int) %>%
+#   rename('Beta Intercept' = b1_int)
+# colnames(JAGS_joint) <- c(gsub("\\.", " ", colnames(JAGS_joint)))
+# colnames(JAGS_joint) <- c(gsub("a_", "", colnames(JAGS_joint)))
+# colnames(JAGS_joint) <- c(gsub("b_", "", colnames(JAGS_joint)))
 
 # make heatmap:
-png("2024_JAGS_params_heatmap.png",
+png("2024_07_18_JAGS_params_heatmap.png",
     width = 10, height = 8, units = "in", res = 300)
 superheat(as.matrix(t(JAGS_params)), 
           scale = FALSE, # the scale normalizes to mean 0 SD 1
@@ -602,7 +672,7 @@ superheat(as.matrix(t(JAGS_joint)),
           heat.pal.values = c(0, 0.45, 0.5, 0.55, 1),
           heat.lim = c(-6,6),
           legend.num.ticks = 8,
-          column.title = "Models",
+          column.title = "Joint Models",
           row.title = "Parameters",
           column.title.size = 4,
           row.title.size = 4,
