@@ -67,9 +67,9 @@ spongy_var_explore<-function(var,dmrdat,dmr,coln){
   aics <- vector()
   
   #loop over all members of dmvars list:
-  for (i in 1:ncol(var)){
+  for (i in 1:(ncol(var))){
     #first extract the list you want:
-    varvariables <- as.data.frame(var[as.numeric(dmrdat$sitenum),])
+    varvariables <- as.data.frame(var[as.numeric(dmrdat$sitenum),])#,-1]) #,-1 for 7/31/2024 reruns, erase otherwise
     #grab column number:
     cn <- as.matrix(as.numeric(dmrdat$colnum))
     #grab exploratory response  of choice:

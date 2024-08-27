@@ -203,7 +203,7 @@ joint_pd_obs <- cbind(coords[,'lon'], coords[,'lat'],
                       obsdist_m, preddist_m)
 colnames(joint_pd_obs) <- c("lon", "lat", "a_obs", "a_pred", "b_obs", "b_pred")
 #write.csv(joint_pd_obs, "Maps/Chapter_1/Data/joint_pred_obs.csv")
-
+joint_mags_test <- cbind(coords[,'lon'], coords[,'lat'], Emu0)
 
 ### Predicted/Observed plots: -----
 # DP ------
@@ -247,14 +247,14 @@ sqrt(mean(plot_data_roc$roc_fit_m-plot_data_roc$Ed)^2)
 
 # DM: ------
 # data
-obsdist <- obsdist_m
-preddist <- preddist_m
+#obsdist <- obsdist_m  # for joint
+#preddist <- preddist_m
 plot_data <- cbind.data.frame(obsdist, preddist)
 pred_obs_lm <- lm(plot_data$obsdist ~ plot_data$preddist, plot_data)
 summ = summary(pred_obs_lm)
 
-png("2024_07_distmag_pred_v_obs_joint.png",
-    width = 6, height = 4, units = "in", res = 300)
+#png(mags_plot, "2024_07_distmag_pred_v_obs_joint.png",
+    #width = 6, height = 4, units = "in", res = 300)
 mags_plot <- ggplot(plot_data, aes(x = plot_data[,2], y = plot_data[,1]),
                     xlim(-20,10), ylim(-20,10)) +
   geom_point(color = "grey50", size = 1) +
@@ -263,13 +263,24 @@ mags_plot <- ggplot(plot_data, aes(x = plot_data[,2], y = plot_data[,1]),
        y = "Forest Condition (Observed Score)",
        title = "Disturbance Magnitude Predicted vs Observed") +
   annotate("text",
-           x = 6, y = -12, 
+           x = 3.5, y = -12,
+           #x = 6, y = -12, #for joint
            label = paste("R-squared:", round(summ$adj.r.squared, 3)),
            color = "navyblue", size = 3) +
   theme_classic()
   #geom_smooth(method=lm , color="red", se=FALSE)
-print(mags_plot)
-dev.off()
+mags_plot
+#dev.off()
+# save plot
+ggsave(
+  filename = "2024_07_pred_v_obs_mags_beta.png",
+  plot = mags_plot,
+  device = "png",
+  width = 7,
+  height = 4,
+  units = "in",#c("in", "in"),
+  dpi = 300 #"print"
+)
 
 #sqrt(mean(plot_data$preddist-plot_data$obsdist, na.rm=T)^2)
 
@@ -313,9 +324,9 @@ eg_site <- just_scores[just_scores$sites == site_num,]
 # make a nice looking plot
 time_series <- ggplot(data = eg_site, aes(x = date, y = value)) +
   # add background color for disturbance years:
-  geom_rect(data = NULL, aes(xmin = as.Date("2016-05-01"), xmax = as.Date("2020-07-01"),
-                             ymin = -Inf, ymax = Inf), alpha = 0.1, show.legend = FALSE,
-            fill = "rosybrown1", color = NA) +
+  # geom_rect(data = NULL, aes(xmin = as.Date("2016-05-01"), xmax = as.Date("2020-07-01"),
+  #                            ymin = -Inf, ymax = Inf), alpha = 0.1, show.legend = FALSE,
+  #           fill = "rosybrown1", color = NA) +
   # add line
   geom_line() +
   # add points
@@ -344,7 +355,7 @@ time_series <- ggplot(data = eg_site, aes(x = date, y = value)) +
 print(time_series)
 # save plot
 ggsave(
-  filename = "2024_07_07_forest_condition_eg_plot.png",
+  filename = "2024_07_25_forest_condition_eg_plot_no_box.png",
   plot = time_series,
   device = "png",
   width = 6,

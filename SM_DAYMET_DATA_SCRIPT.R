@@ -264,19 +264,20 @@ spongy_met<-function(scores,startyr,endyr,var,filenm,VorS){
 
 #(as characters):
 #testing, testing, is this thing on?
-dmvars<-spongy_met(cond.scores,2011,2017,
+dmvars<-spongy_met(cond.scores,2014,2016,
                    c("tmax..deg.c.","tmin..deg.c.","prcp..mm.day.","vp..Pa."),
                    c("maxtemp","mintemp","pcp","vpd"),1)
+save(dmvars, file = "2024_08_dm_grab.RData")
 
 
-test_dmv <- spongy_met(cond.samp, 2015, 2017, c("tmax..deg.c.", "tmin..deg.c."),
-                       c("maxtemp", "mintemp"),2)
+# test_dmv <- spongy_met(cond.samp, 2015, 2017, c("tmax..deg.c.", "tmin..deg.c."),
+#                        c("maxtemp", "mintemp"),2)
 
 
 dmvars_seas <- spongy_met(cond.scores, 2013, 2016, 
                           c("tmax..deg.c.","tmin..deg.c.","prcp..mm.day.","vp..Pa."),
                           c("maxtemp","mintemp","pcp","vpd"),2)
-save(dmvars_seas, file="DMVARS_SEAS.RData")
+save(dmvars_seas, file="2024_08_dm_seas_grab.RData")
 
 #### Getting seasonal variable values for analyses:-----
 ## Quick function for making sequences to extract 
@@ -341,7 +342,7 @@ dm_me_seasonal <- function(x,yrs,month){
 }
 
 #seasons:
-spring <- c(9,10,11)
+spring <- c(3,4,5)
 summer <- c(6,7,8)
 fall <- c(9,10,11)
 winter <- c(12,1,2) #but, of course, december is the wrong year

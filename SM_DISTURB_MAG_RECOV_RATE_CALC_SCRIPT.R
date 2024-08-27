@@ -193,7 +193,7 @@ spongy_mpr_2<-function(tcg,cs,distyr,monthnum,seqnum){
                                grep(as.character(distyr+1),colnames(tcgjune))]==mins[i])           #grabs time step at which min score appears in disturbance window
     colnum[i] <- ifelse(colnum[i]==1, (grep(as.character(distyr),colnames(tcgjune))),
                         (grep(as.character(distyr),colnames(tcgjune))+1))
-    
+
     ### RECOVERY, ADD BACK IN FOR CHAP 2:
     # if(is.na(colnum[i] + which(tcgjune[i,colnum[i]:end]>=steadys[i])[1])){
     #    recovcol[i]<-colnum[i] + 2 #puts recovcol outside the disturbance window
