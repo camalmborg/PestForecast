@@ -12,6 +12,16 @@ MV_DATA <- read.csv("Analyses_September2023/MV_2023_09_DATA.csv")
 dmr <- read.csv("Analyses_September2023/2023_09_DMR_DATA_TCG_2016.csv")
 dmrcs <- read.csv("Analyses_September2023/2023_09_DMR_DATA_CS_2016.csv")
 
+# 08/2024 reruns
+load("2024_08_dm_grab.RData")  #dmvars
+load("2024_08_dm_seas_grab.RData")  #dmvars_seas
+load("SMAP_data/2024_04_SMAP.RData")  #SMAP
+load("DEM_data/DEMdata.RData")  #DEMdata
+#viirs <- read.csv("viirs_data/2023_06_21_5000sample_viirs_3.csv")
+
+# load dmls and dpls object from SM_Chapter_1_JAGS_model_output script
+# dmr_tcg and dmr_cs objects have all smap missing values
+
 ##### UNIVARIATE ANALYSES SECTION ------------------------------------------------
 ### Function for Univariate mags Analyses AS LIST  (Daymet data):----------------------
 # dmvars = data in list - Daymet data (each variable is list member)
@@ -139,7 +149,7 @@ spongy_lv_ROC <- function(dmvars,dmrdat,yr,coln){
 #          calculation script
 # yr = year disturbance takes place - 1/2 for 2016/2017 respectively
 # coln = column number of disturbance - 22 for 2016, 23 for 2017
-spongy_var_ROC <- function(var,dmrdat,yr,coln,nvar){
+spongy_var_ROC <- function(var,dmrdat,yr,coln){
   #make empty matrix:
   rocs <- matrix(NA,nrow=ncol(var),ncol=1)
   aics <- vector()
