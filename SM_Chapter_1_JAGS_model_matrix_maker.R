@@ -12,19 +12,20 @@ library(dplyr)
 # # for disturbance magnitude parameters
 # varfile_m <- "CHAPTER_1/DATA/MV_2023_12_DATA_distmag.csv"
 # magvars <- read.csv(varfile_m)[,-1]
-# # for disturbance probability parameters
+# # # for disturbance probability parameters
 # varfile_p <- "CHAPTER_1/DATA/MV_2023_12_DATA_distprob.csv"
 # probvars <- read.csv(varfile_p)[,-1]
 # # load data for dmr to remove missing sites from environmental data
 dmr_file <- "CHAPTER_1/DATA/2023_12_DMR_DATA_TCG.csv"
 dmr <- read.csv(dmr_file)
-# # environmental data without missing sites
+# # # environmental data without missing sites
 # magvars <- magvars[dmr$X,]
 # probvars <- probvars[dmr$X,]
 
 # Loaded from 4/29/2024 making new anomaly data with new SMAP data
-magvars <- read.csv("CHAPTER_1/2024_JAGS_models/2024_04_magvars.csv")[,-1]
-probvars <- read.csv("CHAPTER_1/2024_JAGS_models/2024_04_probvars.csv")[,-1]
+# Loaded again 9/6/2024 for emergency model re-runs
+magvars <- read.csv("CHAPTER_1/2024_03_JAGS_models/2024_04_magvars.csv")[,-1]
+probvars <- read.csv("CHAPTER_1/2024_03_JAGS_models/2024_04_probvars.csv")[,-1]
 
 ### Load model list data frame:
 #modfile <- "CHAPTER_1/2024_JAGS_models/2024_02_20_Dist_Mag_Models.csv"
@@ -32,7 +33,9 @@ probvars <- read.csv("CHAPTER_1/2024_JAGS_models/2024_04_probvars.csv")[,-1]
 #modfile <- "CHAPTER_1/2024_JAGS_models/2024_04_04_Dist_Mag_Models.csv"
 #modfile <- "CHAPTER_1/2024_JAGS_models/2024_04_17_Dist_Prob_Models.csv"
 #modfile <- "CHAPTER_1/2024_JAGS_models/2024_05_best_dist_mag_JAGS_models.csv"
-modfile <- "CHAPTER_1/2024_JAGS_models/2024_05_best_dist_prob_JAGS_models.csv"
+#modfile <- "CHAPTER_1/2024_JAGS_models/2024_05_best_dist_prob_JAGS_models.csv"
+modfile <- "CHAPTER_1/2024_09_JAGS_models/model_variable_csvs/2024_09_best_dist_mag_JAGS_models_for_joint.csv"
+modfile <- "CHAPTER_1/2024_09_JAGS_models/model_variable_csvs/2024_09_best_dist_prob_JAGS_models_for_joint.csv"
 
 # disturbance mag/prob model file
 modeldf <- read.csv(modfile, header = F)
@@ -48,7 +51,7 @@ modeldf <- read.csv(modfile, header = F)
 # empty list
 covls <- list()
 # mag (magvars) or prob (probvars)
-#covs <- magvars
+covs <- magvars
 covs <- probvars
 # loop over models
 for (i in 1:nrow(modeldf)){
@@ -65,12 +68,12 @@ for (i in 1:nrow(modeldf)){
 }
 
 # for saving result
-#dmls <- covls
+dmls <- covls
 dpls <- covls
 
 # save
-save(dmls, file = "CHAPTER_1/2024_JAGS_models/2024_05_dmls.RData")
-save(dpls, file = "CHAPTER_1/2024_JAGS_models/2024_05_dpls.RData")
+save(dmls, file = "CHAPTER_1/2024_09_JAGS_models/2024_09_dmls_for_joint.RData")
+save(dpls, file = "CHAPTER_1/2024_09_JAGS_models/2024_09_dpls_for_joint.RData")
 
 # ## informative R prior ("complicated version" 3/13)
 # # time series 1 object

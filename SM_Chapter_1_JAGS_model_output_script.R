@@ -6,8 +6,8 @@ library(tidyverse)
 library(dplyr)
 library(readr)
 library(boot)
-library(MCMCvis)
-library(ecoforecastR)
+#library(MCMCvis)
+#library(ecoforecastR)
 library(ggplot2)
 library(hrbrthemes)
 library(mgcv)
@@ -21,12 +21,13 @@ library(RColorBrewer)
 
 ### load environmental data-----
 # dmls object:
-load("CHAPTER_1/2024_JAGS_models/2024_05_dmls.RData")
+load("CHAPTER_1/2024_09_JAGS_models/2024_09_dmls.RData") #making new figures 9/19
 # dpls object:
-load("CHAPTER_1/2024_JAGS_models/2024_05_dpls.RData")
+load("CHAPTER_1/2024_09_JAGS_models/2024_09_dpls.RData")
+load("CHAPTER_1/2024_09_JAGS_models/2024_09_dpls_2.RData")
 # find sites with missing output values:
 # choose dmls obj with all environmental data
-find_miss <- dmls[[2]]
+find_miss <- dmls[[4]] # one with SMAP
 # find missing values
 missing <- as.numeric(rownames(find_miss[!complete.cases(find_miss),]))
 rm(find_miss)
@@ -66,15 +67,15 @@ rm(geo)
 ### ALPHA MODELS using output for computing disturbance predictions: -----
 # prepare the predicted values:
 # load best alpha model outputs
-runpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_runs/"
-outpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_outputs/"
+#runpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_runs/"
+#outpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_outputs/"
+outpath <- "CHAPTER_1/2024_09_JAGS_models/model_outputs/alpha/"
+runpath <- "CHAPTER_1/2024_09_JAGS_models/model_runs/alpha/"
 # model data
-runfile <- "A_best_alpha/2024-05-10_modelrun_alpha_a_10_b_1_data.RData"
-#runfile <- "2024-06-21_modelrun_joint_a_1_b_6_data.RData"
+runfile <- "2024-09-09_modelrun_alpha_a_21_b_1_data.RData"
 run <- load(paste0(runpath, runfile))
 # model output
-outfile <- "A_best_alpha/2024-05-10_modelrun_alpha_a_10_b_1_output.csv"
-#outfile <- "2024-06-21_modelrun_joint_a_1_b_6_output.csv"
+outfile <- "2024-09-09_modelrun_alpha_a_21_b_1_output.csv"
 out <- read.csv(paste0(outpath, outfile))
 
 # data from model inputs for computing dist prob and dist mag pred/obs
@@ -91,38 +92,41 @@ ps <- grep("^alpha", names(preds))
 Ed <- inv.logit(as.matrix(env) %*% as.matrix(preds[ps]))
 # observed disturbances:
 dist16 <- dmr_cs$dpy1
-dist17 <- dmr_cs$dpy2
+#dist17 <- dmr_cs$dpy2
 # make empty matrix to fill with 2016 and 2017 disturbance data
-obsdist <- c(rep(NA, nrow(dmr_cs)))
-# add 1s for disturbances in each year:
-dists <- c(which(dmr_cs$dpy1 == 1), 
-           which(dmr_cs$dpy2 == 1))
-obsdist[dists] <- 1
-obsdist[is.na(obsdist)] <- 0
+# obsdist <- c(rep(NA, nrow(dmr_cs)))
+# # add 1s for disturbances in each year:
+# dists <- c(which(dmr_cs$dpy1 == 1), 
+#            which(dmr_cs$dpy2 == 1))
+# obsdist[dists] <- 1
+# obsdist[is.na(obsdist)] <- 0
 
 # percentage of observed disturbances:
-oD <- sum(dist16 + dist17) / nrow(dmr_cs) * 100
-oD16 <- sum(dist16) / nrow(dmr_cs) * 100
-# percentage of predicted disturbance:
-pD <- length(which(Ed > 0.95)) / nrow(dmr_cs) * 100
+# oD <- sum(dist16 + dist17) / nrow(dmr_cs) * 100
+# oD16 <- sum(dist16) / nrow(dmr_cs) * 100
+# # percentage of predicted disturbance:
+# pD <- length(which(Ed > 0.95)) / nrow(dmr_cs) * 100
 
 # save data for maps:
 # add coordinates
 probs_pd_obs <- cbind.data.frame(coords[,'lon'], coords[,'lat'],
-                     obsdist, Ed)
+                     dist16, Ed)
 colnames(probs_pd_obs) <- c("lon", "lat", "obs", "pred")
-#write.csv(probs_pd_obs, "Maps/Chapter_1/Data/probs_pred_obs.csv")
+head(probs_pd_obs[probs_pd_obs$obs == 1,])
+#write.csv(probs_pd_obs, "Maps/Chapter_1/Data/2024_09_probs_pred_obs_test_a_4.csv")
 
   
 ### BETA MODELS --- using output for computing disturbance magnitudes:-----
 # load model outputs
-runpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_runs/"
-outpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_outputs/"
+# runpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_runs/"
+# outpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_outputs/"
+runpath <- "CHAPTER_1/2024_09_JAGS_models/model_runs/beta/"
+outpath <- "CHAPTER_1/2024_09_JAGS_models/model_outputs/beta/"
 
-runfile <- "A_best_beta/2024-05-16_modelrun_beta_a_1_b_4_data.RData"
+runfile <- "2024-09-09_modelrun_beta_a_17_b_1_data.RData"
 run <- load(paste0(runpath, runfile))
 # model output
-outfile <- "A_best_beta/2024-05-16_modelrun_beta_a_1_b_4_output.csv"
+outfile <- "2024-09-09_modelrun_beta_a_17_b_1_output.csv"
 out <- read.csv(paste0(outpath, outfile))
 
 # data from model inputs for computing mu
@@ -150,18 +154,20 @@ mags_pd_obs <- cbind(coords[,'lon'], coords[,'lat'],
 colnames(mags_pd_obs) <- c("lon", "lat", "obs", "pred")
 
 #mags_map_dat <- cbind(coords[,'lon'], coords[,'lat'], Emu0)
-#write.csv(mags_pd_obs, "Maps/Chapter_1/Data/mags_pred_obs.csv")
+write.csv(mags_pd_obs, "Maps/Chapter_1/Data/2024_09_mags_pred_obs.csv")
 
 
 ### JOINT MODELS --- using output from best joint model:-----
 # load model outputs
-runpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_runs/"
-outpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_outputs/"
+#runpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_runs/"
+#outpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_outputs/"
+runpath <- "CHAPTER_1/2024_09_JAGS_models/model_runs/"
+outpath <- "CHAPTER_1/2024_09_JAGS_models/model_outputs/"
 
-runfile <- "A_best_joint/2024-06-21_modelrun_joint_a_4_b_2_data.RData"
+runfile <- "2024-09-19_modelrun_joint_a_2_b_2_data.RData"
 run <- load(paste0(runpath, runfile))
 # model output
-outfile <- "A_best_joint/2024-06-21_modelrun_joint_a_4_b_2_output.csv"
+outfile <- "2024-09-19_modelrun_joint_a_2_b_2_output.csv"
 out <- read.csv(paste0(outpath, outfile))
 
 # data from model inputs for computing dist prob and dist mag pred/obs
@@ -180,12 +186,13 @@ psb <- grep("^beta", names(preds))
 Ed <- inv.logit(as.matrix(enva) %*% as.matrix(preds[psa]))
 # observed values:
 # make empty matrix to fill with 2016 and 2017 disturbance data
-obsdist_p <- c(rep(NA, nrow(dmr_cs)))
+#obsdist_p <- c(rep(NA, nrow(dmr_cs)))
 # add 1s for disturbances in each year:
-dists <- c(which(dmr_cs$dpy1 == 1), 
-           which(dmr_cs$dpy2 == 1))
-obsdist_p[dists] <- 1
-obsdist_p[is.na(obsdist_p)] <- 0
+obsdist_p <- dmr_cs$dpy1
+# dists <- c(which(dmr_cs$dpy1 == 1), 
+#            which(dmr_cs$dpy2 == 1))
+# obsdist_p[dists] <- 1
+# obsdist_p[is.na(obsdist_p)] <- 0
 # predicted magnitudes:
 Emu0 <- as.matrix(envb) %*% as.matrix(preds[psb])
 # observed values:
@@ -202,7 +209,7 @@ joint_pd_obs <- cbind(coords[,'lon'], coords[,'lat'],
                       obsdist_p, Ed,
                       obsdist_m, preddist_m)
 colnames(joint_pd_obs) <- c("lon", "lat", "a_obs", "a_pred", "b_obs", "b_pred")
-#write.csv(joint_pd_obs, "Maps/Chapter_1/Data/joint_pred_obs.csv")
+#write.csv(joint_pd_obs, "Maps/Chapter_1/Data/2024_09_joint_pred_obs.csv")
 joint_mags_test <- cbind(coords[,'lon'], coords[,'lat'], Emu0)
 
 ### Predicted/Observed plots: -----
