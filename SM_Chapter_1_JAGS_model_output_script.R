@@ -6,6 +6,7 @@ library(tidyverse)
 library(dplyr)
 library(readr)
 library(boot)
+library(rjags)
 #library(MCMCvis)
 #library(ecoforecastR)
 library(ggplot2)
@@ -556,6 +557,66 @@ JAGS_params <- JAGS_params %>%
 colnames(JAGS_params) <- c(gsub("\\.", replacement = " ", colnames(JAGS_params)))
 colnames(JAGS_params) <- c(gsub("a_", "", colnames(JAGS_params)))
 colnames(JAGS_params) <- c(gsub("b_", "", colnames(JAGS_params)))
+
+# 10/7/2024 BEST JAGS MODELS 
+#setwd("/projectnb/dietzelab/malmborg/")
+
+mnames <- c(
+  "2024-10-02_modelrun_joint_a_21_b_14",
+  "2024-10-04_modelrun_joint_a_18_b_14",
+  "2024-10-04_modelrun_joint_a_20_b_17",
+  "2024-10-04_modelrun_joint_a_20_b_15",
+  "2024-10-05_modelrun_joint_a_20_b_14",
+  "2024-09-25_modelrun_alpha_a_10_b_1",
+  "2024-09-26_modelrun_alpha_a_18_b_1",
+  "2024-09-27_modelrun_alpha_a_20_b_1",
+  "2024-09-27_modelrun_alpha_a_21_b_1",
+  "2024-09-11_modelrun_beta_a_1_b_13",
+  "2024-09-11_modelrun_beta_a_1_b_14",
+  "2024-09-12_modelrun_beta_a_1_b_15",
+  "2024-09-13_modelrun_beta_a_1_b_16",
+  "2024-09-13_modelrun_beta_a_1_b_17")
+
+columns <- c("R", "alpha0", "alpha[1]", "alpha[2]", "alpha[3]", "alpha[4]",
+             "alpha[5]", "alpha[6]", "alpha[7]", "alpha[8]", "beta0", 
+             "beta[1]", "beta[2]", "beta[3]","beta[4]",
+             "beta[5]", "beta[6]", "beta[7]", "beta[8]", 
+             "beta[9]", "pa0", "DIC")
+
+best_models <- matrix(data = NA, nrow = length(mnames), ncol = length(columns))
+colnames(best_models) <- columns
+
+for (i in 1:length(mnames)){
+  # load model
+  model <- (paste0("CHAPTER_1/2024_09_JAGS_models/best_models/",
+                   mnames[i],"_data.RData"))
+  load(model)
+  # remove burn in
+  jpout <- model_info$jpout
+  burnin <- 100000
+  jburn <- window(jpout, start = burnin)
+  # extract means
+  summ <- summary(jburn)
+  # fill in DIC
+  best_models[i,"DIC"] <- model_info$dic[[2]]
+  # put names in data frame
+  for (j in names(summ$statistics[,"Mean"])){
+    best_models[i, j] <- summ$statistics[j,"Mean"]
+  }
+}
+
+# round results to 3 digits
+best_models <- as.data.frame(best_models) %>% mutate_if(is.numeric, round, digits = 3)
+# calculate delDIC
+best_models$delDIC <- min(best_models$DIC) - best_models$DIC
+# sort
+best_models <- best_models[order(best_models$delDIC, decreasing = T),]
+# fix two columns for alpha and beta intercepts:
+alpha0_int <- c(best_models$alpha0[which(!is.na(best_models$alpha0))])
+alpha1_int <- c(best_models$`alpha[1]`[which(!is.na(best_models$`alpha[1]`))])
+beta0_int <- c(best_models$beta0[which(!is.na(best_models$beta0))])
+beta1_int <- c(best_models$`beta[1]`[which(!is.na(best_models$`beta[1]`))])
+              
 
 #colnames(JAGS_params) <- c(gsub("_", "-", colnames(JAGS_params)))
 
