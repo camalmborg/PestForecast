@@ -536,27 +536,27 @@ for (i in 1:5){
 
 
 ### JAGS MODEL ANALYSES tables -----
-# load results:
-JAGS_models <- read.csv("CHAPTER_1/2024_JAGS_models/2024_BEST_JAGS_MODELS_RESULTS.csv")
-JAGS_models <- JAGS_models %>% mutate_if(is.numeric, round, digits = 3)
-JAGS_models$dDIC_all <- min(JAGS_models$DIC) - JAGS_models$DIC
-# sort by delDICs:
-JAGS_models <- JAGS_models[order(JAGS_models$dDIC_all, decreasing = T),]
-
-## heatmap figure
-# organize data into numeric-only columns:
-JAGS_params <- cbind(a1_int = JAGS_models$a1_int,
-                     JAGS_models[,grep("^a_", colnames(JAGS_models))],
-                     b1_int = JAGS_models$b1_int,
-                     JAGS_models[,grep("^b_", colnames(JAGS_models))])
-# add row names and nicer-looking column names
-rownames(JAGS_params) <- c(paste0(JAGS_models$model_type," ", JAGS_models$model_rank))
-JAGS_params <- JAGS_params %>%
-  rename('Alpha Intercept' = a1_int) %>%
-  rename('Beta Intercept' = b1_int)
-colnames(JAGS_params) <- c(gsub("\\.", replacement = " ", colnames(JAGS_params)))
-colnames(JAGS_params) <- c(gsub("a_", "", colnames(JAGS_params)))
-colnames(JAGS_params) <- c(gsub("b_", "", colnames(JAGS_params)))
+# # load results:
+#JAGS_models <- read.csv("CHAPTER_1/2024_03_JAGS_models/2024_BEST_JAGS_MODELS_RESULTS.csv")
+# JAGS_models <- JAGS_models %>% mutate_if(is.numeric, round, digits = 3)
+# JAGS_models$dDIC_all <- min(JAGS_models$DIC) - JAGS_models$DIC
+# # sort by delDICs:
+# JAGS_models <- JAGS_models[order(JAGS_models$dDIC_all, decreasing = T),]
+# 
+# ## heatmap figure
+# # organize data into numeric-only columns:
+# JAGS_params <- cbind(a1_int = JAGS_models$a1_int,
+#                      JAGS_models[,grep("^a_", colnames(JAGS_models))],
+#                      b1_int = JAGS_models$b1_int,
+#                      JAGS_models[,grep("^b_", colnames(JAGS_models))])
+# # add row names and nicer-looking column names
+# rownames(JAGS_params) <- c(paste0(JAGS_models$model_type," ", JAGS_models$model_rank))
+# JAGS_params <- JAGS_params %>%
+#   rename('Alpha Intercept' = a1_int) %>%
+#   rename('Beta Intercept' = b1_int)
+# colnames(JAGS_params) <- c(gsub("\\.", replacement = " ", colnames(JAGS_params)))
+# colnames(JAGS_params) <- c(gsub("a_", "", colnames(JAGS_params)))
+# colnames(JAGS_params) <- c(gsub("b_", "", colnames(JAGS_params)))
 
 # 10/7/2024 BEST JAGS MODELS 
 #setwd("/projectnb/dietzelab/malmborg/")
@@ -584,7 +584,11 @@ columns <- c("R", "alpha0", "alpha[1]", "alpha[2]", "alpha[3]", "alpha[4]",
              "beta[9]", "pa0", "DIC")
 
 best_models <- matrix(data = NA, nrow = length(mnames), ncol = length(columns))
+a_vars <- matrix(data = NA, nrow = length(mnames), ncol = length(grep("^a", columns))-1)
+b_vars <- matrix(data = NA, nrow = length(mnames), ncol = length(grep("^b", columns))-1)
 colnames(best_models) <- columns
+colnames(a_vars) <- columns[grep("^a", columns)][-1]
+colnames(b_vars) <- columns[grep("^b", columns)][-1]
 
 for (i in 1:length(mnames)){
   # load model
@@ -603,7 +607,25 @@ for (i in 1:length(mnames)){
   for (j in names(summ$statistics[,"Mean"])){
     best_models[i, j] <- summ$statistics[j,"Mean"]
   }
+  # get variable names
+  if (model_info$metadata$covs == 1){
+    for (k in 1:length(names(model_info$metadata$data$a))){
+      a_vars[i, k] <- names(model_info$metadata$data$a)[k]
+      } 
+    } else if (model_info$metadata$covs == 2) {
+      for (k in 1:length(names(model_info$metadata$data$b))){
+        b_vars[i, k] <- names(model_info$metadata$data$b)[k]
+        }
+      } else if (model_info$metadata$covs == 3){
+        for (k in 1:length(names(model_info$metadata$data$a))){
+          a_vars[i, k] <- names(model_info$metadata$data$a)[k]
+          }
+        for (k in 1:length(names(model_info$metadata$data$b))){
+          b_vars[i, k] <- names(model_info$metadata$data$b)[k]
+    }
+  }
 }
+rm(jburn, jpout, model_info, summ, burnin, i, j, k, model)
 
 # round results to 3 digits
 best_models <- as.data.frame(best_models) %>% mutate_if(is.numeric, round, digits = 3)
@@ -611,14 +633,30 @@ best_models <- as.data.frame(best_models) %>% mutate_if(is.numeric, round, digit
 best_models$delDIC <- min(best_models$DIC) - best_models$DIC
 # sort
 best_models <- best_models[order(best_models$delDIC, decreasing = T),]
-# fix two columns for alpha and beta intercepts:
-alpha0_int <- c(best_models$alpha0[which(!is.na(best_models$alpha0))])
-alpha1_int <- c(best_models$`alpha[1]`[which(!is.na(best_models$`alpha[1]`))])
-beta0_int <- c(best_models$beta0[which(!is.na(best_models$beta0))])
-beta1_int <- c(best_models$`beta[1]`[which(!is.na(best_models$`beta[1]`))])
-              
+# make new alpha and beta intercept columns
+best_models[which(is.na(best_models$alpha0)),'alpha0'] <- c(best_models$`alpha[1]`[which(!is.na(best_models$`alpha[1]`))])
+best_models[which(is.na(best_models$beta0)), 'beta0'] <- c(best_models$`beta[1]`[which(!is.na(best_models$`beta[1]`))])
 
-#colnames(JAGS_params) <- c(gsub("_", "-", colnames(JAGS_params)))
+# matching models to correct variable parameters
+
+# put covariate names in one table
+a_vars[which(a_vars[,1] == "int"),1] <- "a_int"
+b_vars[which(b_vars[,1] == "int"),1] <- "b_int"
+vars <- as.data.frame(cbind(a_vars, b_vars))
+# make matrix to fill
+model_params <- as.data.frame(matrix(data = NA, nrow = length(mnames), ncol = ncol(vars)))
+colnames(model_params) <- c(as.character(vars[which(!is.na(vars["alpha[8]"]))[1], grep("^a", names(vars))]),
+                            as.character(vars[which(!is.na(vars["beta[9]"]))[1], grep("^b", names(vars))]))
+# fill in matrix values
+for (i in 1:nrow(model_params)){
+  for(j in 1:length(names(vars))){
+    var <- vars[i,j]
+    name <- names(vars)[j]
+    model_params[i,var] <- best_models
+  }
+}
+# make final table
+#JAGS_params <- best_models[,c()]
 
 # make values for NAs to be able to print numbers in table
 JAGS_params[is.na(JAGS_params)] <- 1000
@@ -632,46 +670,11 @@ JAGS_params.col <- gsub("FALSE", "black", JAGS_params.col)
 # convert to matrix
 JAGS_params.col <- matrix(JAGS_params.col, ncol = ncol(JAGS_params))
 # add row and column names to make broken-up figures:
-rownames(JAGS_params.col) <- rownames(JAGS_params)
+#rownames(JAGS_params.col) <- rownames(JAGS_params)
 colnames(JAGS_params.col) <- colnames(JAGS_params)
 
-# separate alpha and betas to make multiple heatmaps:
-# JAGS_alpha <- JAGS_models[JAGS_models$model_type == 'alpha', 
-#                           -grep("^b", colnames(JAGS_models))]
-# JAGS_beta <- JAGS_models[JAGS_models$model_type == 'beta',]
-# JAGS_joint <- JAGS_models[JAGS_models$model_type == 'joint',]
-# JAGS_alpha <- JAGS_params[grep("^a", rownames(JAGS_params)), 
-#                           -grep("^b", colnames(JAGS_params))]
-# JAGS_alpha.col <- JAGS_params.col[rownames(JAGS_alpha), colnames(JAGS_alpha)]
-# 
-# JAGS_beta <- JAGS_params[grep("^b", rownames(JAGS_params)), 
-#                           -grep("^a", colnames(JAGS_params))]
-# JAGS_beta.col <- JAGS_params.col[rownames(JAGS_beta), colnames(JAGS_beta)]
-# 
-# JAGS_joint <- JAGS_params[grep("^j", rownames(JAGS_params)),]
-# JAGS_joint.col <- JAGS_params.col[rownames(JAGS_joint), colnames(JAGS_joint)]
-
-# # rename columns
-# # alpha
-# JAGS_alpha <- JAGS_alpha %>%
-#   rename(Intercept = a1_int)
-# colnames(JAGS_alpha) <- c(gsub("\\.", " ", colnames(JAGS_alpha)))
-# colnames(JAGS_alpha) <- c(gsub("a_", "", colnames(JAGS_alpha)))
-# # beta
-# JAGS_beta <- JAGS_beta %>%
-#   rename(Intercept = b1_int)
-# colnames(JAGS_beta) <- c(gsub("\\.", " ", colnames(JAGS_beta)))
-# colnames(JAGS_beta) <- c(gsub("b_", "", colnames(JAGS_beta)))
-# # joint
-# JAGS_joint <- JAGS_joint %>%
-#   rename('Alpha Intercept' = a1_int) %>%
-#   rename('Beta Intercept' = b1_int)
-# colnames(JAGS_joint) <- c(gsub("\\.", " ", colnames(JAGS_joint)))
-# colnames(JAGS_joint) <- c(gsub("a_", "", colnames(JAGS_joint)))
-# colnames(JAGS_joint) <- c(gsub("b_", "", colnames(JAGS_joint)))
-
 # make heatmap:
-png("2024_07_18_JAGS_params_heatmap.png",
+png("2024_10_07_JAGS_params_heatmap.png",
     width = 10, height = 8, units = "in", res = 300)
 superheat(as.matrix(t(JAGS_params)), 
           scale = FALSE, # the scale normalizes to mean 0 SD 1
