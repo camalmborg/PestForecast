@@ -582,11 +582,13 @@ columns <- c("R", "alpha0", "alpha[1]", "alpha[2]", "alpha[3]", "alpha[4]",
              "beta[1]", "beta[2]", "beta[3]","beta[4]",
              "beta[5]", "beta[6]", "beta[7]", "beta[8]", 
              "beta[9]", "pa0", "DIC")
+rows <- gsub(".*n_", "" ,mnames)
 
 best_models <- matrix(data = NA, nrow = length(mnames), ncol = length(columns))
 a_vars <- matrix(data = NA, nrow = length(mnames), ncol = length(grep("^a", columns))-1)
 b_vars <- matrix(data = NA, nrow = length(mnames), ncol = length(grep("^b", columns))-1)
 colnames(best_models) <- columns
+rownames(best_models) <- rows
 colnames(a_vars) <- columns[grep("^a", columns)][-1]
 colnames(b_vars) <- columns[grep("^b", columns)][-1]
 
@@ -634,29 +636,41 @@ best_models$delDIC <- min(best_models$DIC) - best_models$DIC
 # sort
 best_models <- best_models[order(best_models$delDIC, decreasing = T),]
 # make new alpha and beta intercept columns
-best_models[which(is.na(best_models$alpha0)),'alpha0'] <- c(best_models$`alpha[1]`[which(!is.na(best_models$`alpha[1]`))])
-best_models[which(is.na(best_models$beta0)), 'beta0'] <- c(best_models$`beta[1]`[which(!is.na(best_models$`beta[1]`))])
+best_models[which(!is.na(best_models$alpha0)),'alpha[1]'] <- c(best_models$alpha0[which(is.na(best_models$`alpha[1]`))])
+best_models[which(!is.na(best_models$beta0)), 'beta[1]'] <- c(best_models$beta0[which(is.na(best_models$`beta[1]`))])
 
 # matching models to correct variable parameters
-
 # put covariate names in one table
-a_vars[which(a_vars[,1] == "int"),1] <- "a_int"
-b_vars[which(b_vars[,1] == "int"),1] <- "b_int"
+#a_vars[which(a_vars[,1] == "int"),1] <- "a_int"
+#b_vars[which(b_vars[,1] == "int"),1] <- "b_int"
+a_vars[c(which(!is.na(a_vars)))] <- paste0("a_", a_vars[c(which(!is.na(a_vars)))])
+b_vars[c(which(!is.na(b_vars)))] <- paste0("b_", b_vars[c(which(!is.na(b_vars)))])
 vars <- as.data.frame(cbind(a_vars, b_vars))
+rownames(vars) <- rows
 # make matrix to fill
-model_params <- as.data.frame(matrix(data = NA, nrow = length(mnames), ncol = ncol(vars)))
+model_params <- matrix(data = NA, nrow = length(mnames), ncol = ncol(vars))
 colnames(model_params) <- c(as.character(vars[which(!is.na(vars["alpha[8]"]))[1], grep("^a", names(vars))]),
                             as.character(vars[which(!is.na(vars["beta[9]"]))[1], grep("^b", names(vars))]))
+# make NA values 1000 to fill in whole table
 # fill in matrix values
 for (i in 1:nrow(model_params)){
-  for(j in 1:length(names(vars))){
+  for(j in which(!is.na(vars[i,]))){
     var <- vars[i,j]
     name <- names(vars)[j]
-    model_params[i,var] <- best_models
+    model_params[i,var] <- best_models[i,name]
   }
 }
 # make final table
-#JAGS_params <- best_models[,c()]
+JAGS_params <- as.data.frame(cbind(model_params, 
+                                   alpha0 = best_models$alpha0,
+                                   beta0 = best_models$beta0))
+# rename columns
+JAGS_params <- JAGS_params %>%
+  rename('Alpha Intercept' = a_int) %>%
+  rename('Beta Intercept' = b_int)
+colnames(JAGS_params) <- c(gsub("a_", "", colnames(JAGS_params)))
+colnames(JAGS_params) <- c(gsub("b_", "", colnames(JAGS_params)))
+colnames(JAGS_params) <- c(gsub("_", replacement = " ", colnames(JAGS_params)))
 
 # make values for NAs to be able to print numbers in table
 JAGS_params[is.na(JAGS_params)] <- 1000
@@ -683,7 +697,7 @@ superheat(as.matrix(t(JAGS_params)),
           bottom.label.text.angle = 90,
           heat.pal = c("dodgerblue", "skyblue1", "white", "pink1","firebrick1"),
           heat.pal.values = c(0, 0.45, 0.5, 0.55, 1),
-          heat.lim = c(-6,6),
+          heat.lim = c(-7,7),
           legend.num.ticks = 8,
           column.title = "Models",
           row.title = "Parameters",
