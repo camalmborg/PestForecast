@@ -535,7 +535,7 @@ for (i in 1:5){
 
 
 
-### JAGS MODEL ANALYSES tables -----
+### JAGS MODEL HEATMAP -----
 # # load results:
 #JAGS_models <- read.csv("CHAPTER_1/2024_03_JAGS_models/2024_BEST_JAGS_MODELS_RESULTS.csv")
 # JAGS_models <- JAGS_models %>% mutate_if(is.numeric, round, digits = 3)
@@ -660,10 +660,14 @@ for (i in 1:nrow(model_params)){
     model_params[i,var] <- best_models[i,name]
   }
 }
+# fill in intercepts
+model_params[which(is.na(model_params[,"a_int"])), "a_int"] <- best_models$alpha0[which(!is.na(best_models$alpha0))]
+model_params[which(is.na(model_params[,"b_int"])), "b_int"] <- best_models$beta0[which(!is.na(best_models$beta0))]
+
 # make final table
-JAGS_params <- as.data.frame(cbind(model_params, 
-                                   alpha0 = best_models$alpha0,
-                                   beta0 = best_models$beta0))
+JAGS_params <- as.data.frame(cbind(model_params))#, 
+                                   #alpha0 = best_models$alpha0,
+                                   #beta0 = best_models$beta0))
 # rename columns
 JAGS_params <- JAGS_params %>%
   rename('Alpha Intercept' = a_int) %>%
@@ -713,82 +717,82 @@ superheat(as.matrix(t(JAGS_params)),
           legend.vspace = 0.01)
 dev.off()
 
-# three superheats for 3-part figure:
-# ALPHA
-png("2024_JAGS_alpha_heatmap1.png",
-    width = 6.5, height = 3.5, units = "in", res = 300)
-superheat(as.matrix(t(JAGS_alpha)), 
-          scale = FALSE, # the scale normalizes to mean 0 SD 1
-          left.label.text.size = 3,
-          bottom.label.text.size = 3,
-          #bottom.label.text.angle = 90,
-          heat.pal = c("dodgerblue", "skyblue1", "white", "pink1","firebrick1"),
-          heat.pal.values = c(0, 0.45, 0.5, 0.55, 1),
-          heat.lim = c(-6,6),
-          legend.num.ticks = 8,
-          column.title = "Alpha Models",
-          row.title = "Parameters",
-          column.title.size = 4,
-          row.title.size = 4,
-          X.text = as.matrix(t(JAGS_alpha)),
-          X.text.col = t(JAGS_alpha.col),
-          heat.na.col = "grey45",
-          X.text.size = 3,
-          extreme.values.na = TRUE,
-          left.label.size = 0.3,
-          bottom.label.size = 0.15,
-          legend = FALSE)
-dev.off()
-# BETA
-png("2024_JAGS_beta_heatmap1.png",
-    width = 7, height = 4, units = "in", res = 300)
-superheat(as.matrix(t(JAGS_beta)), 
-          scale = FALSE, # the scale normalizes to mean 0 SD 1
-          left.label.text.size = 3,
-          bottom.label.text.size = 3,
-          #bottom.label.text.angle = 90,
-          heat.pal = c("dodgerblue", "skyblue1", "white", "pink1","firebrick1"),
-          heat.pal.values = c(0, 0.45, 0.5, 0.55, 1),
-          heat.lim = c(-6,6),
-          legend.num.ticks = 8,
-          column.title = "Beta Models",
-          row.title = "Parameters",
-          column.title.size = 4,
-          row.title.size = 4,
-          X.text = as.matrix(t(JAGS_beta)),
-          X.text.col = t(JAGS_beta.col),
-          heat.na.col = "grey45",
-          X.text.size = 3,
-          extreme.values.na = TRUE,
-          left.label.size = 0.3,
-          bottom.label.size = 0.15,
-          legend = FALSE)
-dev.off()
-# JOINT
-png("2024_JAGS_joint_heatmap1.png",
-    width = 8, height = 8, units = "in", res = 300)
-superheat(as.matrix(t(JAGS_joint)), 
-          scale = FALSE, # the scale normalizes to mean 0 SD 1
-          left.label.text.size = 3,
-          bottom.label.text.size = 3,
-          #bottom.label.text.angle = 90,
-          heat.pal = c("dodgerblue", "skyblue1", "white", "pink1","firebrick1"),
-          heat.pal.values = c(0, 0.45, 0.5, 0.55, 1),
-          heat.lim = c(-6,6),
-          legend.num.ticks = 8,
-          column.title = "Joint Models",
-          row.title = "Parameters",
-          column.title.size = 4,
-          row.title.size = 4,
-          X.text = as.matrix(t(JAGS_joint)),
-          X.text.col = t(JAGS_joint.col),
-          heat.na.col = "grey45",
-          X.text.size = 3,
-          extreme.values.na = TRUE,
-          left.label.size = 0.3,
-          bottom.label.size = 0.1,
-          legend.vspace = 0.01)
-dev.off()
+# # three superheats for 3-part figure:
+# # ALPHA
+# png("2024_JAGS_alpha_heatmap1.png",
+#     width = 6.5, height = 3.5, units = "in", res = 300)
+# superheat(as.matrix(t(JAGS_alpha)), 
+#           scale = FALSE, # the scale normalizes to mean 0 SD 1
+#           left.label.text.size = 3,
+#           bottom.label.text.size = 3,
+#           #bottom.label.text.angle = 90,
+#           heat.pal = c("dodgerblue", "skyblue1", "white", "pink1","firebrick1"),
+#           heat.pal.values = c(0, 0.45, 0.5, 0.55, 1),
+#           heat.lim = c(-6,6),
+#           legend.num.ticks = 8,
+#           column.title = "Alpha Models",
+#           row.title = "Parameters",
+#           column.title.size = 4,
+#           row.title.size = 4,
+#           X.text = as.matrix(t(JAGS_alpha)),
+#           X.text.col = t(JAGS_alpha.col),
+#           heat.na.col = "grey45",
+#           X.text.size = 3,
+#           extreme.values.na = TRUE,
+#           left.label.size = 0.3,
+#           bottom.label.size = 0.15,
+#           legend = FALSE)
+# dev.off()
+# # BETA
+# png("2024_JAGS_beta_heatmap1.png",
+#     width = 7, height = 4, units = "in", res = 300)
+# superheat(as.matrix(t(JAGS_beta)), 
+#           scale = FALSE, # the scale normalizes to mean 0 SD 1
+#           left.label.text.size = 3,
+#           bottom.label.text.size = 3,
+#           #bottom.label.text.angle = 90,
+#           heat.pal = c("dodgerblue", "skyblue1", "white", "pink1","firebrick1"),
+#           heat.pal.values = c(0, 0.45, 0.5, 0.55, 1),
+#           heat.lim = c(-6,6),
+#           legend.num.ticks = 8,
+#           column.title = "Beta Models",
+#           row.title = "Parameters",
+#           column.title.size = 4,
+#           row.title.size = 4,
+#           X.text = as.matrix(t(JAGS_beta)),
+#           X.text.col = t(JAGS_beta.col),
+#           heat.na.col = "grey45",
+#           X.text.size = 3,
+#           extreme.values.na = TRUE,
+#           left.label.size = 0.3,
+#           bottom.label.size = 0.15,
+#           legend = FALSE)
+# dev.off()
+# # JOINT
+# png("2024_JAGS_joint_heatmap1.png",
+#     width = 8, height = 8, units = "in", res = 300)
+# superheat(as.matrix(t(JAGS_joint)), 
+#           scale = FALSE, # the scale normalizes to mean 0 SD 1
+#           left.label.text.size = 3,
+#           bottom.label.text.size = 3,
+#           #bottom.label.text.angle = 90,
+#           heat.pal = c("dodgerblue", "skyblue1", "white", "pink1","firebrick1"),
+#           heat.pal.values = c(0, 0.45, 0.5, 0.55, 1),
+#           heat.lim = c(-6,6),
+#           legend.num.ticks = 8,
+#           column.title = "Joint Models",
+#           row.title = "Parameters",
+#           column.title.size = 4,
+#           row.title.size = 4,
+#           X.text = as.matrix(t(JAGS_joint)),
+#           X.text.col = t(JAGS_joint.col),
+#           heat.na.col = "grey45",
+#           X.text.size = 3,
+#           extreme.values.na = TRUE,
+#           left.label.size = 0.3,
+#           bottom.label.size = 0.1,
+#           legend.vspace = 0.01)
+# dev.off()
 
 ## make the table:
 # # columns with params
