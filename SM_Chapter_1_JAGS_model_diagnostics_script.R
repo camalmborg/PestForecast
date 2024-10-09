@@ -117,35 +117,35 @@ parse.MatrixNames <- function(w, pre = "x", numeric = FALSE) {
 #                     thin = jthin)
 
 
-## adding code from 10/5/24 - how to extract best model parameter means
-setwd("/projectnb/dietzelab/malmborg/")
-
-mnames <- c("2024-10-05_modelrun_joint_a_20_b_16",
-            "2024-10-05_modelrun_joint_a_20_b_14",
-            "2024-10-05_modelrun_joint_a_10_b_17")
-
-columns <- c("R", "alpha[1]", "alpha[2]", "alpha[3]", "alpha[4]",
-             "alpha[5]", "alpha[6]", "alpha[7]", "alpha[8]",
-             "alpha[9]", "beta[1]", "beta[2]", "beta[3]","beta[4]",
-             "beta[5]", "beta[6]", "beta[7]", "beta[8]", "beta[9]",
-             "beta[10]", "pa0")
-
-best_models <- matrix(data = NA, nrow = length(mnames), ncol = length(columns))
-colnames(best_models) <- columns
-
-for (i in 1:length(mnames)){
-  # load model
-  model <- (paste0("Ch1_PestForecast/model_runs/",
-                   mnames[i],"_data.RData"))
-  load(model)
-  # remove burn in
-  jpout <- model_info$jpout
-  burnin <- 100000
-  jburn <- window(jpout, start = burnin)
-  # extract means
-  summ <- summary(jburn)
-  # put names in data frame
-  for (j in names(summ$statistics[,"Mean"])){
-    best_models[i, j] <- summ$statistics[j,"Mean"]
-  }
-}
+# ## adding code from 10/5/24 - how to extract best model parameter means
+# setwd("/projectnb/dietzelab/malmborg/")
+# 
+# mnames <- c("2024-10-05_modelrun_joint_a_20_b_16",
+#             "2024-10-05_modelrun_joint_a_20_b_14",
+#             "2024-10-05_modelrun_joint_a_10_b_17")
+# 
+# columns <- c("R", "alpha[1]", "alpha[2]", "alpha[3]", "alpha[4]",
+#              "alpha[5]", "alpha[6]", "alpha[7]", "alpha[8]",
+#              "alpha[9]", "beta[1]", "beta[2]", "beta[3]","beta[4]",
+#              "beta[5]", "beta[6]", "beta[7]", "beta[8]", "beta[9]",
+#              "beta[10]", "pa0")
+# 
+# best_models <- matrix(data = NA, nrow = length(mnames), ncol = length(columns))
+# colnames(best_models) <- columns
+# 
+# for (i in 1:length(mnames)){
+#   # load model
+#   model <- (paste0("Ch1_PestForecast/model_runs/",
+#                    mnames[i],"_data.RData"))
+#   load(model)
+#   # remove burn in
+#   jpout <- model_info$jpout
+#   burnin <- 100000
+#   jburn <- window(jpout, start = burnin)
+#   # extract means
+#   summ <- summary(jburn)
+#   # put names in data frame
+#   for (j in names(summ$statistics[,"Mean"])){
+#     best_models[i, j] <- summ$statistics[j,"Mean"]
+#   }
+# }
