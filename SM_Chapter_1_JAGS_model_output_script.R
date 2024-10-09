@@ -25,7 +25,7 @@ library(RColorBrewer)
 load("CHAPTER_1/2024_09_JAGS_models/2024_09_dmls.RData") #making new figures 9/19
 # dpls object:
 load("CHAPTER_1/2024_09_JAGS_models/2024_09_dpls.RData")
-load("CHAPTER_1/2024_09_JAGS_models/2024_09_dpls_2.RData")
+#load("CHAPTER_1/2024_09_JAGS_models/2024_09_dpls_2.RData")
 # find sites with missing output values:
 # choose dmls obj with all environmental data
 find_miss <- dmls[[4]] # one with SMAP
@@ -70,13 +70,13 @@ rm(geo)
 # load best alpha model outputs
 #runpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_runs/"
 #outpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_outputs/"
-outpath <- "CHAPTER_1/2024_09_JAGS_models/model_outputs/alpha/"
-runpath <- "CHAPTER_1/2024_09_JAGS_models/model_runs/alpha/"
+outpath <- "CHAPTER_1/2024_09_JAGS_models/best_models/out/"
+runpath <- "CHAPTER_1/2024_09_JAGS_models/best_models/"
 # model data
-runfile <- "2024-09-09_modelrun_alpha_a_21_b_1_data.RData"
+runfile <- "2024-09-27_modelrun_alpha_a_21_b_1_data.RData"
 run <- load(paste0(runpath, runfile))
 # model output
-outfile <- "2024-09-09_modelrun_alpha_a_21_b_1_output.csv"
+outfile <- "2024-09-27_modelrun_alpha_a_21_b_1_output.csv"
 out <- read.csv(paste0(outpath, outfile))
 
 # data from model inputs for computing dist prob and dist mag pred/obs
@@ -113,21 +113,21 @@ dist16 <- dmr_cs$dpy1
 probs_pd_obs <- cbind.data.frame(coords[,'lon'], coords[,'lat'],
                      dist16, Ed)
 colnames(probs_pd_obs) <- c("lon", "lat", "obs", "pred")
-head(probs_pd_obs[probs_pd_obs$obs == 1,])
-#write.csv(probs_pd_obs, "Maps/Chapter_1/Data/2024_09_probs_pred_obs_test_a_4.csv")
+#head(probs_pd_obs[probs_pd_obs$obs == 1,])
+write.csv(probs_pd_obs, "Maps/Chapter_1/Data/2024_10_probs_pred_obs.csv")
 
   
 ### BETA MODELS --- using output for computing disturbance magnitudes:-----
 # load model outputs
 # runpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_runs/"
 # outpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_outputs/"
-runpath <- "CHAPTER_1/2024_09_JAGS_models/model_runs/beta/"
-outpath <- "CHAPTER_1/2024_09_JAGS_models/model_outputs/beta/"
+runpath <- "CHAPTER_1/2024_09_JAGS_models/best_models/"
+outpath <- "CHAPTER_1/2024_09_JAGS_models/best_models/out/"
 
-runfile <- "2024-09-09_modelrun_beta_a_17_b_1_data.RData"
+runfile <- "2024-09-13_modelrun_beta_a_1_b_17_data.RData"
 run <- load(paste0(runpath, runfile))
 # model output
-outfile <- "2024-09-09_modelrun_beta_a_17_b_1_output.csv"
+outfile <- "2024-09-13_modelrun_beta_a_1_b_17_output.csv"
 out <- read.csv(paste0(outpath, outfile))
 
 # data from model inputs for computing mu
@@ -155,20 +155,20 @@ mags_pd_obs <- cbind(coords[,'lon'], coords[,'lat'],
 colnames(mags_pd_obs) <- c("lon", "lat", "obs", "pred")
 
 #mags_map_dat <- cbind(coords[,'lon'], coords[,'lat'], Emu0)
-write.csv(mags_pd_obs, "Maps/Chapter_1/Data/2024_09_mags_pred_obs.csv")
+write.csv(mags_pd_obs, "Maps/Chapter_1/Data/2024_10_mags_pred_obs.csv")
 
 
 ### JOINT MODELS --- using output from best joint model:-----
 # load model outputs
 #runpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_runs/"
 #outpath <- "CHAPTER_1/2024_JAGS_models/Best_Models_from_SCC/model_outputs/"
-runpath <- "CHAPTER_1/2024_09_JAGS_models/model_runs/"
-outpath <- "CHAPTER_1/2024_09_JAGS_models/model_outputs/"
+runpath <- "CHAPTER_1/2024_09_JAGS_models/best_models/"
+outpath <- "CHAPTER_1/2024_09_JAGS_models/best_models/out/"
 
-runfile <- "2024-09-19_modelrun_joint_a_2_b_2_data.RData"
+runfile <- "2024-10-05_modelrun_joint_a_20_b_14_data.RData"
 run <- load(paste0(runpath, runfile))
 # model output
-outfile <- "2024-09-19_modelrun_joint_a_2_b_2_output.csv"
+outfile <- "2024-10-05_modelrun_joint_a_20_b_14_output.csv"
 out <- read.csv(paste0(outpath, outfile))
 
 # data from model inputs for computing dist prob and dist mag pred/obs
@@ -210,8 +210,8 @@ joint_pd_obs <- cbind(coords[,'lon'], coords[,'lat'],
                       obsdist_p, Ed,
                       obsdist_m, preddist_m)
 colnames(joint_pd_obs) <- c("lon", "lat", "a_obs", "a_pred", "b_obs", "b_pred")
-#write.csv(joint_pd_obs, "Maps/Chapter_1/Data/2024_09_joint_pred_obs.csv")
-joint_mags_test <- cbind(coords[,'lon'], coords[,'lat'], Emu0)
+write.csv(joint_pd_obs, "Maps/Chapter_1/Data/2024_10_joint_pred_obs.csv")
+#joint_mags_test <- cbind(coords[,'lon'], coords[,'lat'], Emu0)
 
 ### Predicted/Observed plots: -----
 # DP ------
@@ -261,17 +261,17 @@ plot_data <- cbind.data.frame(obsdist, preddist)
 pred_obs_lm <- lm(plot_data$obsdist ~ plot_data$preddist, plot_data)
 summ = summary(pred_obs_lm)
 
-#png(mags_plot, "2024_07_distmag_pred_v_obs_joint.png",
-    #width = 6, height = 4, units = "in", res = 300)
-mags_plot <- ggplot(plot_data, aes(x = plot_data[,2], y = plot_data[,1]),
-                    xlim(-20,10), ylim(-20,10)) +
+# png(mags_plot, "2024_10_distmag_pred_v_obs_joint.png",
+#     width = 6, height = 4, units = "in", res = 300)
+mags_plot <- ggplot(plot_data, aes(x = plot_data[,2], y = plot_data[,1])) +
+  coord_cartesian(ylim = c(-14, 5), xlim = c(-15,8)) +
   geom_point(color = "grey50", size = 1) +
   geom_abline(color = "firebrick", lwd = 1) +
   labs(x = "Forest Condition (Predicted Score)",
        y = "Forest Condition (Observed Score)",
        title = "Disturbance Magnitude Predicted vs Observed") +
   annotate("text",
-           x = 3.5, y = -12,
+           x = 12, y = 5,
            #x = 6, y = -12, #for joint
            label = paste("R-squared:", round(summ$adj.r.squared, 3)),
            color = "navyblue", size = 3) +
@@ -281,7 +281,7 @@ mags_plot
 #dev.off()
 # save plot
 ggsave(
-  filename = "2024_07_pred_v_obs_mags_beta.png",
+  filename = "2024_10_pred_v_obs_beta.png",
   plot = mags_plot,
   device = "png",
   width = 7,
