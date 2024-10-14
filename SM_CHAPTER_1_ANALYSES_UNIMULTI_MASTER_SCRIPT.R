@@ -21,6 +21,16 @@ load("DEM_data/DEMdata.RData")  #DEMdata
 
 # load dmls and dpls object from SM_Chapter_1_JAGS_model_output script
 # dmr_tcg and dmr_cs objects have all smap missing values
+load("CHAPTER_1/2024_09_JAGS_models/2024_09_dmls.RData")
+# MANUAL: remove SMAP missing values 4/29/2024
+# choose model with SMAP
+find_miss <- dmls[[4]]
+missing <- as.numeric(rownames(find_miss[!complete.cases(find_miss),]))
+rm(find_miss)
+# run all to remove missing:
+# missing values for dmr objects
+dmr <- dmr[-which(dmr$X %in% missing),]
+dmrcs <- dmrcs[-which(dmrcs$X %in% missing),]
 
 ##### UNIVARIATE ANALYSES SECTION ------------------------------------------------
 ### Function for Univariate mags Analyses AS LIST  (Daymet data):----------------------
