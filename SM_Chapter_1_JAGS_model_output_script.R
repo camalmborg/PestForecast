@@ -142,11 +142,14 @@ ps <- grep("^beta", names(preds))
 # predicted magnitudes
 Emu0 <- as.matrix(env) %*% as.matrix(preds[ps])
 # observed minimum values from disturbance
-obsdist <- dmr_cs$mins
-# prior timestep value
-prior <- data$x_ic
-# predicted score value - magnitude = disturbance
-preddist <- prior + Emu0
+#obsdist <- dmr_cs$mins
+obsdist <- scores$X2016.06.01_score_mean
+
+# predicted condition scores
+Ed <- inv.logit(preds['alpha0'])
+muN <- preds["R"] * model_info$metadata$data$x_ic
+mu <- Ed * Emu0 + (1-Ed) * muN
+
 
 # save data for maps:
 # add coordinates
@@ -179,6 +182,7 @@ enva <- data$a
 envb <- data$b
 # predicted intercept and slope means
 preds <- apply(out, 2, mean)
+
 # get probabilities
 # which outputs are alpha covariates
 psa <- grep("^alpha", names(preds))
@@ -198,11 +202,30 @@ obsdist_p <- dmr_cs$dpy1
 Emu0 <- as.matrix(envb) %*% as.matrix(preds[psb])
 # observed values:
 # observed minimum values from disturbance
-obsdist_m <- dmr_cs$mins
-# prior timestep value
-prior <- data$x_ic
-# predicted score value - magnitude = disturbance
-preddist_m <- prior + Emu0
+#obsdist_m <- dmr_cs$mins
+obsdist_m <- scores$X2016.06.01_score_mean
+# # prior timestep value
+# prior <- data$x_ic
+# # predicted score value - magnitude = disturbance
+# preddist_m <- prior + Emu0
+
+
+### 10/14/2024 - testing joint model estimates:
+muN <- preds["R"] * model_info$metadata$data$x_ic
+mu <- Ed * Emu0 + (1-Ed) * muN
+
+# running through all beta params:
+# b1 <- envb$int * preds["beta.1."]
+# b2 <- envb$mintemp_summ_2014 * preds["beta.2."]
+# b3 <- envb$mintemp_spr_2015 * preds["beta.3."]
+# b4 <- envb$precip_Apr_2016 * preds["beta.4."]
+# b5 <- envb$VPD_summ_2014 * preds["beta.5."]
+# b6 <- envb$VPD_fall_2014 * preds["beta.6."]
+
+# sum = b1 + b2 + b3 + b3 + b4 + b5 + b6
+
+# mu <- Ed * sum + (1-Ed) * muN
+
 
 # save data for maps:
 # add coordinates
