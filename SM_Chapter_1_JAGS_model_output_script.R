@@ -149,7 +149,7 @@ obsdist <- scores$X2016.06.01_score_mean
 Ed <- inv.logit(preds['alpha0'])
 muN <- preds["R"] * model_info$metadata$data$x_ic
 mu <- Ed * Emu0 + (1-Ed) * muN
-
+preddist <- mu
 
 # save data for maps:
 # add coordinates
@@ -158,7 +158,7 @@ mags_pd_obs <- cbind(coords[,'lon'], coords[,'lat'],
 colnames(mags_pd_obs) <- c("lon", "lat", "obs", "pred")
 
 #mags_map_dat <- cbind(coords[,'lon'], coords[,'lat'], Emu0)
-write.csv(mags_pd_obs, "Maps/Chapter_1/Data/2024_10_mags_pred_obs.csv")
+write.csv(mags_pd_obs, "Maps/Chapter_1/Data/2024_10_15_mags_pred_obs.csv")
 
 
 ### JOINT MODELS --- using output from best joint model:-----
@@ -213,6 +213,7 @@ obsdist_m <- scores$X2016.06.01_score_mean
 ### 10/14/2024 - testing joint model estimates:
 muN <- preds["R"] * model_info$metadata$data$x_ic
 mu <- Ed * Emu0 + (1-Ed) * muN
+preddist_m <- mu
 
 # running through all beta params:
 # b1 <- envb$int * preds["beta.1."]
@@ -233,7 +234,7 @@ joint_pd_obs <- cbind(coords[,'lon'], coords[,'lat'],
                       obsdist_p, Ed,
                       obsdist_m, preddist_m)
 colnames(joint_pd_obs) <- c("lon", "lat", "a_obs", "a_pred", "b_obs", "b_pred")
-write.csv(joint_pd_obs, "Maps/Chapter_1/Data/2024_10_joint_pred_obs.csv")
+write.csv(joint_pd_obs, "Maps/Chapter_1/Data/2024_10_15_joint_pred_obs.csv")
 #joint_mags_test <- cbind(coords[,'lon'], coords[,'lat'], Emu0)
 
 ### Predicted/Observed plots: -----
@@ -278,8 +279,8 @@ sqrt(mean(plot_data_roc$roc_fit_m-plot_data_roc$Ed)^2)
 
 # DM: ------
 # data
-#obsdist <- obsdist_m  # for joint
-#preddist <- preddist_m
+obsdist <- obsdist_m  # for joint
+preddist <- preddist_m
 plot_data <- cbind.data.frame(obsdist, preddist)
 pred_obs_lm <- lm(plot_data$obsdist ~ plot_data$preddist, plot_data)
 summ = summary(pred_obs_lm)
@@ -287,14 +288,14 @@ summ = summary(pred_obs_lm)
 # png(mags_plot, "2024_10_distmag_pred_v_obs_joint.png",
 #     width = 6, height = 4, units = "in", res = 300)
 mags_plot <- ggplot(plot_data, aes(x = plot_data[,2], y = plot_data[,1])) +
-  coord_cartesian(ylim = c(-14, 5), xlim = c(-15,8)) +
+  #coord_cartesian(ylim = c(-14, 5), xlim = c(-15,8)) +
   geom_point(color = "grey50", size = 1) +
-  geom_abline(color = "firebrick", lwd = 1) +
+  geom_abline(intercept = 0, slope = 1, color = "firebrick", lwd = 1) +
   labs(x = "Forest Condition (Predicted Score)",
        y = "Forest Condition (Observed Score)",
        title = "Disturbance Magnitude Predicted vs Observed") +
   annotate("text",
-           x = 12, y = 5,
+           x = -7.5, y = 3,
            #x = 6, y = -12, #for joint
            label = paste("R-squared:", round(summ$adj.r.squared, 3)),
            color = "navyblue", size = 3) +
@@ -304,7 +305,7 @@ mags_plot
 #dev.off()
 # save plot
 ggsave(
-  filename = "2024_10_pred_v_obs_beta.png",
+  filename = "2024_10_15_pred_v_obs_joint.png",
   plot = mags_plot,
   device = "png",
   width = 7,
@@ -664,17 +665,16 @@ best_models[which(!is.na(best_models$beta0)), 'beta[1]'] <- c(best_models$beta0[
 
 # matching models to correct variable parameters
 # put covariate names in one table
-#a_vars[which(a_vars[,1] == "int"),1] <- "a_int"
-#b_vars[which(b_vars[,1] == "int"),1] <- "b_int"
 a_vars[c(which(!is.na(a_vars)))] <- paste0("a_", a_vars[c(which(!is.na(a_vars)))])
 b_vars[c(which(!is.na(b_vars)))] <- paste0("b_", b_vars[c(which(!is.na(b_vars)))])
 vars <- as.data.frame(cbind(a_vars, b_vars))
 rownames(vars) <- rows
+vars <- vars[match(rownames(best_models), rownames(vars)),]
+
 # make matrix to fill
 model_params <- matrix(data = NA, nrow = length(mnames), ncol = ncol(vars))
 colnames(model_params) <- c(as.character(vars[which(!is.na(vars["alpha[8]"]))[1], grep("^a", names(vars))]),
                             as.character(vars[which(!is.na(vars["beta[9]"]))[1], grep("^b", names(vars))]))
-# make NA values 1000 to fill in whole table
 # fill in matrix values
 for (i in 1:nrow(model_params)){
   for(j in which(!is.na(vars[i,]))){
@@ -715,7 +715,7 @@ JAGS_params.col <- matrix(JAGS_params.col, ncol = ncol(JAGS_params))
 colnames(JAGS_params.col) <- colnames(JAGS_params)
 
 # make heatmap:
-png("2024_10_07_JAGS_params_heatmap.png",
+png("2024_10_16_JAGS_params_heatmap.png",
     width = 10, height = 8, units = "in", res = 300)
 superheat(as.matrix(t(JAGS_params)), 
           scale = FALSE, # the scale normalizes to mean 0 SD 1
