@@ -101,6 +101,12 @@ dist16 <- dmr_cs$dpy1
 #            which(dmr_cs$dpy2 == 1))
 # obsdist[dists] <- 1
 # obsdist[is.na(obsdist)] <- 0
+beta <- preds[grep("^beta",names(preds))] * -1
+pa0 <- preds[grep("^p",names(preds))]
+Emu0 <- rnorm(nrow(Ed), mean = beta, sd = pa0)
+muN <- preds["R"] * model_info$metadata$data$x_ic
+mu <- Ed * beta + (1-beta) * muN
+preddist <- mu
 
 # percentage of observed disturbances:
 # oD <- sum(dist16 + dist17) / nrow(dmr_cs) * 100
@@ -279,8 +285,8 @@ sqrt(mean(plot_data_roc$roc_fit_m-plot_data_roc$Ed)^2)
 
 # DM: ------
 # data
-obsdist <- obsdist_m  # for joint
-preddist <- preddist_m
+#obsdist <- obsdist_m  # for joint
+#preddist <- preddist_m
 plot_data <- cbind.data.frame(obsdist, preddist)
 pred_obs_lm <- lm(plot_data$obsdist ~ plot_data$preddist, plot_data)
 summ = summary(pred_obs_lm)
@@ -288,14 +294,14 @@ summ = summary(pred_obs_lm)
 # png(mags_plot, "2024_10_distmag_pred_v_obs_joint.png",
 #     width = 6, height = 4, units = "in", res = 300)
 mags_plot <- ggplot(plot_data, aes(x = plot_data[,2], y = plot_data[,1])) +
-  #coord_cartesian(ylim = c(-14, 5), xlim = c(-15,8)) +
+  coord_cartesian(ylim = c(-13, 5), xlim = c(-3.5,1)) +
   geom_point(color = "grey50", size = 1) +
   geom_abline(intercept = 0, slope = 1, color = "firebrick", lwd = 1) +
   labs(x = "Forest Condition (Predicted Score)",
        y = "Forest Condition (Observed Score)",
        title = "Disturbance Magnitude Predicted vs Observed") +
   annotate("text",
-           x = -7.5, y = 3,
+           x = -3.15, y = 4.5,
            #x = 6, y = -12, #for joint
            label = paste("R-squared:", round(summ$adj.r.squared, 3)),
            color = "navyblue", size = 3) +
@@ -305,7 +311,7 @@ mags_plot
 #dev.off()
 # save plot
 ggsave(
-  filename = "2024_10_15_pred_v_obs_joint.png",
+  filename = "2024_10_22_pred_v_obs_alpha.png",
   plot = mags_plot,
   device = "png",
   width = 7,
@@ -316,6 +322,38 @@ ggsave(
 
 #sqrt(mean(plot_data$preddist-plot_data$obsdist, na.rm=T)^2)
 
+
+### histograms - 10/22/24 -----
+hist(obsdist)
+
+# Build dataset with different distributions
+hist_dat <- data.frame(
+  Type = c(rep("Observed", 4990), 
+           #rep("Disturbance Magnitude-only", 4990), 
+           rep("Predicted", 4990)),
+  Value = c(obsdist, preddist_m))
+
+# Represent it
+p <- hist_dat %>%
+  ggplot(aes(x=Value, fill=Type)) +
+  geom_histogram(alpha=0.6, 
+                 position = 'identity',
+                 bins = 50) +
+  scale_fill_manual(values=c("#FF5454", "#3DA5FF")) +
+  theme_ipsum() +
+  labs(x = "Forest Condition Score")
+
+p
+
+ggsave(
+  filename = "2024_10_22_pred_v_obs_joint_histogram.png",
+  plot = p,
+  device = "png",
+  width = 7,
+  height = 4,
+  units = "in",#c("in", "in"),
+  dpi = 300 #"print"
+)
 
 ### Example time series for conceptual figure ---------------------------
 # get the condition scores for time series examples
