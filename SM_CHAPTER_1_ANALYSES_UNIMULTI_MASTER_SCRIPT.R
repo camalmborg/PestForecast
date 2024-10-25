@@ -18,6 +18,9 @@ load("2024_08_dm_seas_grab.RData")  #dmvars_seas
 load("SMAP_data/2024_04_SMAP.RData")  #SMAP
 load("DEM_data/DEMdata.RData")  #DEMdata
 #viirs <- read.csv("viirs_data/2023_06_21_5000sample_viirs_3.csv")
+# MV_oct2024 <- cbind(dmvars[[1]], dmvars[[2]], dmvars[[3]], dmvars[[4]],
+#                     dmvars_seas[[1]], dmvars_seas[[2]], dmvars_seas[[3]], dmvars_seas[[4]],
+#                     SMAP, DEMdata)
 
 # load dmls and dpls object from SM_Chapter_1_JAGS_model_output script
 # dmr_tcg and dmr_cs objects have all smap missing values
