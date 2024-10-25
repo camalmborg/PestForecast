@@ -328,10 +328,10 @@ hist(obsdist)
 
 # Build dataset with different distributions
 hist_dat <- data.frame(
-  Type = c(rep("Observed", 4990), 
+  Type = c(rep("Steady State", 4990), 
            #rep("Disturbance Magnitude-only", 4990), 
-           rep("Predicted", 4990)),
-  Value = c(obsdist, preddist_m))
+           rep("Disturbed", 4990)),
+  Value = c(dmr_cs$steady, obsdist))
 
 # Represent it
 p <- hist_dat %>%
@@ -346,7 +346,7 @@ p <- hist_dat %>%
 p
 
 ggsave(
-  filename = "2024_10_22_pred_v_obs_joint_histogram.png",
+  filename = "2024_10_22_steady_vs_disturbance_histogram.png",
   plot = p,
   device = "png",
   width = 7,
