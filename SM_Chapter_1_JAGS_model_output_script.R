@@ -325,28 +325,36 @@ ggsave(
 
 ### histograms - 10/22/24 -----
 hist(obsdist)
+# for joint
+preddist <- preddist_m
 
 # Build dataset with different distributions
 hist_dat <- data.frame(
-  Type = c(rep("Steady State", 4990), 
-           #rep("Disturbance Magnitude-only", 4990), 
-           rep("Disturbed", 4990)),
+  Type = c(#rep("Steady State", 4990), 
+           rep("Steady State", 4990), 
+           rep("2016 Disturbance", 4990)),
   Value = c(dmr_cs$steady, obsdist))
+  #Value = c(preddist, obsdist))
 
 # Represent it
 p <- hist_dat %>%
   ggplot(aes(x=Value, fill=Type)) +
-  geom_histogram(alpha=0.6, 
-                 position = 'identity',
-                 bins = 50) +
+  geom_density(alpha=0.6, 
+                 position = 'identity') +
   scale_fill_manual(values=c("#FF5454", "#3DA5FF")) +
-  theme_ipsum() +
-  labs(x = "Forest Condition Score")
-
+  xlab("Forest Condition Score") +
+  guides(fill=guide_legend("")) +
+  expand_limits(x = c(-13, 4)) +
+  theme(panel.background = element_rect(fill = 'white'),
+        panel.grid.major = element_line(color = 'grey90', linewidth = 0.25),
+        panel.grid.minor = element_line(color = 'grey90', linewidth = 0.25),
+        axis.line = element_line(colour = "black"))
+  
 p
 
 ggsave(
-  filename = "2024_10_22_steady_vs_disturbance_histogram.png",
+  #filename = "2024_10_22_steady_vs_disturbance_histogram.png",
+  filename = "steady_vs_disturbed_density.png",
   plot = p,
   device = "png",
   width = 7,
