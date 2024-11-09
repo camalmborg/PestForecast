@@ -294,28 +294,28 @@ summ = summary(pred_obs_lm)
 # png(mags_plot, "2024_10_distmag_pred_v_obs_joint.png",
 #     width = 6, height = 4, units = "in", res = 300)
 mags_plot <- ggplot(plot_data, aes(x = plot_data[,2], y = plot_data[,1])) +
-  coord_cartesian(ylim = c(-13, 5), xlim = c(-3.5,1)) +
+  coord_cartesian(ylim = c(-13, 4), xlim = c(-13,4)) +
   geom_point(color = "grey50", size = 1) +
   geom_abline(intercept = 0, slope = 1, color = "firebrick", lwd = 1) +
   labs(x = "Forest Condition (Predicted Score)",
        y = "Forest Condition (Observed Score)",
        title = "Disturbance Magnitude Predicted vs Observed") +
   annotate("text",
-           x = -3.15, y = 4.5,
+           x = -10, y = 0,
            #x = 6, y = -12, #for joint
-           label = paste("R-squared:", round(summ$adj.r.squared, 3)),
-           color = "navyblue", size = 3) +
+           label = paste("R-squared:", round(summ$adj.r.squared, 4)),
+           color = "navyblue", size = 3.5) +
   theme_classic()
   #geom_smooth(method=lm , color="red", se=FALSE)
 mags_plot
 #dev.off()
 # save plot
 ggsave(
-  filename = "2024_10_22_pred_v_obs_alpha.png",
+  filename = "2024_11_09_pred_v_obs_alpha.png",
   plot = mags_plot,
   device = "png",
-  width = 7,
-  height = 4,
+  width = 6,
+  height = 6,
   units = "in",#c("in", "in"),
   dpi = 300 #"print"
 )
