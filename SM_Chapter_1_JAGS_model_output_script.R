@@ -895,6 +895,52 @@ dev.off()
   # )
 
 
+### PAIRS PLOTS ------
+
+## for covariates:
+# get all variables
+#dm_vars <- dmls[[17]]
+#dp_vars <- dpls[[18]]
+dp_vars <- model_info$metadata$data$a
+dm_vars <- model_info$metadata$data$b
+
+# make pairs plots
+covs <- dp_vars
+png("2024_11_11_cov_pairs_plot_dp.png",
+    width = 10, height = 8, units = "in", res = 300)
+pairs(covs[,2:ncol(covs)])
+dev.off()
+
+# for model outputs:
+file_names <- list.files("CHAPTER_1/all_JAGS_models/")
+mnames <- gsub("_data.RData", "", file_names)
+bestybest <- which(best_models$delDIC > -6)
+
+mnames <- mnames[c(bestybest)]
+
+for (i in 1:length(mnames)){
+  # load model
+  model <- (paste0("CHAPTER_1/all_JAGS_models/",
+                   mnames[i], "_data.RData"))
+  load(model)
+
+  # get JAGS output
+  jpout <- model_info$jpout
+  # remove burn in
+  burnin <- 100000
+  jburn <- window(jpout, start = burnin)
+  # thin output
+  samps <- coda.samples(jburn, n.iter = 1000, thin = 10)
+  #make pairs plot
+  out <- as.matrix(jburn)
+  pairs(out)
+}
+
+png("2024_11_11_best_model_pairs_plot_output.png",
+    width = 10, height = 8, units = "in", res = 300)
+pairs(out)
+dev.off()
+
 ##### ARCHIVE ##### -----------------------------------------------------
 ### PLOTTING AND TABLE STUFF FOR EFI CONFERENCE
 
