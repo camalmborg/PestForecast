@@ -18,7 +18,7 @@ file<-"2022_08_31_DATAGRAB/2022_08_31_5k_score_mean - 2022_08_31_5k_score_mean.c
 
 #condition score object:
 cond.scores<-read.csv(file)
-cond.samp<-cond.scores[1:2,]
+cond.samp<-cond.scores[c(sample(nrow(sites),100)),]
 
 
 #### Function for grabbing daymet data:-----
@@ -50,7 +50,7 @@ spongy_met<-function(scores,startyr,endyr,var,filenm,VorS){
   nsites<-1:nrow(scores)
   sites<-as.data.frame(cbind(nsites,coords))
   ######these lines were for testing: ###
-  #sites<-sites[1:5,]
+  #sites<-sites[c(sample(nrow(sites),100)),]
   #nsites<-1:nrow(sites)
   
   ##Section for downloading daymet for each site:
@@ -268,6 +268,10 @@ dmvars<-spongy_met(cond.scores,2014,2016,
                    c("tmax..deg.c.","tmin..deg.c.","prcp..mm.day.","vp..Pa."),
                    c("maxtemp","mintemp","pcp","vpd"),1)
 save(dmvars, file = "2024_08_dm_grab.RData")
+
+#getting precip data 11/15/2024
+dm_rain <- spongy_met(cond.samp, 2000,2020, c("prcp..mm.day"),
+                      c("pcp"), 1)
 
 
 # test_dmv <- spongy_met(cond.samp, 2015, 2017, c("tmax..deg.c.", "tmin..deg.c."),

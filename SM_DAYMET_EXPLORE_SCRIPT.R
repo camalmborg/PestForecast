@@ -1,7 +1,40 @@
 # This code is for the daymet exploratory analyses
 
 #load data if not in environment:
-load("DMVARS_MO.RData")
+#load("DMVARS_MO.RData")
+
+# 11/26/2024
+load("2024_08_dm_grab.RData")
+names <- read.table("colnamesbcimstupid.txt")
+varcolnames <- as.character(names[,2])
+# data frame the daymet data:
+daymet <- cbind.data.frame(dmvars[[1]], dmvars[[2]], dmvars[[3]], dmvars[[4]])
+colnames(daymet) <- varcolnames
+write.csv(daymet, "2024_11_26_Daymet_For_Supp.csv")
+
+# add column names:
+years <- c("2014", "2015", "2016")
+variable <- c("maxtemp", "mintemp", "precip", "vpd")
+month <- as.character(1:12)
+
+# 
+#   for (i in 1:length(variable)){
+#     for (j in 1:length(years)){
+#       for (k in 1:length(month)){
+#          print(paste0(years[j],"_",
+#                month[k],"_",
+#                variable[i]))
+#       }
+#     }
+#   }
+# printed to console, copied and pasted as a txt and loaded in - has names
+
+
+# for (i in 1:length(variable)){
+#   for(i in 1:length(years)){
+#     print(paste0(years[j],"_",variable[i],"_"))
+#   }
+# }
 
 # necessary libraries:
 library(mgcv)
