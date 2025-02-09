@@ -511,4 +511,4 @@ aics[i] <- mv_gam$aic
 model_vars[i] <- paste(vars,collapse=",")
 
 #best_distprob_models_cs <- cbind(model_num, aucs, aics, model_vars)
-#git test 
+#git test 2
