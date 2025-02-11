@@ -41,6 +41,7 @@ ptc <- nlcd$percent_tree_cover
 # change 41 (deciduous forest class) to 1 for setting reference class in gam
 lc <- replace(lc, lc == 41, 1)
 # column number for disturbance years
+dmr <- dmrcs
 cn <- as.matrix(as.numeric(dmr$colnum))
 # which response variable? "mags" for dist mag, "dpy1" or "dpy2" for dist prob
 #yvar <- "mags"
@@ -65,16 +66,20 @@ nlcd_gam <- gam(y ~ as.factor(lc), data = dat)
 summ <- summary(nlcd_gam)
 r2 <- summ$r.sq
 aic <- nlcd_gam$aic
-#ran 2/11/2025: r2 = 0.186744, aic = -4278.522635 for y = mags
-#ran 2/11/2025: r2 = 0.090457, aic = 2002.571447 for y = dpy1
+#ran 2/11/2025: r2 = 0.186744, aic = -4278.522635 for y = mags tcg
+#               r2 = 0.093025, aic = 8104.702825 for y = mags CS
+#ran 2/11/2025: r2 = 0.090457, aic = 2002.571447 for y = dpy1 tcg
+#               r2 = 0.0707096, aic = 1771.436604 for y = dpy1 CS
 
 # do with percent tree cover
 nlcd_ptc_gam <- gam(y ~ as.factor(ptc), data = dat)
 summ <- summary(nlcd_ptc_gam)
 r2 <- summ$r.sq
 aic <- nlcd_ptc_gam$aic
-#ran 2/11/2025 r2 = 0.0984026, aic = -4084.3285187 for y = mags
-#ran 2/11/2025 r2 = 0.0457663, aic = 2098.2506737 for y = dpy1
+#ran 2/11/2025 r2 = 0.0984026, aic = -4084.3285187 for y = mags tcg
+#              r2 = 0.0500345, aic = 8195.4280983 for y = mags cs
+#ran 2/11/2025 r2 = 0.0457663, aic = 2098.2506737 for y = dpy1 tcg
+#              r2 = 0.0399439, aic = 1838.1852318 for y = dpy1 cs
 
 # disturbance probability
 nlcd_gam <- gam(y ~ as.factor(lc), data = dat, family = "binomial", method = "REML")
