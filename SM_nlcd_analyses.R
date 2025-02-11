@@ -90,7 +90,7 @@ nlcd_roc <- multiclass.roc(dmr$dpy1, lc)
 roc <- nlcd_roc$auc
 aic <- nlcd_gam$aic
 #ran 2/11/25 roc = 0.454, aic = 1938.28555
-
+#            roc = 0.0399943, aic - 1771.436604
 # notes:
 # convert categories to factor
 # 
