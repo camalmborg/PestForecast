@@ -7,8 +7,9 @@ library(ggplot2)
 library(tidyverse)
 library(dplyr)
 library(stringr)
-library(kableExtra)
 library(knitr)
+library(gt)
+library(gtExtras)
 
 ### Load data and files:
 
@@ -20,19 +21,34 @@ data_products <- read.csv("CHAPTER_1/Figures/Tables/Data_Products_Table.csv")
 colnames(data_products) <- str_replace_all(colnames(data_products), "\\.", " ")
 colnames(data_products)[6] <- "Temporal Resolution (for analyses)"
 
-# png("2024_09_Ch1_data_products_table.png", 
-#     width = 8, height = 5, units ="in", res = 800)
-# prep table
-table <- kbl(data_products, align = "l") %>%
-  kable_classic(full_width = F, html_font = "Cambria", font_size = 10) %>%
-  row_spec(0, bold = TRUE)
+table <- data_products %>% 
+  gt() %>%
+  tab_options(table.font.names = 'Times New Roman',
+              column_labels.font.weight = 'bold',
+              heading.title.font.size = 14,
+              heading.subtitle.font.size = 14,
+              table.font.color = 'black',
+              table.font.size = 12) %>%
+  tab_header(title = "Table 1: Covariate Data for Univariate and Multivariate Model Selection") %>%
+  opt_align_table_header("left") %>%
+  #gt_theme_pff() %>%
+  cols_width(everything() ~ px(90)) %>%
+  opt_table_font(size = 12)
+
+gtsave(table, "2025_05_11_T1_data_products_table.png")
 
 
+# # png("2024_09_Ch1_data_products_table.png", 
+# #     width = 8, height = 5, units ="in", res = 800)
+# # prep table
+# table <- kbl(data_products, align = "l") %>%
+#   kable_classic(full_width = F, html_font = "Cambria", font_size = 10) %>%
+#   row_spec(0, bold = TRUE)
 
-save_kable(table, "2024_09_Ch1_data_products_table.html")
-webshot::webshot("2024_09_Ch1_data_products_table.html",
-                 file = "2024_09_Ch1_data_products_table.png")
-dev.off
+# save_kable(table, "2024_09_Ch1_data_products_table.html")
+# webshot::webshot("2024_09_Ch1_data_products_table.html",
+#                  file = "2024_09_Ch1_data_products_table.png")
+# dev.off
 
 
 
